@@ -9,8 +9,7 @@ public class MasterPassword {
 	public MasterPassword() {
 	}
 
-	public MasterPassword(final String profileName,
-			final String encryptedSecretKey, final String salt) {
+	public MasterPassword(final String profileName, final String encryptedSecretKey, final String salt) {
 		this.profileName = profileName;
 		this.encryptedSecretKey = encryptedSecretKey;
 		this.salt = salt;

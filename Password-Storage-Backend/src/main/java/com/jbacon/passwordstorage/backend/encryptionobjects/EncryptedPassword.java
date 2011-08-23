@@ -54,7 +54,6 @@ public class EncryptedPassword implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Name: " + encryptedPasswordName + ", Type: " + passwordType
-				+ ", URL: " + encryptedWebsiteUrl;
+		return "Name: " + encryptedPasswordName + ", Type: " + passwordType + ", URL: " + encryptedWebsiteUrl;
 	}
 }

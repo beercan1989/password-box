@@ -14,10 +14,17 @@ public class EncrypterUtils {
 	private static final String TEXT_ENCODING_TYPE = "UTF-8";
 	private static final String AES_ENCRYPTION_KEY_TYPE = "AES";
 
+	public String byteToString(final byte[] byteToString) throws EncrypterException {
+		try {
+			return new String(byteToString, TEXT_ENCODING_TYPE);
+		} catch (UnsupportedEncodingException e) {
+			throw new EncrypterException("Failed to convert the string to a byte array", e);
+		}
+	}
+
 	public byte[] generateAesEncryptionKey() throws EncrypterException {
 		try {
-			KeyGenerator keyGenerator = KeyGenerator
-					.getInstance(AES_ENCRYPTION_KEY_TYPE);
+			KeyGenerator keyGenerator = KeyGenerator.getInstance(AES_ENCRYPTION_KEY_TYPE);
 			keyGenerator.init(AES_ENCRYPTION_KEY_LENGTH);
 			SecretKey secretKey = keyGenerator.generateKey();
 			return secretKey.getEncoded();
@@ -30,8 +37,7 @@ public class EncrypterUtils {
 		return generateSalt(DEFAULT_SALT_LENGTH);
 	}
 
-	public byte[] generateSalt(final int numberOfBytes)
-			throws EncrypterException {
+	public byte[] generateSalt(final int numberOfBytes) throws EncrypterException {
 		try {
 			byte[] salt = new byte[numberOfBytes];
 			SecureRandom saltGen = SecureRandom.getInstance(SECURE_SALT_ALGORITHM);
@@ -42,23 +48,11 @@ public class EncrypterUtils {
 		}
 	}
 
-	public byte[] stringToByte(final String stringToByte)
-			throws EncrypterException {
+	public byte[] stringToByte(final String stringToByte) throws EncrypterException {
 		try {
 			return stringToByte.getBytes(TEXT_ENCODING_TYPE);
 		} catch (UnsupportedEncodingException e) {
-			throw new EncrypterException(
-					"Failed to convert the string to a byte array", e);
-		}
-	}
-
-	public String byteToString(final byte[] byteToString)
-			throws EncrypterException {
-		try {
-			return new String(byteToString, TEXT_ENCODING_TYPE);
-		} catch (UnsupportedEncodingException e) {
-			throw new EncrypterException(
-					"Failed to convert the string to a byte array", e);
+			throw new EncrypterException("Failed to convert the string to a byte array", e);
 		}
 	}
 }
