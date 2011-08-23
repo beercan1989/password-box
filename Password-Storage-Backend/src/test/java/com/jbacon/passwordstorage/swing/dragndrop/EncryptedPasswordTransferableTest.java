@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class TransferableEncryptedPasswordTest {
+public class EncryptedPasswordTransferableTest {
 
     @Test
     public void testTransferableEncryptedPassword() {
