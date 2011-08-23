@@ -8,33 +8,22 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 
 import com.jbacon.passwordstorage.backend.encryptionobjects.EncryptedPassword;
 
-public class TransferableEncryptedPassword implements Transferable, ClipboardOwner {
-
-    public static DataFlavor encryptedPasswordFlavor = null;
-    public static DataFlavor localEncryptedPasswordFlavor = null;
+public class EncryptedPasswordTransferable implements Transferable, ClipboardOwner {
 
     private final EncryptedPassword encryptedPassword;
 
-    static {
-        try {
-            encryptedPasswordFlavor = new DataFlavor(EncryptedPassword.class, "Non Local EncryptedPassword");
-            localEncryptedPasswordFlavor = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + "; class=EncryptedPassword", "Local EncryptedPassword");
-        } catch (Exception e) {
-        }
-    }
-
-    public TransferableEncryptedPassword(final EncryptedPassword encryptedPassword) {
+    public EncryptedPasswordTransferable(final EncryptedPassword encryptedPassword) {
         this.encryptedPassword = encryptedPassword;
     }
 
     @Override
     public DataFlavor[] getTransferDataFlavors() {
-        return new DataFlavor[] { encryptedPasswordFlavor, localEncryptedPasswordFlavor };
+        return new DataFlavor[] { EncryptionPasswordDataFlavour.encryptedPasswordFlavor, EncryptionPasswordDataFlavour.localEncryptedPasswordFlavor };
     }
 
     @Override
     public boolean isDataFlavorSupported(final DataFlavor flavor) {
-        if (flavor.equals(encryptedPasswordFlavor) || flavor.equals(localEncryptedPasswordFlavor)) {
+        if (flavor.equals(EncryptionPasswordDataFlavour.encryptedPasswordFlavor) || flavor.equals(EncryptionPasswordDataFlavour.localEncryptedPasswordFlavor)) {
             return true;
         }
         return false;
@@ -42,7 +31,7 @@ public class TransferableEncryptedPassword implements Transferable, ClipboardOwn
 
     @Override
     public Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException {
-        if (flavor.equals(encryptedPasswordFlavor) || flavor.equals(localEncryptedPasswordFlavor)) {
+        if (flavor.equals(EncryptionPasswordDataFlavour.encryptedPasswordFlavor) || flavor.equals(EncryptionPasswordDataFlavour.localEncryptedPasswordFlavor)) {
             return encryptedPassword;
         }
         throw new UnsupportedFlavorException(flavor);
