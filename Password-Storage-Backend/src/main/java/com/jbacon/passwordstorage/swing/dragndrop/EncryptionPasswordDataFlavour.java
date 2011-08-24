@@ -10,10 +10,7 @@ public class EncryptionPasswordDataFlavour extends DataFlavor {
     public static DataFlavor localEncryptedPasswordFlavor = null;
 
     static {
-        try {
-            encryptedPasswordFlavor = new DataFlavor(EncryptedPassword.class, "Non Local EncryptedPassword");
-            localEncryptedPasswordFlavor = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + "; class=EncryptedPassword", "Local EncryptedPassword");
-        } catch (Exception e) {
-        }
+        encryptedPasswordFlavor = new DataFlavor(EncryptedPassword.class, "Non Local EncryptedPassword");
+        localEncryptedPasswordFlavor = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + "; class=EncryptedPassword", "Local EncryptedPassword");
     }
 }
