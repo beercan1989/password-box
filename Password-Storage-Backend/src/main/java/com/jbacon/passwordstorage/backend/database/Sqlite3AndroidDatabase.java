@@ -2,8 +2,8 @@ package com.jbacon.passwordstorage.backend.database;
 
 import java.util.List;
 
-import com.jbacon.passwordstorage.backend.encryptionobjects.EncryptedPassword;
-import com.jbacon.passwordstorage.backend.encryptionobjects.MasterPassword;
+import com.jbacon.passwordstorage.backend.encryption.objects.EncryptedPassword;
+import com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword;
 
 public class Sqlite3AndroidDatabase implements Sqlite3Database {
 

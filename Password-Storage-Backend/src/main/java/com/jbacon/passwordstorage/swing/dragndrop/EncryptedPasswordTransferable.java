@@ -6,7 +6,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 
-import com.jbacon.passwordstorage.backend.encryptionobjects.EncryptedPassword;
+import com.jbacon.passwordstorage.backend.encryption.objects.EncryptedPassword;
 
 public class EncryptedPasswordTransferable implements Transferable, ClipboardOwner {
 

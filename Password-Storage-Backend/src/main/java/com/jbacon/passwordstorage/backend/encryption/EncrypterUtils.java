@@ -9,7 +9,7 @@ import javax.crypto.SecretKey;
 
 public class EncrypterUtils {
 	private static final int DEFAULT_SALT_LENGTH = 8;
-	private static final int AES_ENCRYPTION_KEY_LENGTH = 128;
+	private static final int AES_ENCRYPTION_KEY_LENGTH = 256;
 	private static final String SECURE_SALT_ALGORITHM = "SHA1PRNG";
 	private static final String TEXT_ENCODING_TYPE = "UTF-8";
 	private static final String AES_ENCRYPTION_KEY_TYPE = "AES";

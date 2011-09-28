@@ -1,4 +1,4 @@
-package com.jbacon.passwordstorage.backend.encryptionobjects;
+package com.jbacon.passwordstorage.backend.encryption.objects;
 
 import java.io.Serializable;
 

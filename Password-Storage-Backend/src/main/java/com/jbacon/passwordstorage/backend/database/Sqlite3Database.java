@@ -2,8 +2,8 @@ package com.jbacon.passwordstorage.backend.database;
 
 import java.util.List;
 
-import com.jbacon.passwordstorage.backend.encryptionobjects.EncryptedPassword;
-import com.jbacon.passwordstorage.backend.encryptionobjects.MasterPassword;
+import com.jbacon.passwordstorage.backend.encryption.objects.EncryptedPassword;
+import com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword;
 
 public interface Sqlite3Database {
 	public EncryptedPassword getStoredPassword(String passwordName);
