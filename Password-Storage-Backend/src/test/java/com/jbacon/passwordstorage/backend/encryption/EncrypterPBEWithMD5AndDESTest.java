@@ -10,22 +10,12 @@ import org.junit.runner.RunWith;
 public class EncrypterPBEWithMD5AndDESTest {
 
 	@Test
-	public void testEncryptWithPassword() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	@Test
 	public void testDecryptWithPassword() {
 		fail("Not yet implemented"); // TODO
 	}
 
 	@Test
-	public void testGenerateSalt() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	@Test
-	public void testGenerateSaltInt() {
+	public void testEncryptWithPassword() {
 		fail("Not yet implemented"); // TODO
 	}
 

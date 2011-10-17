@@ -14,45 +14,34 @@ public class EncrypterUtils {
 	private static final String TEXT_ENCODING_TYPE = "UTF-8";
 	private static final String AES_ENCRYPTION_KEY_TYPE = "AES";
 
-	public String byteToString(final byte[] byteToString) throws EncrypterException {
-		try {
-			return new String(byteToString, TEXT_ENCODING_TYPE);
-		} catch (UnsupportedEncodingException e) {
-			throw new EncrypterException("Failed to convert the string to a byte array", e);
-		}
+	public String byteToString(final byte[] byteToString) throws UnsupportedEncodingException {
+		return new String(byteToString, TEXT_ENCODING_TYPE);
 	}
 
-	public byte[] generateAesEncryptionKey() throws EncrypterException {
-		try {
-			KeyGenerator keyGenerator = KeyGenerator.getInstance(AES_ENCRYPTION_KEY_TYPE);
-			keyGenerator.init(AES_ENCRYPTION_KEY_LENGTH);
-			SecretKey secretKey = keyGenerator.generateKey();
-			return secretKey.getEncoded();
-		} catch (NoSuchAlgorithmException e) {
-			throw new EncrypterException("No Such Encryption Key Algorithm", e);
+	public byte[] generateAesEncryptionKey() throws NoSuchAlgorithmException {
+		KeyGenerator keyGenerator = KeyGenerator.getInstance(AES_ENCRYPTION_KEY_TYPE);
+		keyGenerator.init(AES_ENCRYPTION_KEY_LENGTH);
+		SecretKey secretKey = keyGenerator.generateKey();
+
+		for (int i = 0; i < secretKey.getEncoded().length; i++) {
+			System.out.println(secretKey.getEncoded()[i]);
 		}
+
+		return secretKey.getEncoded();
 	}
 
-	public byte[] generateSalt() throws EncrypterException {
+	public byte[] generateSalt() throws NoSuchAlgorithmException {
 		return generateSalt(DEFAULT_SALT_LENGTH);
 	}
 
-	public byte[] generateSalt(final int numberOfBytes) throws EncrypterException {
-		try {
-			byte[] salt = new byte[numberOfBytes];
-			SecureRandom saltGen = SecureRandom.getInstance(SECURE_SALT_ALGORITHM);
-			saltGen.nextBytes(salt);
-			return salt;
-		} catch (NoSuchAlgorithmException e) {
-			throw new EncrypterException("No Such Salt Generation Algorithm", e);
-		}
+	public byte[] generateSalt(final int numberOfBytes) throws NoSuchAlgorithmException {
+		byte[] salt = new byte[numberOfBytes];
+		SecureRandom saltGen = SecureRandom.getInstance(SECURE_SALT_ALGORITHM);
+		saltGen.nextBytes(salt);
+		return salt;
 	}
 
-	public byte[] stringToByte(final String stringToByte) throws EncrypterException {
-		try {
-			return stringToByte.getBytes(TEXT_ENCODING_TYPE);
-		} catch (UnsupportedEncodingException e) {
-			throw new EncrypterException("Failed to convert the string to a byte array", e);
-		}
+	public byte[] stringToByte(final String stringToByte) throws UnsupportedEncodingException {
+		return stringToByte.getBytes(TEXT_ENCODING_TYPE);
 	}
 }

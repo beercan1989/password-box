@@ -10,7 +10,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 public class EncrypterAES implements Encrypter {
-	private static final String ENCRYPTION_TYPE = "AES";
+	private static final String ENCRYPTION_TYPE = "AES"; // AES
 
 	public byte[] decryptWithAes(final byte[] toDecrypt, final byte[] aesKey) throws EncrypterException {
 		try {
