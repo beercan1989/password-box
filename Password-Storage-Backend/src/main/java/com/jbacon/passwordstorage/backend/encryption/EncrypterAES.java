@@ -10,7 +10,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 public class EncrypterAES implements Encrypter {
-	private static final String ENCRYPTION_TYPE = "AES"; // AES
+	protected static final String ENCRYPTION_TYPE = "AES";
 
 	public byte[] decryptWithAes(final byte[] toDecrypt, final byte[] aesKey) throws EncrypterException {
 		try {
@@ -23,7 +23,7 @@ public class EncrypterAES implements Encrypter {
 		} catch (NoSuchPaddingException e) {
 			throw new EncrypterException("No Such Encryption Padding Found", e);
 		} catch (InvalidKeyException e) {
-			throw new EncrypterException("Invalid Encryption Key", e);
+			throw new EncrypterException("Invalid Encryption Key - You may need the Unlimited JCE Policies.", e);
 		} catch (IllegalBlockSizeException e) {
 			throw new EncrypterException(e);
 		} catch (BadPaddingException e) {

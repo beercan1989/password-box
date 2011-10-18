@@ -12,21 +12,15 @@ public class EncrypterUtils {
 	private static final int AES_ENCRYPTION_KEY_LENGTH = 256;
 	private static final String SECURE_SALT_ALGORITHM = "SHA1PRNG";
 	private static final String TEXT_ENCODING_TYPE = "UTF-8";
-	private static final String AES_ENCRYPTION_KEY_TYPE = "AES";
 
 	public String byteToString(final byte[] byteToString) throws UnsupportedEncodingException {
 		return new String(byteToString, TEXT_ENCODING_TYPE);
 	}
 
 	public byte[] generateAesEncryptionKey() throws NoSuchAlgorithmException {
-		KeyGenerator keyGenerator = KeyGenerator.getInstance(AES_ENCRYPTION_KEY_TYPE);
+		KeyGenerator keyGenerator = KeyGenerator.getInstance(EncrypterAES.ENCRYPTION_TYPE);
 		keyGenerator.init(AES_ENCRYPTION_KEY_LENGTH);
 		SecretKey secretKey = keyGenerator.generateKey();
-
-		for (int i = 0; i < secretKey.getEncoded().length; i++) {
-			System.out.println(secretKey.getEncoded()[i]);
-		}
-
 		return secretKey.getEncoded();
 	}
 

@@ -1,6 +1,11 @@
 package com.jbacon.passwordstorage.backend.encryption;
 
-import static org.junit.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
@@ -12,37 +17,34 @@ import com.jbacon.passwordstorage.backend.database.DatabaseException;
 
 public class EncrypterAESTest {
 
-	private static byte[] hexStringToByteArray(final String s) {
-		int len = s.length();
-		byte[] data = new byte[len / 2];
-		for (int i = 0; i < len; i += 2) {
-			data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
-		}
-		return data;
-	}
-
 	private EncrypterAES encrypter;
-	private EncrypterUtils encrypterUtils;
+
+	private final byte[] toEncrypt = new byte[] { 72, 101, 108, 108, 111, 87, 111, 114, 108, 100 };
+	private final byte[] toDecrypt = new byte[] { 64, -32, -57, 114, 0, 55, -73, -29, -33, 106, -70, 41, 32, 55, 92, -14 };
+	private final byte[] aesKey = new byte[] { -57, -92, -38, -41, -8, -26, -13, -121, -100, -31, -106, 43, -64, -41, -57, 22, -55, -82, -99, -5, -123, -9,
+			-19, -106, 15, -65, -102, 16, -23, -88, -18, 26 };
 
 	@Before
-	public void setup() throws DatabaseException {
+	public void setup() throws DatabaseException, UnsupportedEncodingException, NoSuchAlgorithmException {
 		EncrypterFactory encrypterFactory = new EncrypterFactory();
 		encrypter = (EncrypterAES) encrypterFactory.getEncrypter(EncrypterType.AES_ENCRYPTER);
-		encrypterUtils = new EncrypterUtils();
 	}
 
 	@Test
-	public void testDecryptWithAes() throws EncrypterException, NoSuchAlgorithmException {
-		// byte[] result = encrypter.decryptWithAes(toDecrypt, aesKey);
-		fail("Not Implemented Yet");
-	}
-
-	@Test
-	public void testEncryptWithAes() throws UnsupportedEncodingException, NoSuchAlgorithmException, EncrypterException {
-		byte[] toEncrypt = encrypterUtils.stringToByte("HelloWorld");
-		byte[] aesKey = encrypterUtils.generateAesEncryptionKey();
-
+	public void test01EncryptWithAes() throws UnsupportedEncodingException, NoSuchAlgorithmException, EncrypterException {
 		byte[] result = encrypter.encryptWithAes(toEncrypt, aesKey);
+
+		assertThat(result, is(not(nullValue())));
+		assertThat(result.length, is(greaterThan(0)));
+		assertThat(result, is(equalTo(toDecrypt)));
 	}
 
+	@Test
+	public void test02DecryptWithAes() throws EncrypterException, UnsupportedEncodingException, NoSuchAlgorithmException {
+		byte[] result = encrypter.decryptWithAes(toDecrypt, aesKey);
+
+		assertThat(result, is(not(nullValue())));
+		assertThat(result.length, is(greaterThan(0)));
+		assertThat(result, is(equalTo(toEncrypt)));
+	}
 }
