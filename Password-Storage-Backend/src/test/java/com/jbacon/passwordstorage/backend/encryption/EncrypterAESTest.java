@@ -9,23 +9,30 @@ import static org.hamcrest.Matchers.nullValue;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.jbacon.passwordstorage.backend.database.DatabaseException;
 
 public class EncrypterAESTest {
 
-	private EncrypterAES encrypter;
+	@BeforeClass
+	public static void setupBeforeClass() {
+		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+	}
 
+	private EncrypterAES encrypter;
 	private final byte[] toEncrypt = new byte[] { 72, 101, 108, 108, 111, 87, 111, 114, 108, 100 };
 	private final byte[] toDecrypt = new byte[] { 64, -32, -57, 114, 0, 55, -73, -29, -33, 106, -70, 41, 32, 55, 92, -14 };
+
 	private final byte[] aesKey = new byte[] { -57, -92, -38, -41, -8, -26, -13, -121, -100, -31, -106, 43, -64, -41, -57, 22, -55, -82, -99, -5, -123, -9,
 			-19, -106, 15, -65, -102, 16, -23, -88, -18, 26 };
 
 	@Before
-	public void setup() throws DatabaseException, UnsupportedEncodingException, NoSuchAlgorithmException {
+	public void setupBeforeTest() throws DatabaseException, UnsupportedEncodingException, NoSuchAlgorithmException {
 		EncrypterFactory encrypterFactory = new EncrypterFactory();
 		encrypter = (EncrypterAES) encrypterFactory.getEncrypter(EncrypterType.AES_ENCRYPTER);
 	}

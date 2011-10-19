@@ -9,11 +9,19 @@ import static org.junit.Assert.assertThat;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.Security;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class EncrypterUtilsTest {
+
+	@BeforeClass
+	public static void setupBeforeClass() {
+		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+	}
 
 	private EncrypterUtils encrypterUtils;
 
@@ -33,12 +41,12 @@ public class EncrypterUtilsTest {
 	}
 
 	@Test
-	public void shouldGenerateAesEncryptionKey() throws NoSuchAlgorithmException {
+	public void shouldGenerateAesEncryptionKey() throws NoSuchAlgorithmException, NoSuchProviderException {
 		assertThat(encrypterUtils.generateAesEncryptionKey().length, is(equalTo(32)));
 	}
 
 	@Test
-	public void shouldGenerateDefaultSaltValue() throws NoSuchAlgorithmException {
+	public void shouldGenerateDefaultSaltValue() throws NoSuchAlgorithmException, NoSuchProviderException {
 		byte[] generatedSalt = encrypterUtils.generateSalt();
 		assertThat(generatedSalt, is(not(nullValue())));
 		assertThat(generatedSalt.length, is(not(lessThanOrEqualTo(0))));
@@ -47,7 +55,7 @@ public class EncrypterUtilsTest {
 	}
 
 	@Test
-	public void shouldGenerateSaltValue() throws NoSuchAlgorithmException {
+	public void shouldGenerateSaltValue() throws NoSuchAlgorithmException, NoSuchProviderException {
 		byte[] generatedSalt = encrypterUtils.generateSalt(18);
 		assertThat(generatedSalt, is(not(nullValue())));
 		assertThat(generatedSalt.length, is(not(lessThanOrEqualTo(0))));
