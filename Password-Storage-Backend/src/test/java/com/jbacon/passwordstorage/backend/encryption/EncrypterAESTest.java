@@ -11,6 +11,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,7 +22,7 @@ public class EncrypterAESTest {
 
 	@BeforeClass
 	public static void setupBeforeClass() {
-		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+		Security.addProvider(new BouncyCastleProvider());
 	}
 
 	private EncrypterAES encrypter;
@@ -34,12 +35,12 @@ public class EncrypterAESTest {
 	@Before
 	public void setupBeforeTest() throws DatabaseException, UnsupportedEncodingException, NoSuchAlgorithmException {
 		EncrypterFactory encrypterFactory = new EncrypterFactory();
-		encrypter = (EncrypterAES) encrypterFactory.getEncrypter(EncrypterType.AES_ENCRYPTER);
+		encrypter = (EncrypterAES) encrypterFactory.getEncrypter(EncryptionType.AES);
 	}
 
 	@Test
 	public void test01EncryptWithAes() throws UnsupportedEncodingException, NoSuchAlgorithmException, EncrypterException {
-		byte[] result = encrypter.encryptWithAes(toEncrypt, aesKey);
+		byte[] result = encrypter.doCiper(EncryptionMode.ENCRYPT_MODE, toEncrypt, aesKey);
 
 		assertThat(result, is(not(nullValue())));
 		assertThat(result.length, is(greaterThan(0)));
@@ -48,7 +49,7 @@ public class EncrypterAESTest {
 
 	@Test
 	public void test02DecryptWithAes() throws EncrypterException, UnsupportedEncodingException, NoSuchAlgorithmException {
-		byte[] result = encrypter.decryptWithAes(toDecrypt, aesKey);
+		byte[] result = encrypter.doCiper(EncryptionMode.DECRYPT_MODE, toDecrypt, aesKey);
 
 		assertThat(result, is(not(nullValue())));
 		assertThat(result.length, is(greaterThan(0)));

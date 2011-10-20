@@ -7,15 +7,15 @@ import com.jbacon.passwordstorage.backend.database.DatabaseException;
 
 public class EncrypterFactory {
 
-	private final Map<EncrypterType, Encrypter> encrypters;
+	private final Map<EncryptionType, Encrypter> encrypters;
 
 	public EncrypterFactory() {
-		encrypters = new EnumMap<EncrypterType, Encrypter>(EncrypterType.class);
-		encrypters.put(EncrypterType.AES_ENCRYPTER, new EncrypterAES());
-		encrypters.put(EncrypterType.PBEWithMD5AndDES_ENCRYPTER, new EncrypterPBEWithMD5AndDES());
+		encrypters = new EnumMap<EncryptionType, Encrypter>(EncryptionType.class);
+		encrypters.put(EncryptionType.AES, new EncrypterAES());
+		encrypters.put(EncryptionType.PBE_WITH_MD5_AND_DES, new EncrypterPBEWithMD5AndDES());
 	}
 
-	public Encrypter getEncrypter(final EncrypterType encrypterType) throws DatabaseException {
+	public Encrypter getEncrypter(final EncryptionType encrypterType) throws DatabaseException {
 		if (!encrypters.containsKey(encrypterType)) {
 			throw new DatabaseException("Unsupported encrypter type [" + encrypterType.name() + "]");
 		}

@@ -19,8 +19,8 @@ public class EncrypterUtils {
 	}
 
 	public byte[] generateAesEncryptionKey() throws NoSuchAlgorithmException, NoSuchProviderException {
-		KeyGenerator keyGenerator = KeyGenerator.getInstance(EncrypterAES.ENCRYPTION_TYPE, EncrypterAES.ENCRYPTION_PROVIDER);
-		keyGenerator.init(EncrypterAES.ENCRYPTION_KEY_LENGTH);
+		KeyGenerator keyGenerator = KeyGenerator.getInstance(EncryptionType.AES.algorithm());
+		keyGenerator.init(EncryptionType.AES.keyLength());
 		SecretKey secretKey = keyGenerator.generateKey();
 		return secretKey.getEncoded();
 	}

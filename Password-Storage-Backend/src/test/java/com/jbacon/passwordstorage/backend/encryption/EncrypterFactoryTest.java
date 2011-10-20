@@ -22,20 +22,20 @@ public class EncrypterFactoryTest {
 
 	@Test
 	public void shouldCreateAesEncrypter() throws DatabaseException {
-		Encrypter result = encrypterFactory.getEncrypter(EncrypterType.AES_ENCRYPTER);
+		Encrypter result = encrypterFactory.getEncrypter(EncryptionType.AES);
 		assertThat(result, is(not(nullValue())));
 		assertThat(result, is(instanceOf(EncrypterAES.class)));
 	}
 
 	@Test
 	public void shouldCreatePbeEncrypter() throws DatabaseException {
-		Encrypter result = encrypterFactory.getEncrypter(EncrypterType.PBEWithMD5AndDES_ENCRYPTER);
+		Encrypter result = encrypterFactory.getEncrypter(EncryptionType.PBE_WITH_MD5_AND_DES);
 		assertThat(result, is(not(nullValue())));
 		assertThat(result, is(instanceOf(EncrypterPBEWithMD5AndDES.class)));
 	}
 
 	@Test(expected = DatabaseException.class)
 	public void shouldThrowExceptionOnBadEncrypterType() throws DatabaseException {
-		encrypterFactory.getEncrypter(EncrypterType.UnsupportedPBEWithSHA256AndAES);
+		encrypterFactory.getEncrypter(EncryptionType.UNSUPPORTED_TYPE);
 	}
 }

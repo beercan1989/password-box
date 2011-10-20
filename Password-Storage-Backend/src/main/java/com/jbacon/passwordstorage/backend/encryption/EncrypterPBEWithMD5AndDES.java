@@ -16,7 +16,7 @@ import javax.crypto.spec.PBEParameterSpec;
 
 public class EncrypterPBEWithMD5AndDES implements Encrypter {
 	private static final int ENCRYPTION_ITERATION_COUNT = 20;
-	private static final String ENCRYPTION_TYPE = "PBEWithMD5AndDES";
+	private static final String ENCRYPTION_TYPE = "PBE_WITH_MD5_AND_DES";
 
 	public byte[] decryptWithPassword(final byte[] salt, final byte[] toDecrypt, final char[] passPhrase) throws EncrypterException {
 		try {
