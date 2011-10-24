@@ -1,19 +1,19 @@
-package com.jbacon.passwordstorage.backend.database;
+package com.jbacon.passwordstorage.backend.encryption;
 
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
 //@RunWith(JMock.class)
-public class DatabaseFactoryTest {
+public class EncrypterPBETest {
 
     @Test
-    public void testDatabaseFactory() {
+    public void testDecryptWithPassword() {
         fail("Not yet implemented"); // TODO
     }
 
     @Test
-    public void testGetInstance() {
+    public void testEncryptWithPassword() {
         fail("Not yet implemented"); // TODO
     }
 
