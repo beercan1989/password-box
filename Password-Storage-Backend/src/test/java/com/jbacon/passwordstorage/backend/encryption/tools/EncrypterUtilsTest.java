@@ -1,4 +1,4 @@
-package com.jbacon.passwordstorage.backend.encryption;
+package com.jbacon.passwordstorage.backend.encryption.tools;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -16,6 +16,8 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.jbacon.passwordstorage.backend.encryption.tools.EncrypterUtils;
 
 public class EncrypterUtilsTest {
 

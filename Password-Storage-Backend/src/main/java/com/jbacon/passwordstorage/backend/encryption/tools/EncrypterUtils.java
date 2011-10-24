@@ -1,4 +1,4 @@
-package com.jbacon.passwordstorage.backend.encryption;
+package com.jbacon.passwordstorage.backend.encryption.tools;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
@@ -7,6 +7,8 @@ import java.security.SecureRandom;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+
+import com.jbacon.passwordstorage.backend.encryption.EncryptionType;
 
 public class EncrypterUtils {
 
@@ -18,9 +20,9 @@ public class EncrypterUtils {
 		return new String(byteToString, TEXT_ENCODING_TYPE);
 	}
 
-	public byte[] generateAesEncryptionKey() throws NoSuchAlgorithmException, NoSuchProviderException {
-		KeyGenerator keyGenerator = KeyGenerator.getInstance(EncryptionType.AES.algorithm());
-		keyGenerator.init(EncryptionType.AES.keyLength());
+	public byte[] generateAesEncryptionKey(final EncryptionType encryptionType) throws NoSuchAlgorithmException, NoSuchProviderException {
+		KeyGenerator keyGenerator = KeyGenerator.getInstance(encryptionType.algorithm());
+		keyGenerator.init(encryptionType.keyLength());
 		SecretKey secretKey = keyGenerator.generateKey();
 		return secretKey.getEncoded();
 	}

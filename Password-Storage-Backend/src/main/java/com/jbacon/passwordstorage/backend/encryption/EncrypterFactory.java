@@ -11,8 +11,8 @@ public class EncrypterFactory {
 
 	public EncrypterFactory() {
 		encrypters = new EnumMap<EncryptionType, Encrypter>(EncryptionType.class);
-		encrypters.put(EncryptionType.AES, new EncrypterAES());
-		encrypters.put(EncryptionType.PBE_WITH_MD5_AND_DES, new EncrypterPBEWithMD5AndDES());
+		encrypters.put(EncryptionType.AES_256, new EncrypterAES());
+		encrypters.put(EncryptionType.PBE_WITH_MD5_AND_DES, new EncrypterPBE());
 	}
 
 	public Encrypter getEncrypter(final EncryptionType encrypterType) throws DatabaseException {

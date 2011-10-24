@@ -2,11 +2,7 @@ package com.jbacon.passwordstorage.backend.encryption;
 
 public enum EncryptionType {
 
-	/** Supported Encryption Type */
-	AES("AES", 256, true),
-
-	/** Supported Encryption Type */
-	PBE_WITH_MD5_AND_DES("", 8, true),
+	AES_256("AES", 256, true), AES_128("AES", 128, true), PBE_WITH_MD5_AND_DES("PBE_WITH_MD5_AND_DES", 20, true),
 
 	/** Unsupported - Test Value */
 	UNSUPPORTED_TYPE("", 0, false);

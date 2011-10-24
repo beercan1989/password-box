@@ -17,6 +17,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.jbacon.passwordstorage.backend.database.DatabaseException;
+import com.jbacon.passwordstorage.backend.encryption.error.AbstractEncrypterException;
 
 public class EncrypterAESTest {
 
@@ -35,11 +36,11 @@ public class EncrypterAESTest {
 	@Before
 	public void setupBeforeTest() throws DatabaseException, UnsupportedEncodingException, NoSuchAlgorithmException {
 		EncrypterFactory encrypterFactory = new EncrypterFactory();
-		encrypter = (EncrypterAES) encrypterFactory.getEncrypter(EncryptionType.AES);
+		encrypter = (EncrypterAES) encrypterFactory.getEncrypter(EncryptionType.AES_256);
 	}
 
 	@Test
-	public void test01EncryptWithAes() throws UnsupportedEncodingException, NoSuchAlgorithmException, EncrypterException {
+	public void test01EncryptWithAes() throws UnsupportedEncodingException, NoSuchAlgorithmException, AbstractEncrypterException {
 		byte[] result = encrypter.doCiper(EncryptionMode.ENCRYPT_MODE, toEncrypt, aesKey);
 
 		assertThat(result, is(not(nullValue())));
@@ -48,7 +49,7 @@ public class EncrypterAESTest {
 	}
 
 	@Test
-	public void test02DecryptWithAes() throws EncrypterException, UnsupportedEncodingException, NoSuchAlgorithmException {
+	public void test02DecryptWithAes() throws AbstractEncrypterException, UnsupportedEncodingException, NoSuchAlgorithmException {
 		byte[] result = encrypter.doCiper(EncryptionMode.DECRYPT_MODE, toDecrypt, aesKey);
 
 		assertThat(result, is(not(nullValue())));

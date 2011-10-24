@@ -22,7 +22,7 @@ public class EncrypterFactoryTest {
 
 	@Test
 	public void shouldCreateAesEncrypter() throws DatabaseException {
-		Encrypter result = encrypterFactory.getEncrypter(EncryptionType.AES);
+		Encrypter result = encrypterFactory.getEncrypter(EncryptionType.AES_256);
 		assertThat(result, is(not(nullValue())));
 		assertThat(result, is(instanceOf(EncrypterAES.class)));
 	}
@@ -31,7 +31,7 @@ public class EncrypterFactoryTest {
 	public void shouldCreatePbeEncrypter() throws DatabaseException {
 		Encrypter result = encrypterFactory.getEncrypter(EncryptionType.PBE_WITH_MD5_AND_DES);
 		assertThat(result, is(not(nullValue())));
-		assertThat(result, is(instanceOf(EncrypterPBEWithMD5AndDES.class)));
+		assertThat(result, is(instanceOf(EncrypterPBE.class)));
 	}
 
 	@Test(expected = DatabaseException.class)
