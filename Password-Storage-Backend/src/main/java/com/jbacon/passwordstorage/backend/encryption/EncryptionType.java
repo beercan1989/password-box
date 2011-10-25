@@ -1,36 +1,42 @@
 package com.jbacon.passwordstorage.backend.encryption;
 
+import com.jbacon.passwordstorage.backend.encryption.errors.NoSuchEncryptionException;
+import com.jbacon.passwordstorage.backend.encryption.specifications.EncryptionSpecification;
+import com.jbacon.passwordstorage.backend.encryption.specifications.EncryptionSpecificationAES;
+import com.jbacon.passwordstorage.backend.encryption.specifications.EncryptionSpecificationPBE;
+
 public enum EncryptionType {
 
-	AES_256("AES", 256, true), AES_128("AES", 128, true), PBE_WITH_MD5_AND_DES("PBE_WITH_MD5_AND_DES", 20, true),
+	AES_256("AES", true), AES_128("AES", true), PBE_WITH_MD5_AND_DES("PBE_WITH_MD5_AND_DES", true),
 
 	/** Unsupported - Test Value */
-	UNSUPPORTED_TYPE("", 0, false);
+	UNSUPPORTED_TYPE("", false);
 
-	private String algorithm;
-	private int keyLength;
-	private boolean isSupported;
-	private final String provider = "BC";
+	private static final int AES_128_KEY_SIZE = 128;
+	private static final int AES_256_KEY_SIZE = 256;
+	private static final int PBE_MD5_DES_SALT_SIZE = 8;
+	private static final int PBE_MD5_DES_ITERATION_COUNT = 20;
+	private static final String PBE_MD5_DES_SALT_ALGORITHM = "SHA1PRNG";
 
-	private EncryptionType(final String algorithm, final Integer keyLength, final boolean isSupported) {
-		this.algorithm = algorithm;
-		this.keyLength = keyLength;
+	public static final String PROVIDER_NAME = "BC";
+	public final String algorithmName;
+	public final boolean isSupported;
+
+	private EncryptionType(final String algorithm, final boolean isSupported) {
+		this.algorithmName = algorithm;
 		this.isSupported = isSupported;
 	}
 
-	public String algorithm() {
-		return algorithm;
-	}
-
-	public boolean isSupported() {
-		return isSupported;
-	}
-
-	public int keyLength() {
-		return keyLength;
-	}
-
-	public String provider() {
-		return provider;
+	public EncryptionSpecification getSpecification() throws NoSuchEncryptionException {
+		switch (this) {
+		case AES_128:
+			return new EncryptionSpecificationAES(AES_128_KEY_SIZE);
+		case AES_256:
+			return new EncryptionSpecificationAES(AES_256_KEY_SIZE);
+		case PBE_WITH_MD5_AND_DES:
+			return new EncryptionSpecificationPBE(PBE_MD5_DES_SALT_SIZE, PBE_MD5_DES_ITERATION_COUNT, PBE_MD5_DES_SALT_ALGORITHM);
+		default:
+			throw new NoSuchEncryptionException();
+		}
 	}
 }

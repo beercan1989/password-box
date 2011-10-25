@@ -1,4 +1,4 @@
-package com.jbacon.passwordstorage.backend.encryption.error;
+package com.jbacon.passwordstorage.backend.encryption.errors;
 
 public class NoSuchEncryptionException extends AbstractEncrypterException {
 

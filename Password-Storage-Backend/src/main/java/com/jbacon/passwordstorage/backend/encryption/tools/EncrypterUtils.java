@@ -9,31 +9,49 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 import com.jbacon.passwordstorage.backend.encryption.EncryptionType;
+import com.jbacon.passwordstorage.backend.encryption.errors.InvalidEncryptionTypeChangeException;
+import com.jbacon.passwordstorage.backend.encryption.errors.NoSuchEncryptionException;
 
 public class EncrypterUtils {
 
-	private static final int DEFAULT_SALT_LENGTH = 8;
-	private static final String SECURE_SALT_ALGORITHM = "SHA1PRNG";
+	private static final String SALT_SIZE = "saltSize";
+	private static final String KEY_SIZE = "keysize";
+	private static final String SECURE_SALT_ALGORITHM = "secureSaltAlgorithm";
 	private static final String TEXT_ENCODING_TYPE = "UTF-8";
 
 	public String byteToString(final byte[] byteToString) throws UnsupportedEncodingException {
 		return new String(byteToString, TEXT_ENCODING_TYPE);
 	}
 
-	public byte[] generateAesEncryptionKey(final EncryptionType encryptionType) throws NoSuchAlgorithmException, NoSuchProviderException {
-		KeyGenerator keyGenerator = KeyGenerator.getInstance(encryptionType.algorithm());
-		keyGenerator.init(encryptionType.keyLength());
+	public byte[] generateAesEncryptionKey(final EncryptionType encryptionType) throws NoSuchAlgorithmException, NoSuchProviderException,
+			NoSuchEncryptionException {
+		KeyGenerator keyGenerator = KeyGenerator.getInstance(encryptionType.algorithmName);
+		keyGenerator.init((Integer) encryptionType.getSpecification().get(KEY_SIZE));
 		SecretKey secretKey = keyGenerator.generateKey();
 		return secretKey.getEncoded();
 	}
 
-	public byte[] generateSalt() throws NoSuchAlgorithmException, NoSuchProviderException {
-		return generateSalt(DEFAULT_SALT_LENGTH);
+	public byte[] generateSalt(final EncryptionType encryptionType) throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchEncryptionException,
+			InvalidEncryptionTypeChangeException {
+		switch (encryptionType) {
+		case PBE_WITH_MD5_AND_DES:
+			break;
+		default:
+			throw new InvalidEncryptionTypeChangeException();
+		}
+		return generateSalt(encryptionType, (Integer) encryptionType.getSpecification().get(SALT_SIZE));
 	}
 
-	public byte[] generateSalt(final int numberOfBytes) throws NoSuchAlgorithmException, NoSuchProviderException {
+	public byte[] generateSalt(final EncryptionType encryptionType, final Integer numberOfBytes) throws NoSuchAlgorithmException, NoSuchProviderException,
+			NoSuchEncryptionException, InvalidEncryptionTypeChangeException {
+		switch (encryptionType) {
+		case PBE_WITH_MD5_AND_DES:
+			break;
+		default:
+			throw new InvalidEncryptionTypeChangeException();
+		}
 		byte[] salt = new byte[numberOfBytes];
-		SecureRandom saltGen = SecureRandom.getInstance(SECURE_SALT_ALGORITHM);
+		SecureRandom saltGen = SecureRandom.getInstance((String) encryptionType.getSpecification().get(SECURE_SALT_ALGORITHM));
 		saltGen.nextBytes(salt);
 		return salt;
 	}

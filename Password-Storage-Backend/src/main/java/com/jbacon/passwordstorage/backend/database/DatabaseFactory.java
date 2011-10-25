@@ -3,7 +3,7 @@ package com.jbacon.passwordstorage.backend.database;
 import java.util.EnumMap;
 import java.util.Map;
 
-import com.jbacon.passwordstorage.backend.database.error.UnsupportedDatabaseException;
+import com.jbacon.passwordstorage.backend.database.errors.UnsupportedDatabaseException;
 
 public class DatabaseFactory {
 

@@ -10,11 +10,11 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.jbacon.passwordstorage.backend.encryption.error.AbstractEncrypterException;
-import com.jbacon.passwordstorage.backend.encryption.error.BouncyCastleNotInstalledException;
-import com.jbacon.passwordstorage.backend.encryption.error.InvalidEncryptionTypeChangeException;
-import com.jbacon.passwordstorage.backend.encryption.error.NoSuchEncryptionException;
-import com.jbacon.passwordstorage.backend.encryption.error.UnlimitedJcePoliciesNotInstalledException;
+import com.jbacon.passwordstorage.backend.encryption.errors.AbstractEncrypterException;
+import com.jbacon.passwordstorage.backend.encryption.errors.BouncyCastleNotInstalledException;
+import com.jbacon.passwordstorage.backend.encryption.errors.InvalidEncryptionTypeChangeException;
+import com.jbacon.passwordstorage.backend.encryption.errors.NoSuchEncryptionException;
+import com.jbacon.passwordstorage.backend.encryption.errors.UnlimitedJcePoliciesNotInstalledException;
 
 public class EncrypterAES implements Encrypter {
 
@@ -28,6 +28,7 @@ public class EncrypterAES implements Encrypter {
 		this.encryptionType = encryptionType;
 	}
 
+	@Override
 	public void changeEncryptionType(final EncryptionType encryptionType) throws InvalidEncryptionTypeChangeException {
 		switch (encryptionType) {
 		case AES_128:
@@ -41,8 +42,8 @@ public class EncrypterAES implements Encrypter {
 
 	public byte[] doCiper(final EncryptionMode encryptionMode, final byte[] cipherText, final byte[] aesKey) throws AbstractEncrypterException {
 		try {
-			SecretKeySpec secretKeySpecification = new SecretKeySpec(aesKey, encryptionType.algorithm());
-			Cipher cipher = Cipher.getInstance(encryptionType.algorithm(), encryptionType.provider());
+			SecretKeySpec secretKeySpecification = new SecretKeySpec(aesKey, encryptionType.algorithmName);
+			Cipher cipher = Cipher.getInstance(encryptionType.algorithmName, EncryptionType.PROVIDER_NAME);
 			cipher.init(encryptionMode.mode(), secretKeySpecification);
 			return cipher.doFinal(cipherText);
 

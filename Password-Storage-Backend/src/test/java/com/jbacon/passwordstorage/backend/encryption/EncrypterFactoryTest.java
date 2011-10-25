@@ -9,7 +9,7 @@ import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.jbacon.passwordstorage.backend.encryption.error.NoSuchEncryptionException;
+import com.jbacon.passwordstorage.backend.encryption.errors.NoSuchEncryptionException;
 
 public class EncrypterFactoryTest {
 

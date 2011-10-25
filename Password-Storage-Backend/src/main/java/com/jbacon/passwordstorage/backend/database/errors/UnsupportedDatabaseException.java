@@ -1,4 +1,4 @@
-package com.jbacon.passwordstorage.backend.database.error;
+package com.jbacon.passwordstorage.backend.database.errors;
 
 public class UnsupportedDatabaseException extends Exception {
 

@@ -3,7 +3,7 @@ package com.jbacon.passwordstorage.backend.encryption;
 import java.util.EnumMap;
 import java.util.Map;
 
-import com.jbacon.passwordstorage.backend.encryption.error.NoSuchEncryptionException;
+import com.jbacon.passwordstorage.backend.encryption.errors.NoSuchEncryptionException;
 
 public class EncrypterFactory {
 

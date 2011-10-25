@@ -16,8 +16,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.jbacon.passwordstorage.backend.encryption.error.AbstractEncrypterException;
-import com.jbacon.passwordstorage.backend.encryption.error.NoSuchEncryptionException;
+import com.jbacon.passwordstorage.backend.encryption.errors.AbstractEncrypterException;
+import com.jbacon.passwordstorage.backend.encryption.errors.NoSuchEncryptionException;
 
 public class EncrypterAESTest {
 

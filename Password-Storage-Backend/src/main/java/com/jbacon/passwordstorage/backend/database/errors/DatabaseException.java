@@ -1,4 +1,4 @@
-package com.jbacon.passwordstorage.backend.database.error;
+package com.jbacon.passwordstorage.backend.database.errors;
 
 public abstract class DatabaseException extends Exception {
     private static final long serialVersionUID = 3512692824289047375L;

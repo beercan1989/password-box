@@ -15,13 +15,14 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
-import com.jbacon.passwordstorage.backend.encryption.error.AbstractEncrypterException;
-import com.jbacon.passwordstorage.backend.encryption.error.BouncyCastleNotInstalledException;
-import com.jbacon.passwordstorage.backend.encryption.error.InvalidEncryptionTypeChangeException;
-import com.jbacon.passwordstorage.backend.encryption.error.NoSuchEncryptionException;
+import com.jbacon.passwordstorage.backend.encryption.errors.AbstractEncrypterException;
+import com.jbacon.passwordstorage.backend.encryption.errors.BouncyCastleNotInstalledException;
+import com.jbacon.passwordstorage.backend.encryption.errors.InvalidEncryptionTypeChangeException;
+import com.jbacon.passwordstorage.backend.encryption.errors.NoSuchEncryptionException;
 
 public class EncrypterPBE implements Encrypter {
 
+	private static final String ITERATION_COUNT = "iterationCount";
 	private EncryptionType encryptionType;
 
 	public EncrypterPBE() {
@@ -32,6 +33,7 @@ public class EncrypterPBE implements Encrypter {
 		this.encryptionType = encryptionType;
 	}
 
+	@Override
 	public void changeEncryptionType(final EncryptionType encryptionType) throws InvalidEncryptionTypeChangeException {
 		switch (encryptionType) {
 		case PBE_WITH_MD5_AND_DES:
@@ -51,11 +53,11 @@ public class EncrypterPBE implements Encrypter {
 			Cipher cipher;
 			SecretKey secretKey;
 
-			parameterSpecification = new PBEParameterSpec(salt, encryptionType.keyLength());
+			parameterSpecification = new PBEParameterSpec(salt, (Integer) encryptionType.getSpecification().get(ITERATION_COUNT));
 			keySpecification = new PBEKeySpec(passPhrase);
-			keyFactory = SecretKeyFactory.getInstance(encryptionType.algorithm());
+			keyFactory = SecretKeyFactory.getInstance(encryptionType.algorithmName);
 			secretKey = keyFactory.generateSecret(keySpecification);
-			cipher = Cipher.getInstance(encryptionType.algorithm(), encryptionType.provider());
+			cipher = Cipher.getInstance(encryptionType.algorithmName, EncryptionType.PROVIDER_NAME);
 			cipher.init(encryptionMode.mode(), secretKey, parameterSpecification);
 			byte[] processedText = cipher.doFinal(cipherText);
 			return processedText;
