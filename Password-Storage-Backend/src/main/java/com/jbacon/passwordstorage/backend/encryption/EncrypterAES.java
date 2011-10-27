@@ -16,7 +16,7 @@ import com.jbacon.passwordstorage.backend.encryption.errors.InvalidEncryptionTyp
 import com.jbacon.passwordstorage.backend.encryption.errors.NoSuchEncryptionException;
 import com.jbacon.passwordstorage.backend.encryption.errors.UnlimitedJcePoliciesNotInstalledException;
 
-public class EncrypterAES implements Encrypter {
+public class EncrypterAES extends Encrypter {
 
 	private EncryptionType encryptionType;
 

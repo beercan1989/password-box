@@ -20,7 +20,7 @@ import com.jbacon.passwordstorage.backend.encryption.errors.BouncyCastleNotInsta
 import com.jbacon.passwordstorage.backend.encryption.errors.InvalidEncryptionTypeChangeException;
 import com.jbacon.passwordstorage.backend.encryption.errors.NoSuchEncryptionException;
 
-public class EncrypterPBE implements Encrypter {
+public class EncrypterPBE extends Encrypter {
 
 	private static final String ITERATION_COUNT = "iterationCount";
 	private EncryptionType encryptionType;
@@ -37,6 +37,9 @@ public class EncrypterPBE implements Encrypter {
 	public void changeEncryptionType(final EncryptionType encryptionType) throws InvalidEncryptionTypeChangeException {
 		switch (encryptionType) {
 		case PBE_WITH_MD5_AND_DES:
+		case PBE_WITH_SHA_AND_3_KEY_TRIPPLE_DES_CBC:
+		case PBE_WITH_SHA_AND_TWOFISH_CBC:
+		case PBE_WITH_SHA512_AND_AES_CBC:
 			this.encryptionType = encryptionType;
 			break;
 		default:
