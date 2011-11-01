@@ -18,11 +18,6 @@ import com.jbacon.passwordstorage.backend.encryption.errors.NoSuchEncryptionExce
 
 public class EncrypterAESTest {
 
-	// @BeforeClass
-	// public static void setupBeforeClass() {
-	// Security.addProvider(new BouncyCastleProvider());
-	// }
-
 	private EncrypterAES encrypter;
 	private final byte[] toEncrypt = new byte[] { 72, 101, 108, 108, 111, 87, 111, 114, 108, 100 };
 	private final byte[] toDecrypt = new byte[] { 64, -32, -57, 114, 0, 55, -73, -29, -33, 106, -70, 41, 32, 55, 92, -14 };
@@ -37,7 +32,7 @@ public class EncrypterAESTest {
 	}
 
 	@Test
-	public void testDecryptWithAes() throws AbstractEncrypterException, UnsupportedEncodingException, NoSuchAlgorithmException {
+	public void shouldDecryptWithAes() throws AbstractEncrypterException, UnsupportedEncodingException, NoSuchAlgorithmException {
 		final byte[] result = encrypter.doCiper(EncryptionMode.DECRYPT_MODE, toDecrypt, aesKey);
 
 		assertThat(result, is(not(nullValue())));
@@ -46,7 +41,7 @@ public class EncrypterAESTest {
 	}
 
 	@Test
-	public void testEncryptWithAes() throws UnsupportedEncodingException, NoSuchAlgorithmException, AbstractEncrypterException {
+	public void shouldEncryptWithAes() throws AbstractEncrypterException {
 		final byte[] result = encrypter.doCiper(EncryptionMode.ENCRYPT_MODE, toEncrypt, aesKey);
 
 		assertThat(result, is(not(nullValue())));

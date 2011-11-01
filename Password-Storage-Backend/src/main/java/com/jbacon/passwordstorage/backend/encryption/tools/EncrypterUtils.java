@@ -33,12 +33,6 @@ public class EncrypterUtils {
 
 	public byte[] generateSalt(final EncryptionType encryptionType) throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchEncryptionException,
 			InvalidEncryptionTypeChangeException {
-		switch (encryptionType) {
-		case PBE_WITH_MD5_AND_DES:
-			break;
-		default:
-			throw new InvalidEncryptionTypeChangeException();
-		}
 		return generateSalt(encryptionType, (Integer) encryptionType.getSpecification().get(SALT_SIZE));
 	}
 
@@ -46,6 +40,9 @@ public class EncrypterUtils {
 			NoSuchEncryptionException, InvalidEncryptionTypeChangeException {
 		switch (encryptionType) {
 		case PBE_WITH_MD5_AND_DES:
+		case PBE_WITH_SHA_AND_3_KEY_TRIPPLE_DES_CBC:
+		case PBE_WITH_SHA_AND_TWOFISH_CBC:
+		case PBE_WITH_SHA512_AND_AES_CBC:
 			break;
 		default:
 			throw new InvalidEncryptionTypeChangeException();
@@ -58,5 +55,9 @@ public class EncrypterUtils {
 
 	public byte[] stringToByte(final String stringToByte) throws UnsupportedEncodingException {
 		return stringToByte.getBytes(TEXT_ENCODING_TYPE);
+	}
+
+	public char[] stringToChar(final String stringToChar) {
+		return stringToChar.toCharArray();
 	}
 }

@@ -44,7 +44,7 @@ public class EncrypterAES extends Encrypter {
 		try {
 			SecretKeySpec secretKeySpecification = new SecretKeySpec(aesKey, encryptionType.algorithmName);
 			Cipher cipher = Cipher.getInstance(encryptionType.algorithmName, EncryptionType.PROVIDER_NAME);
-			cipher.init(encryptionMode.mode(), secretKeySpecification);
+			cipher.init(encryptionMode.mode, secretKeySpecification);
 			return cipher.doFinal(cipherText);
 
 		} catch (NoSuchAlgorithmException e) {

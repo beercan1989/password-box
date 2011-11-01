@@ -46,6 +46,15 @@ public class EncrypterUtilsTest {
 	}
 
 	@Test
+	public void shouldConvertStringToCharArray() {
+		final char[] convertedString = encrypterUtils.stringToChar("Test");
+		assertThat(convertedString, is(not(nullValue())));
+		assertThat(convertedString.length, is(not(lessThanOrEqualTo(0))));
+		assertThat(convertedString[0], is(not(nullValue())));
+		assertThat(convertedString.length, is(equalTo(4)));
+	}
+
+	@Test
 	public void shouldGenerateAesEncryptionKey() throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchEncryptionException {
 		assertThat(encrypterUtils.generateAesEncryptionKey(EncryptionType.AES_256).length, is(equalTo(32)));
 		assertThat(encrypterUtils.generateAesEncryptionKey(EncryptionType.AES_128).length, is(equalTo(16)));

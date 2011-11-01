@@ -12,13 +12,9 @@ public enum EncryptionMode {
 
 	DECRYPT_MODE(Cipher.DECRYPT_MODE), ENCRYPT_MODE(Cipher.ENCRYPT_MODE);
 
-	private int mode;
+	public final int mode;
 
 	private EncryptionMode(final int mode) {
 		this.mode = mode;
-	}
-
-	public int mode() {
-		return mode;
 	}
 }

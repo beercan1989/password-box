@@ -3,7 +3,6 @@ package com.jbacon.passwordstorage.backend.encryption;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
 
 import javax.crypto.BadPaddingException;
@@ -16,7 +15,6 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
 import com.jbacon.passwordstorage.backend.encryption.errors.AbstractEncrypterException;
-import com.jbacon.passwordstorage.backend.encryption.errors.BouncyCastleNotInstalledException;
 import com.jbacon.passwordstorage.backend.encryption.errors.InvalidEncryptionTypeChangeException;
 import com.jbacon.passwordstorage.backend.encryption.errors.NoSuchEncryptionException;
 
@@ -48,7 +46,7 @@ public class EncrypterPBE extends Encrypter {
 	}
 
 	public byte[] doCiper(final EncryptionMode encryptionMode, final byte[] salt, final byte[] cipherText, final char[] passPhrase)
-			throws AbstractEncrypterException {
+			throws AbstractEncrypterException, InvalidAlgorithmParameterException {
 		try {
 			PBEKeySpec keySpecification;
 			PBEParameterSpec parameterSpecification;
@@ -60,8 +58,10 @@ public class EncrypterPBE extends Encrypter {
 			keySpecification = new PBEKeySpec(passPhrase);
 			keyFactory = SecretKeyFactory.getInstance(encryptionType.algorithmName);
 			secretKey = keyFactory.generateSecret(keySpecification);
-			cipher = Cipher.getInstance(encryptionType.algorithmName, EncryptionType.PROVIDER_NAME);
-			cipher.init(encryptionMode.mode(), secretKey, parameterSpecification);
+			cipher = Cipher.getInstance(encryptionType.algorithmName
+			// , EncryptionType.PROVIDER_NAME
+					);
+			cipher.init(encryptionMode.mode, secretKey, parameterSpecification);
 			byte[] processedText = cipher.doFinal(cipherText);
 			return processedText;
 
@@ -79,8 +79,9 @@ public class EncrypterPBE extends Encrypter {
 			throw new NoSuchEncryptionException(e);
 		} catch (BadPaddingException e) {
 			throw new NoSuchEncryptionException(e);
-		} catch (NoSuchProviderException e) {
-			throw new BouncyCastleNotInstalledException(e);
 		}
+		// catch (NoSuchProviderException e) {
+		// throw new BouncyCastleNotInstalledException(e);
+		// }
 	}
 }
