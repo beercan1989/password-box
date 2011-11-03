@@ -1,28 +1,25 @@
 package com.jbacon.passwordstorage.backend.encryption;
 
-import java.util.EnumMap;
-import java.util.Map;
-
 import com.jbacon.passwordstorage.backend.encryption.errors.NoSuchEncryptionException;
 
 public class EncrypterFactory {
 
-	private final Map<EncryptionType, Encrypter> encrypters;
-
-	public EncrypterFactory() {
-		encrypters = new EnumMap<EncryptionType, Encrypter>(EncryptionType.class);
-		encrypters.put(EncryptionType.AES_256, new EncrypterAES());
-		encrypters.put(EncryptionType.PBE_WITH_MD5_AND_DES, new EncrypterPBE());
-		encrypters.put(EncryptionType.PBE_WITH_SHA_AND_3_KEY_TRIPPLE_DES_CBC, new EncrypterPBE());
-		encrypters.put(EncryptionType.PBE_WITH_SHA_AND_TWOFISH_CBC, new EncrypterPBE());
-		encrypters.put(EncryptionType.PBE_WITH_SHA512_AND_AES_CBC, new EncrypterPBE());
-	}
-
 	public Encrypter getEncrypter(final EncryptionType encrypterType) throws NoSuchEncryptionException {
-		if (!encrypters.containsKey(encrypterType)) {
+		switch (encrypterType) {
+		case AES_128:
+			return new EncrypterAES(EncryptionType.AES_128);
+		case AES_256:
+			return new EncrypterAES(EncryptionType.AES_256);
+		case PBE_WITH_MD5_AND_DES:
+			return new EncrypterPBE(EncryptionType.PBE_WITH_MD5_AND_DES);
+		case PBE_WITH_SHA1_AND_256_AES_CBC_BC:
+			return new EncrypterPBE(EncryptionType.PBE_WITH_SHA1_AND_256_AES_CBC_BC);
+		case PBE_WITH_SHA_AND_TWOFISH_CBC:
+			return new EncrypterPBE(EncryptionType.PBE_WITH_SHA_AND_TWOFISH_CBC);
+		case PBE_WITH_SHA_AND_3_KEY_TRIPPLE_DES_CBC:
+			return new EncrypterPBE(EncryptionType.PBE_WITH_SHA_AND_3_KEY_TRIPPLE_DES_CBC);
+		default:
 			throw new NoSuchEncryptionException("Unsupported encrypter type [" + encrypterType.name() + "]");
 		}
-
-		return encrypters.get(encrypterType);
 	}
 }

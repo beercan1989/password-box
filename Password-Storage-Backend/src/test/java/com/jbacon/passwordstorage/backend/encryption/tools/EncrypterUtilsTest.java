@@ -17,8 +17,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.jbacon.passwordstorage.backend.database.errors.InvalidEncryptionTypeForSaltGeneration;
 import com.jbacon.passwordstorage.backend.encryption.EncryptionType;
-import com.jbacon.passwordstorage.backend.encryption.errors.InvalidEncryptionTypeChangeException;
 import com.jbacon.passwordstorage.backend.encryption.errors.NoSuchEncryptionException;
 
 public class EncrypterUtilsTest {
@@ -62,7 +62,7 @@ public class EncrypterUtilsTest {
 
 	@Test
 	public void shouldGenerateDefaultSaltValueForPBEWithMD5AndDES() throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchEncryptionException,
-			InvalidEncryptionTypeChangeException {
+			InvalidEncryptionTypeForSaltGeneration {
 		final byte[] generatedSalt = encrypterUtils.generateSalt(EncryptionType.PBE_WITH_MD5_AND_DES);
 		assertThat(generatedSalt, is(not(nullValue())));
 		assertThat(generatedSalt.length, is(not(lessThanOrEqualTo(0))));
@@ -72,7 +72,7 @@ public class EncrypterUtilsTest {
 
 	@Test
 	public void shouldGenerateSaltValueForPBEWithMD5AndDES() throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchEncryptionException,
-			InvalidEncryptionTypeChangeException {
+			InvalidEncryptionTypeForSaltGeneration {
 		final byte[] generatedSalt = encrypterUtils.generateSalt(EncryptionType.PBE_WITH_MD5_AND_DES, 18);
 		assertThat(generatedSalt, is(not(nullValue())));
 		assertThat(generatedSalt.length, is(not(lessThanOrEqualTo(0))));
@@ -80,9 +80,9 @@ public class EncrypterUtilsTest {
 		assertThat(generatedSalt.length, is(equalTo(18)));
 	}
 
-	@Test(expected = InvalidEncryptionTypeChangeException.class)
+	@Test(expected = InvalidEncryptionTypeForSaltGeneration.class)
 	public void shouldThrowExceptionGeneratingSaltForAES() throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchEncryptionException,
-			InvalidEncryptionTypeChangeException {
+			InvalidEncryptionTypeForSaltGeneration {
 		final byte[] generatedSalt = encrypterUtils.generateSalt(EncryptionType.AES_128);
 		assertThat(generatedSalt, is(nullValue()));
 	}

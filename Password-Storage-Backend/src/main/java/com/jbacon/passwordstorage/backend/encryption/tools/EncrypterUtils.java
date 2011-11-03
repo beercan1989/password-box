@@ -8,8 +8,8 @@ import java.security.SecureRandom;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import com.jbacon.passwordstorage.backend.database.errors.InvalidEncryptionTypeForSaltGeneration;
 import com.jbacon.passwordstorage.backend.encryption.EncryptionType;
-import com.jbacon.passwordstorage.backend.encryption.errors.InvalidEncryptionTypeChangeException;
 import com.jbacon.passwordstorage.backend.encryption.errors.NoSuchEncryptionException;
 
 public class EncrypterUtils {
@@ -32,25 +32,24 @@ public class EncrypterUtils {
 	}
 
 	public byte[] generateSalt(final EncryptionType encryptionType) throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchEncryptionException,
-			InvalidEncryptionTypeChangeException {
+			InvalidEncryptionTypeForSaltGeneration {
 		return generateSalt(encryptionType, (Integer) encryptionType.getSpecification().get(SALT_SIZE));
 	}
 
 	public byte[] generateSalt(final EncryptionType encryptionType, final Integer numberOfBytes) throws NoSuchAlgorithmException, NoSuchProviderException,
-			NoSuchEncryptionException, InvalidEncryptionTypeChangeException {
+			NoSuchEncryptionException, InvalidEncryptionTypeForSaltGeneration {
 		switch (encryptionType) {
 		case PBE_WITH_MD5_AND_DES:
-		case PBE_WITH_SHA_AND_3_KEY_TRIPPLE_DES_CBC:
 		case PBE_WITH_SHA_AND_TWOFISH_CBC:
-		case PBE_WITH_SHA512_AND_AES_CBC:
-			break;
+		case PBE_WITH_SHA1_AND_256_AES_CBC_BC:
+		case PBE_WITH_SHA_AND_3_KEY_TRIPPLE_DES_CBC:
+			byte[] salt = new byte[numberOfBytes];
+			SecureRandom saltGen = SecureRandom.getInstance((String) encryptionType.getSpecification().get(SECURE_SALT_ALGORITHM));
+			saltGen.nextBytes(salt);
+			return salt;
 		default:
-			throw new InvalidEncryptionTypeChangeException();
+			throw new InvalidEncryptionTypeForSaltGeneration("No such supported passwordbased encryption.");
 		}
-		byte[] salt = new byte[numberOfBytes];
-		SecureRandom saltGen = SecureRandom.getInstance((String) encryptionType.getSpecification().get(SECURE_SALT_ALGORITHM));
-		saltGen.nextBytes(salt);
-		return salt;
 	}
 
 	public byte[] stringToByte(final String stringToByte) throws UnsupportedEncodingException {

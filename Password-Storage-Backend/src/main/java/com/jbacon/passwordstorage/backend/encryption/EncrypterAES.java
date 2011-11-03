@@ -12,39 +12,25 @@ import javax.crypto.spec.SecretKeySpec;
 
 import com.jbacon.passwordstorage.backend.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.backend.encryption.errors.BouncyCastleNotInstalledException;
-import com.jbacon.passwordstorage.backend.encryption.errors.InvalidEncryptionTypeChangeException;
 import com.jbacon.passwordstorage.backend.encryption.errors.NoSuchEncryptionException;
 import com.jbacon.passwordstorage.backend.encryption.errors.UnlimitedJcePoliciesNotInstalledException;
 
 public class EncrypterAES extends Encrypter {
 
-	private EncryptionType encryptionType;
-
-	public EncrypterAES() {
-		encryptionType = EncryptionType.AES_256;
-	}
+	private final EncryptionType encryptionType;
 
 	public EncrypterAES(final EncryptionType encryptionType) {
 		this.encryptionType = encryptionType;
 	}
 
-	@Override
-	public void changeEncryptionType(final EncryptionType encryptionType) throws InvalidEncryptionTypeChangeException {
-		switch (encryptionType) {
-		case AES_128:
-		case AES_256:
-			this.encryptionType = encryptionType;
-			break;
-		default:
-			throw new InvalidEncryptionTypeChangeException();
-		}
-	}
-
 	public byte[] doCiper(final EncryptionMode encryptionMode, final byte[] cipherText, final byte[] aesKey) throws AbstractEncrypterException {
 		try {
 			SecretKeySpec secretKeySpecification = new SecretKeySpec(aesKey, encryptionType.algorithmName);
+
 			Cipher cipher = Cipher.getInstance(encryptionType.algorithmName, EncryptionType.PROVIDER_NAME);
+
 			cipher.init(encryptionMode.mode, secretKeySpecification);
+
 			return cipher.doFinal(cipherText);
 
 		} catch (NoSuchAlgorithmException e) {

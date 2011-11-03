@@ -11,13 +11,13 @@ public enum EncryptionType {
 
 	AES_128("AES", true),
 
-	PBE_WITH_MD5_AND_DES("PBEWithMD5AndDES", true),
+	PBE_WITH_MD5_AND_DES("PbeWithMd5AndDes", true),
 
-	PBE_WITH_SHA_AND_3_KEY_TRIPPLE_DES_CBC("PBEWithSHAAnd3-KeyTripleDES-CBC", true),
+	PBE_WITH_SHA1_AND_256_AES_CBC_BC("PbeWithSHA1And256BitAES-CBC-BC", true),
 
-	PBE_WITH_SHA_AND_TWOFISH_CBC("PBEWithSHAAndTwofish-CBC", true),
+	PBE_WITH_SHA_AND_3_KEY_TRIPPLE_DES_CBC("PbeWithSHAAnd3-KeyTripleDES-CBC", true),
 
-	PBE_WITH_SHA512_AND_AES_CBC("PBEWithSHA512AndAES-CBC", true),
+	PBE_WITH_SHA_AND_TWOFISH_CBC("PbeWithSHAAndTwofish-CBC", true),
 
 	/** Unsupported - Test Value */
 	UNSUPPORTED_TYPE("", false);
@@ -44,9 +44,9 @@ public enum EncryptionType {
 		case AES_256:
 			return new EncryptionSpecificationAES(AES_256_KEY_SIZE);
 		case PBE_WITH_MD5_AND_DES:
-		case PBE_WITH_SHA_AND_3_KEY_TRIPPLE_DES_CBC:
 		case PBE_WITH_SHA_AND_TWOFISH_CBC:
-		case PBE_WITH_SHA512_AND_AES_CBC:
+		case PBE_WITH_SHA1_AND_256_AES_CBC_BC:
+		case PBE_WITH_SHA_AND_3_KEY_TRIPPLE_DES_CBC:
 			return new EncryptionSpecificationPBE(DEFAULT_SALT_SIZE, DEFAULT_ITERATION_COUNT, DEFAULT_SALT_ALGORITHM);
 		default:
 			throw new NoSuchEncryptionException();
