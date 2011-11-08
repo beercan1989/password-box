@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jbacon.passwordstorage.mybatis.mappers.DatabaseMapper">
+
+	<!-- Master Password Mappings -->
+<!-- 	<select id="getAllMasterPasswords"> -->
+<!-- 	</select> -->
+	
+<!-- 	<select id="getSingleMasterPassword"> -->
+<!-- 	</select> -->
+
+<!-- 	<update id="updateSingleMasterPassword"> -->
+<!-- 	</update> -->
+
+<!-- 	<insert id="instertSingleMasterPassword"> -->
+<!-- 	</insert> -->
+
+<!-- 	<delete id="deleteSingleMasterPassword"> -->
+<!-- 	</delete> -->
+	
+	
+	<!-- Stored Password Mappings -->
+<!-- 	<select id="getAllStoredPasswords"> -->
+<!-- 	</select> -->
+	
+<!-- 	<select id="getSingleStoredPassword"> -->
+<!-- 	</select> -->
+
+<!-- 	<update id="updateSingleStoredPassword"> -->
+<!-- 	</update> -->
+
+<!-- 	<insert id="instertSingleStoredPassword"> -->
+<!-- 	</insert> -->
+
+<!-- 	<delete id="deleteSingleStoredPassword"> -->
+<!-- 	</delete> -->
+	
+	
+	<!-- Database Configuration Mappings -->
+	<update id="createAllTables">
+		CREATE TABLE IF NOT EXISTS MasterPasswords (id INTEGER PRIMARY KEY, profileName TEXT, secretKey TEXT, salt TEXT);
+		CREATE TABLE IF NOT EXISTS StoredPasswords (id INTEGER PRIMARY KEY, profileName TEXT, passwordName TEXT, password TEXT, passwordNotes TEXT);
+	</update>
+	
+	<update id="dropAllTables">
+		DROP TABLE IF EXISTS MasterPasswords;
+		DROP TABLE IF EXISTS StoredPasswords;
+	</update>
+	
+	
+	<!-- Result Mappings -->
+<!-- 	<resultMap id="MasterPassword" type=""> -->
+<!-- 	</resultMap> -->
+	
+<!-- 	<resultMap id="StoredPassword" type=""> -->
+<!-- 	</resultMap> -->
+
+</mapper>

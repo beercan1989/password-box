@@ -2,7 +2,7 @@ package com.jbacon.passwordstorage.swing.dragndrop;
 
 import java.awt.datatransfer.DataFlavor;
 
-import com.jbacon.passwordstorage.backend.encryption.objects.EncryptedPassword;
+import com.jbacon.passwordstorage.backend.encryption.objects.StoredPassword;
 
 public class EncryptionPasswordDataFlavour extends DataFlavor {
 
@@ -10,7 +10,7 @@ public class EncryptionPasswordDataFlavour extends DataFlavor {
     public static DataFlavor localEncryptedPasswordFlavor = null;
 
     static {
-        encryptedPasswordFlavor = new DataFlavor(EncryptedPassword.class, "Non Local EncryptedPassword");
+        encryptedPasswordFlavor = new DataFlavor(StoredPassword.class, "Non Local EncryptedPassword");
         localEncryptedPasswordFlavor = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + "; class=EncryptedPassword", "Local EncryptedPassword");
     }
 }

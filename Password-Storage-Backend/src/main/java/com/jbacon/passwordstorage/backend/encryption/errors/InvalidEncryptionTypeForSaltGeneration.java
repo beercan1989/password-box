@@ -1,4 +1,4 @@
-package com.jbacon.passwordstorage.backend.database.errors;
+package com.jbacon.passwordstorage.backend.encryption.errors;
 
 public class InvalidEncryptionTypeForSaltGeneration extends Exception {
 

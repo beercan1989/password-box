@@ -15,24 +15,24 @@ public class MasterPassword {
 		this.salt = salt;
 	}
 
+	public String getEncryptedSecretKey() {
+		return encryptedSecretKey;
+	}
+
 	public String getProfileName() {
 		return profileName;
 	}
 
-	public void setProfileName(final String profileName) {
-		this.profileName = profileName;
-	}
-
-	public String getEncryptedSecretKey() {
-		return encryptedSecretKey;
+	public String getSalt() {
+		return salt;
 	}
 
 	public void setEncryptedSecretKey(final String encryptedSecretKey) {
 		this.encryptedSecretKey = encryptedSecretKey;
 	}
 
-	public String getSalt() {
-		return salt;
+	public void setProfileName(final String profileName) {
+		this.profileName = profileName;
 	}
 
 	public void setSalt(final String salt) {
@@ -41,6 +41,15 @@ public class MasterPassword {
 
 	@Override
 	public String toString() {
-		return "Name: " + profileName;
+		StringBuilder builder = new StringBuilder();
+		builder.append("MasterPassword [profileName=");
+		builder.append(profileName);
+		builder.append(", encryptedSecretKey=");
+		builder.append(encryptedSecretKey);
+		builder.append(", salt=");
+		builder.append(salt);
+		builder.append("]");
+		return builder.toString();
 	}
+
 }

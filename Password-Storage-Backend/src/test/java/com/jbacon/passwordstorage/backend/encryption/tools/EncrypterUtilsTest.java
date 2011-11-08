@@ -17,8 +17,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.jbacon.passwordstorage.backend.database.errors.InvalidEncryptionTypeForSaltGeneration;
 import com.jbacon.passwordstorage.backend.encryption.EncryptionType;
+import com.jbacon.passwordstorage.backend.encryption.errors.InvalidEncryptionTypeForSaltGeneration;
 import com.jbacon.passwordstorage.backend.encryption.errors.NoSuchEncryptionException;
 
 public class EncrypterUtilsTest {

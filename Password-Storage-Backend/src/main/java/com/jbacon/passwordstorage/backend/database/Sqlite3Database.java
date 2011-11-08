@@ -2,13 +2,13 @@ package com.jbacon.passwordstorage.backend.database;
 
 import java.util.List;
 
-import com.jbacon.passwordstorage.backend.encryption.objects.EncryptedPassword;
+import com.jbacon.passwordstorage.backend.encryption.objects.StoredPassword;
 import com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword;
 
 public interface Sqlite3Database {
-	public EncryptedPassword getStoredPassword(String passwordName);
+	public StoredPassword getStoredPassword(String passwordName);
 
-	public List<EncryptedPassword> getStoredPasswords(String profileName);
+	public List<StoredPassword> getStoredPasswords(String profileName);
 
 	public MasterPassword getMasterPassword(String profileName);
 
@@ -20,11 +20,11 @@ public interface Sqlite3Database {
 
 	public void dropDatabase();
 
-	public void insertSavedPassword(EncryptedPassword encryptedPassword);
+	public void insertSavedPassword(StoredPassword encryptedPassword);
 
 	public void insertMasterPassword(MasterPassword masterPassword);
 
-	public void updateSavedPassword(EncryptedPassword encryptedPassword);
+	public void updateSavedPassword(StoredPassword encryptedPassword);
 
 	public void updateMasterPassword(MasterPassword masterPassword);
 }
