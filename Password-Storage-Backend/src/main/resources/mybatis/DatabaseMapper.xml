@@ -4,6 +4,9 @@
 <mapper namespace="com.jbacon.passwordstorage.mybatis.mappers.DatabaseMapper">
 
 	<!-- Master Password Mappings -->
+<!-- 	<select id="getAllMasterPasswordNames"> -->
+<!-- 	</select> -->
+	
 <!-- 	<select id="getAllMasterPasswords"> -->
 <!-- 	</select> -->
 	
@@ -24,7 +27,7 @@
 <!-- 	<select id="getAllStoredPasswords"> -->
 <!-- 	</select> -->
 	
-<!-- 	<select id="getSingleStoredPassword"> -->
+<!-- 	<select id="getEveryStoredPassword"> -->
 <!-- 	</select> -->
 
 <!-- 	<update id="updateSingleStoredPassword"> -->

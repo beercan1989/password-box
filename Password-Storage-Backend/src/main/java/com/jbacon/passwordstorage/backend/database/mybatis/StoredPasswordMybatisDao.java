@@ -8,7 +8,9 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
+import com.jbacon.passwordstorage.backend.database.dao.StoredPasswordDao;
 import com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword;
+import com.jbacon.passwordstorage.backend.encryption.objects.StoredPassword;
 
 public class StoredPasswordMybatisDao implements StoredPasswordDao {
 
@@ -21,29 +23,30 @@ public class StoredPasswordMybatisDao implements StoredPasswordDao {
 	}
 
 	@Override
-	public int deleteSingleStoredPassword() {
-		return databaseConnection.update("deleteSingleStoredPassword");
+	public int deleteStoredPassword(final StoredPassword storedPassword) {
+		return databaseConnection.update("deleteSingleStoredPassword", storedPassword);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<MasterPassword> getAllStoredPasswords() {
-		return databaseConnection.selectList("getAllStoredPasswords");
+	public List<StoredPassword> getStoredPasswords() {
+		return databaseConnection.selectList("getEveryStoredPassword");
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<MasterPassword> getSingleStoredPassword() {
-		return databaseConnection.selectList("getSingleStoredPassword");
+	public List<StoredPassword> getStoredPasswords(final MasterPassword masterPassword) {
+		return databaseConnection.selectList("getAllStoredPasswords", masterPassword);
 	}
 
 	@Override
-	public int instertSingleStoredPassword() {
-		return databaseConnection.update("instertSingleStoredPassword");
+	public int instertStoredPassword(final StoredPassword storedPassword) {
+		return databaseConnection.update("instertSingleStoredPassword", storedPassword);
 	}
 
 	@Override
-	public int updateSingleStoredPassword() {
-		return databaseConnection.update("updateSingleStoredPassword");
+	public int updateStoredPassword(final StoredPassword storedPassword) {
+		return databaseConnection.update("updateSingleStoredPassword", storedPassword);
 	}
+
 }

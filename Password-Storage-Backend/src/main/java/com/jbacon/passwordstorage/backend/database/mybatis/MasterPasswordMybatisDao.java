@@ -8,6 +8,7 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
+import com.jbacon.passwordstorage.backend.database.dao.MasterPasswordDao;
 import com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword;
 
 public class MasterPasswordMybatisDao implements MasterPasswordDao {
@@ -21,29 +22,34 @@ public class MasterPasswordMybatisDao implements MasterPasswordDao {
 	}
 
 	@Override
-	public int deleteSingleMasterPassword() {
+	public int deleteMasterPassword(final MasterPassword masterPassword) {
 		return databaseConnection.update("deleteSingleMasterPassword");
 	}
 
 	@Override
+	public MasterPassword getMasterPassword(final String profileName) {
+		return (MasterPassword) databaseConnection.selectOne("getSingleMasterPassword");
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
-	public List<MasterPassword> getAllMasterPasswords() {
+	public List<String> getMasterPasswordNames() {
+		return databaseConnection.selectList("getAllMasterPasswordNames");
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<MasterPassword> getMasterPasswords() {
 		return databaseConnection.selectList("getAllMasterPasswords");
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public List<MasterPassword> getSingleMasterPassword() {
-		return databaseConnection.selectList("getSingleMasterPassword");
-	}
-
-	@Override
-	public int instertSingleMasterPassword() {
+	public int instertMasterPassword(final MasterPassword masterPassword) {
 		return databaseConnection.update("instertSingleMasterPassword");
 	}
 
 	@Override
-	public int updateSingleMasterPassword() {
+	public int updateMasterPassword(final MasterPassword masterPassword) {
 		return databaseConnection.update("updateSingleMasterPassword");
 	}
 

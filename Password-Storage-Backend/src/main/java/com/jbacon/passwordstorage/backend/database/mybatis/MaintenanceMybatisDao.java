@@ -7,6 +7,8 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
+import com.jbacon.passwordstorage.backend.database.dao.MaintenanceDao;
+
 public class MaintenanceMybatisDao implements MaintenanceDao {
 
 	private static final String MYBATIS_CONFIGURATION = "mybatis/Configuration.xml";
@@ -14,6 +16,11 @@ public class MaintenanceMybatisDao implements MaintenanceDao {
 
 	public MaintenanceMybatisDao() throws IOException {
 		Reader reader = Resources.getResourceAsReader(MYBATIS_CONFIGURATION);
+		databaseConnection = new SqlSessionFactoryBuilder().build(reader).openSession();
+	}
+
+	protected MaintenanceMybatisDao(final String configuration) throws IOException {
+		Reader reader = Resources.getResourceAsReader(configuration);
 		databaseConnection = new SqlSessionFactoryBuilder().build(reader).openSession();
 	}
 
