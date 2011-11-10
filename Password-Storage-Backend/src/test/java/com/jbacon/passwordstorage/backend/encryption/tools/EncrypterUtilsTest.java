@@ -13,7 +13,6 @@ import java.security.NoSuchProviderException;
 import java.security.Security;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -28,10 +27,9 @@ public class EncrypterUtilsTest {
 		Security.addProvider(new BouncyCastleProvider());
 	}
 
-	private EncrypterUtils encrypterUtils;
+	private final EncrypterUtils encrypterUtils;
 
-	@Before
-	public void setup() {
+	public EncrypterUtilsTest() {
 		encrypterUtils = new EncrypterUtils();
 	}
 

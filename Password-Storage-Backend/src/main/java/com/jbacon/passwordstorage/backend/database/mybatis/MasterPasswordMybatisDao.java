@@ -1,24 +1,19 @@
 package com.jbacon.passwordstorage.backend.database.mybatis;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.util.List;
-
-import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import com.jbacon.passwordstorage.backend.database.dao.MasterPasswordDao;
 import com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword;
 
-public class MasterPasswordMybatisDao implements MasterPasswordDao {
-
-	private static final String MYBATIS_CONFIGURATION = "com.jbacon.passwordstorage.backend.database.mybatis.configuration/configuration.xml";
-	private final SqlSession databaseConnection;
+public final class MasterPasswordMybatisDao extends MybatisDao implements MasterPasswordDao {
 
 	public MasterPasswordMybatisDao() throws IOException {
-		Reader reader = Resources.getResourceAsReader(MYBATIS_CONFIGURATION);
-		databaseConnection = new SqlSessionFactoryBuilder().build(reader).openSession();
+		super();
+	}
+
+	protected MasterPasswordMybatisDao(final String testConfiguration) throws IOException {
+		super(testConfiguration);
 	}
 
 	@Override
@@ -34,13 +29,13 @@ public class MasterPasswordMybatisDao implements MasterPasswordDao {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<String> getMasterPasswordNames() {
-		return databaseConnection.selectList("getAllMasterPasswordNames");
+		return (List<String>) databaseConnection.selectList("getAllMasterPasswordNames");
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<MasterPassword> getMasterPasswords() {
-		return databaseConnection.selectList("getAllMasterPasswords");
+		return (List<MasterPassword>) databaseConnection.selectList("getAllMasterPasswords");
 	}
 
 	@Override

@@ -9,7 +9,7 @@ import com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword;
  * 
  * @author James Bacon
  */
-public interface MasterPasswordDao {
+public interface MasterPasswordDao extends GenericDao {
 
 	/**
 	 * Deletes a MasterPassword from the database.

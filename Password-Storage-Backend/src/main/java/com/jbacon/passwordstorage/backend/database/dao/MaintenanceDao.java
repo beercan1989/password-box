@@ -5,7 +5,7 @@ package com.jbacon.passwordstorage.backend.database.dao;
  * 
  * @author James Bacon
  */
-public interface MaintenanceDao {
+public interface MaintenanceDao extends GenericDao {
 
 	/**
 	 * Creates all the necessary tables in the database.
