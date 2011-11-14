@@ -25,14 +25,26 @@ public class MaintenanceMybatisDaoTest {
 	}
 
 	@Test
-	public void shouldCreateAllTables() {
-		int result = dao.createAllTables();
+	public void shouldCreateMasterPasswordTable() {
+		int result = dao.createMasterPasswordTable();
 		assertThat(result, is(equalTo(0)));
 	}
 
 	@Test
-	public void shouldDropAllTables() {
-		int result = dao.dropAllTables();
+	public void shouldCreateStoredPasswordTable() {
+		int result = dao.createStoredPasswordTable();
+		assertThat(result, is(equalTo(0)));
+	}
+
+	@Test
+	public void shouldDropMasterPasswordTable() {
+		int result = dao.dropMasterPasswordTable();
+		assertThat(result, is(equalTo(0)));
+	}
+
+	@Test
+	public void shouldDropStoredPasswordTable() {
+		int result = dao.dropStoredPasswordTable();
 		assertThat(result, is(equalTo(0)));
 	}
 

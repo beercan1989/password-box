@@ -8,16 +8,30 @@ package com.jbacon.passwordstorage.backend.database.dao;
 public interface MaintenanceDao extends GenericDao {
 
 	/**
-	 * Creates all the necessary tables in the database.
+	 * Creates the MasterPasswords table in the database.
 	 * 
 	 * @return the result of the SQL query.
 	 */
-	public int createAllTables();
+	public int createMasterPasswordTable();
 
 	/**
-	 * Deletes all the tables in the database.
+	 * Creates the StoredPasswords table in the database.
 	 * 
 	 * @return the result of the SQL query.
 	 */
-	public int dropAllTables();
+	public int createStoredPasswordTable();
+
+	/**
+	 * Deletes the MasterPasswords table in the database.
+	 * 
+	 * @return the result of the SQL query.
+	 */
+	public int dropMasterPasswordTable();
+
+	/**
+	 * Deletes the StoredPasswords table in the database.
+	 * 
+	 * @return the result of the SQL query.
+	 */
+	public int dropStoredPasswordTable();
 }

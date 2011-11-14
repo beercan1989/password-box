@@ -15,13 +15,23 @@ public final class MaintenanceMybatisDao extends MybatisDao implements Maintenan
 	}
 
 	@Override
-	public int createAllTables() {
-		return databaseConnection.update("createAllTables");
+	public int createMasterPasswordTable() {
+		return databaseConnection.update("createMasterPasswordTable");
 	}
 
 	@Override
-	public int dropAllTables() {
-		return databaseConnection.update("dropAllTables");
+	public int createStoredPasswordTable() {
+		return databaseConnection.update("createStoredPasswordTable");
+	}
+
+	@Override
+	public int dropMasterPasswordTable() {
+		return databaseConnection.update("dropMasterPasswordTable");
+	}
+
+	@Override
+	public int dropStoredPasswordTable() {
+		return databaseConnection.update("dropStoredPasswordTable");
 	}
 
 }

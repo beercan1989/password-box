@@ -4,24 +4,12 @@
 <mapper namespace="com.jbacon.passwordstorage.mybatis.mappers.DatabaseMapper">
 
 	<!-- Master Password Mappings -->
-<!-- 	<select id="getAllMasterPasswordNames"> -->
-<!-- 	</select> -->
-	
-<!-- 	<select id="getAllMasterPasswords"> -->
-<!-- 	</select> -->
-	
-<!-- 	<select id="getSingleMasterPassword"> -->
-<!-- 	</select> -->
-
-<!-- 	<update id="updateSingleMasterPassword"> -->
-<!-- 	</update> -->
-
-<!-- 	<insert id="instertSingleMasterPassword"> -->
-<!-- 	</insert> -->
-
-<!-- 	<delete id="deleteSingleMasterPassword"> -->
-<!-- 	</delete> -->
-	
+<!-- 	<delete id="deleteMasterPassword" parameterType="MasterPassword"></delete>	 -->
+<!-- 	<select id="getMasterPassword" resultType="MasterPassword" parameterType="java.lang.String"></select> -->
+<!-- 	<select id="getMasterPasswordNames" resultType="java.lang.String"></select> -->
+<!-- 	<select id="getMasterPasswords" resultType="MasterPassword"></select> -->
+<!-- 	<insert id="instertMasterPassword" parameterType="MasterPassword"></insert> -->
+<!-- 	<update id="updateMasterPassword" parameterType="MasterPassword"></update> -->
 	
 	<!-- Stored Password Mappings -->
 <!-- 	<select id="getAllStoredPasswords"> -->
@@ -41,22 +29,35 @@
 	
 	
 	<!-- Database Configuration Mappings -->
-	<update id="createAllTables">
-		CREATE TABLE IF NOT EXISTS MasterPasswords (id INTEGER PRIMARY KEY, profileName TEXT, secretKey TEXT, salt TEXT);
-		CREATE TABLE IF NOT EXISTS StoredPasswords (id INTEGER PRIMARY KEY, profileName TEXT, passwordName TEXT, password TEXT, passwordNotes TEXT);
+	<!-- Create DB tables. -->
+	<update id="createStoredPasswordTable">
+		CREATE TABLE IF NOT EXISTS StoredPasswords (id INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE ON CONFLICT FAIL, profileName TEXT NOT NULL, passwordName TEXT NOT NULL, password TEXT NOT NULL, passwordNotes TEXT NOT NULL);
+	</update>
+	<update id="createMasterPasswordTable">
+		CREATE TABLE IF NOT EXISTS MasterPasswords (id INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE ON CONFLICT FAIL, profileName TEXT NOT NULL UNIQUE ON CONFLICT FAIL, secretKey TEXT NOT NULL, salt TEXT NOT NULL);
 	</update>
 	
-	<update id="dropAllTables">
-		DROP TABLE IF EXISTS MasterPasswords;
+	<!-- Drop DB tables. -->
+	<update id="dropStoredPasswordTable">
 		DROP TABLE IF EXISTS StoredPasswords;
+	</update>
+	<update id="dropMasterPasswordTable">
+		DROP TABLE IF EXISTS MasterPasswords;
 	</update>
 	
 	
 	<!-- Result Mappings -->
-<!-- 	<resultMap id="MasterPassword" type=""> -->
-<!-- 	</resultMap> -->
+	<resultMap id="MasterPassword" type="com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword">
+		<result column="profileName" property="profileName" />
+		<result column="secretKey" property="encryptedSecretKey" />
+		<result column="salt" property="salt" />
+	</resultMap>
 	
-<!-- 	<resultMap id="StoredPassword" type=""> -->
-<!-- 	</resultMap> -->
+	<resultMap id="StoredPassword" type="com.jbacon.passwordstorage.backend.encryption.objects.StoredPassword">
+		<result column="profileName" property="profileName"/>
+		<result column="passwordName" property="encryptedPasswordName"/>
+		<result column="password" property="encryptedPassword"/>
+		<result column="passwordNotes" property="encryptedPasswordNotes"/>
+	</resultMap>
 
 </mapper>
