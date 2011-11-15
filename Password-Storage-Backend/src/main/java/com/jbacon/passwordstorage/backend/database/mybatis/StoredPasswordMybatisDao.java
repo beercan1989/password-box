@@ -19,7 +19,7 @@ public final class StoredPasswordMybatisDao extends MybatisDao implements Stored
 
 	@Override
 	public int deleteStoredPassword(final StoredPassword storedPassword) {
-		return databaseConnection.update("deleteSingleStoredPassword", storedPassword);
+		return databaseConnection.delete("deleteSingleStoredPassword", storedPassword);
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public final class StoredPasswordMybatisDao extends MybatisDao implements Stored
 
 	@Override
 	public int instertStoredPassword(final StoredPassword storedPassword) {
-		return databaseConnection.update("instertSingleStoredPassword", storedPassword);
+		return databaseConnection.insert("instertSingleStoredPassword", storedPassword);
 	}
 
 	@Override

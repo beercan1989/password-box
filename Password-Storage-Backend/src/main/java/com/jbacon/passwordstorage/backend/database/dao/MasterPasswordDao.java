@@ -30,6 +30,16 @@ public interface MasterPasswordDao extends GenericDao {
 	public MasterPassword getMasterPassword(String profileName);
 
 	/**
+	 * Retrieves the ID for a newly created database entry for a MasterPassword.
+	 * 
+	 * @param masterPassword
+	 *            the MasterPassword to get an ID for.
+	 * @return the ID value of the MasterPassword, null if the MasterPassword is
+	 *         not in the database.
+	 */
+	public Integer getMasterPasswordId(MasterPassword masterPassword);
+
+	/**
 	 * Retrieves a list containing all the names of the MasterPasswords.
 	 * 
 	 * @return the list of every MasterPassword name.

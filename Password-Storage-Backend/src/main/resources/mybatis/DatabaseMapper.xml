@@ -4,37 +4,53 @@
 <mapper namespace="com.jbacon.passwordstorage.mybatis.mappers.DatabaseMapper">
 
 	<!-- Master Password Mappings -->
-<!-- 	<delete id="deleteMasterPassword" parameterType="MasterPassword"></delete>	 -->
-<!-- 	<select id="getMasterPassword" resultType="MasterPassword" parameterType="java.lang.String"></select> -->
-<!-- 	<select id="getMasterPasswordNames" resultType="java.lang.String"></select> -->
-<!-- 	<select id="getMasterPasswords" resultType="MasterPassword"></select> -->
-<!-- 	<insert id="instertMasterPassword" parameterType="MasterPassword"></insert> -->
-<!-- 	<update id="updateMasterPassword" parameterType="MasterPassword"></update> -->
+	<delete id="deleteMasterPassword" parameterType="com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword">
+		DELETE FROM MasterPasswords WHERE profileName = #{profileName} AND id = #{id};
+	</delete>
+		
+	<select id="getMasterPassword" resultMap="MasterPassword" parameterType="java.lang.String">
+		SELECT * FROM MasterPasswords WHERE profileName = #{profileName};
+	</select>
+	
+	<select id="getMasterPasswordNames" resultType="java.lang.String">
+		SELECT profileName FROM MasterPasswords;
+	</select>
+	
+	<select id="getMasterPasswords" resultMap="MasterPassword">
+		SELECT * FROM MasterPasswords;
+	</select>
+	
+	<select id="getMasterPasswordId" resultType="java.lang.Integer" parameterType="com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword">
+		SELECT id FROM MasterPasswords WHERE profileName = #{profileName} AND secretKey = #{secretKey} AND  salt = #{salt} AND  createdAt = #{createdAt} AND  updatedAt = #{updatedAt}; 
+	</select>
+	
+	<insert id="instertMasterPassword" parameterType="com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword">
+		INSERT OR FAIL INTO MasterPasswords (profileName, secretKey, salt, createdAt, updatedAt) VALUES (#{profileName}, #{secretKey}, #{salt}, #{createdAt}, #{updatedAt});
+	</insert>
+	
+	<update id="updateMasterPassword" parameterType="com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword">
+		UPDATE OR FAIL MasterPasswords SET profileName = #{profileName}, secretKey = #{secretKey}, salt = #{salt}, createdAt = #{createdAt}, updatedAt = #{updatedAt} WHERE id = #{id};
+	</update>
+	
 	
 	<!-- Stored Password Mappings -->
-<!-- 	<select id="getAllStoredPasswords"> -->
-<!-- 	</select> -->
+	<delete id="deleteStoredPassword" parameterType="com.jbacon.passwordstorage.backend.encryption.objects.StoredPassword">
+		DELETE FROM StoredPasswords WHERE passwordName = #{passwordName} AND id = #{id};
+	</delete>
 	
-<!-- 	<select id="getEveryStoredPassword"> -->
-<!-- 	</select> -->
-
-<!-- 	<update id="updateSingleStoredPassword"> -->
-<!-- 	</update> -->
-
-<!-- 	<insert id="instertSingleStoredPassword"> -->
-<!-- 	</insert> -->
-
-<!-- 	<delete id="deleteSingleStoredPassword"> -->
-<!-- 	</delete> -->
+<!-- 	<select id="getAllStoredPasswords resultMap="StoredPassword""></select> -->
+<!-- 	<select id="getStoredPasswords" resultMap="StoredPassword" parameterType="com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword"></select> -->
+<!-- 	<insert id="instertMasterPassword" parameterType="com.jbacon.passwordstorage.backend.encryption.objects.StoredPassword"></insert> -->
+<!-- 	<update id="updateMasterPassword" parameterType="com.jbacon.passwordstorage.backend.encryption.objects.StoredPassword"></update> -->
 	
 	
 	<!-- Database Configuration Mappings -->
 	<!-- Create DB tables. -->
 	<update id="createStoredPasswordTable">
-		CREATE TABLE IF NOT EXISTS StoredPasswords (id INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE ON CONFLICT FAIL, profileName TEXT NOT NULL, passwordName TEXT NOT NULL, password TEXT NOT NULL, passwordNotes TEXT NOT NULL);
+		CREATE TABLE IF NOT EXISTS StoredPasswords (id INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE ON CONFLICT FAIL, profileName TEXT NOT NULL, passwordName TEXT NOT NULL, password TEXT NOT NULL, passwordNotes TEXT NOT NULL, createdAt TEXT NOT NULL, updatedAt TEXT NOT NULL);
 	</update>
 	<update id="createMasterPasswordTable">
-		CREATE TABLE IF NOT EXISTS MasterPasswords (id INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE ON CONFLICT FAIL, profileName TEXT NOT NULL UNIQUE ON CONFLICT FAIL, secretKey TEXT NOT NULL, salt TEXT NOT NULL);
+		CREATE TABLE IF NOT EXISTS MasterPasswords (id INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE ON CONFLICT FAIL, profileName TEXT NOT NULL UNIQUE ON CONFLICT FAIL, secretKey TEXT NOT NULL, salt TEXT NOT NULL, createdAt TEXT NOT NULL, updatedAt TEXT NOT NULL);
 	</update>
 	
 	<!-- Drop DB tables. -->
@@ -48,16 +64,22 @@
 	
 	<!-- Result Mappings -->
 	<resultMap id="MasterPassword" type="com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword">
+		<result column="id" 		 property="id" />
 		<result column="profileName" property="profileName" />
-		<result column="secretKey" property="encryptedSecretKey" />
-		<result column="salt" property="salt" />
+		<result column="secretKey" 	 property="encryptedSecretKey" />
+		<result column="salt" 		 property="salt" />
+		<result column="createdAt" 	 property="createdAt" javaType="java.sql.TimeStamp" jdbcType="TEXT"/>
+		<result column="updatedAt" 	 property="updatedAt" javaType="java.sql.TimeStamp" jdbcType="TEXT"/>
 	</resultMap>
 	
 	<resultMap id="StoredPassword" type="com.jbacon.passwordstorage.backend.encryption.objects.StoredPassword">
-		<result column="profileName" property="profileName"/>
-		<result column="passwordName" property="encryptedPasswordName"/>
-		<result column="password" property="encryptedPassword"/>
-		<result column="passwordNotes" property="encryptedPasswordNotes"/>
+		<result column="id" 		    property="id" />
+		<result column="profileName" 	property="profileName"/>
+		<result column="passwordName" 	property="encryptedPasswordName"/>
+		<result column="password" 		property="encryptedPassword"/>
+		<result column="passwordNotes" 	property="encryptedPasswordNotes"/>
+		<result column="createdAt" 		property="createdAt" javaType="java.sql.TimeStamp" jdbcType="TEXT"/>
+		<result column="updatedAt" 		property="updatedAt" javaType="java.sql.TimeStamp" jdbcType="TEXT"/>
 	</resultMap>
 
 </mapper>

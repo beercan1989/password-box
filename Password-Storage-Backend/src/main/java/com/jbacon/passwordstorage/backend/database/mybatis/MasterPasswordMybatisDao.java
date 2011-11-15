@@ -18,12 +18,17 @@ public final class MasterPasswordMybatisDao extends MybatisDao implements Master
 
 	@Override
 	public int deleteMasterPassword(final MasterPassword masterPassword) {
-		return databaseConnection.update("deleteSingleMasterPassword");
+		return databaseConnection.delete("deleteSingleMasterPassword");
 	}
 
 	@Override
 	public MasterPassword getMasterPassword(final String profileName) {
 		return (MasterPassword) databaseConnection.selectOne("getSingleMasterPassword");
+	}
+
+	@Override
+	public Integer getMasterPasswordId(final MasterPassword masterPassword) {
+		return (Integer) databaseConnection.selectOne("getMasterPasswordId");
 	}
 
 	@Override
@@ -40,7 +45,7 @@ public final class MasterPasswordMybatisDao extends MybatisDao implements Master
 
 	@Override
 	public int instertMasterPassword(final MasterPassword masterPassword) {
-		return databaseConnection.update("instertSingleMasterPassword");
+		return databaseConnection.insert("instertSingleMasterPassword");
 	}
 
 	@Override
