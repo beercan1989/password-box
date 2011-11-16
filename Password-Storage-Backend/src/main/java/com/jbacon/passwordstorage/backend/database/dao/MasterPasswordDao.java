@@ -23,6 +23,15 @@ public interface MasterPasswordDao extends GenericDao {
 	/**
 	 * Retrieves a specific MasterPassword.
 	 * 
+	 * @param id
+	 *            the id of the MasterPassword.
+	 * @return the retrieved MasterPassword from the database.
+	 */
+	public MasterPassword getMasterPassword(Integer id);
+
+	/**
+	 * Retrieves a specific MasterPassword.
+	 * 
 	 * @param profileName
 	 *            the profile name of the MasterPassword.
 	 * @return the retrieved MasterPassword from the database.

@@ -8,8 +8,12 @@
 		DELETE FROM MasterPasswords WHERE profileName = #{profileName} AND id = #{id};
 	</delete>
 		
-	<select id="getMasterPassword" resultMap="MasterPassword" parameterType="java.lang.String">
+	<select id="getMasterPasswordByProfileName" resultMap="MasterPassword" parameterType="java.lang.String">
 		SELECT * FROM MasterPasswords WHERE profileName = #{profileName};
+	</select>
+	
+	<select id="getMasterPasswordById" resultType="MasterPassword" parameterType="java.lang.Integer">
+		SELECT * FROM MasterPasswords WHERE id = #{id}; 
 	</select>
 	
 	<select id="getMasterPasswordNames" resultType="java.lang.String">
@@ -25,23 +29,42 @@
 	</select>
 	
 	<insert id="instertMasterPassword" parameterType="com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword">
-		INSERT OR FAIL INTO MasterPasswords (profileName, secretKey, salt, createdAt, updatedAt) VALUES (#{profileName}, #{secretKey}, #{salt}, #{createdAt}, #{updatedAt});
+		INSERT OR FAIL INTO MasterPasswords (profileName, secretKey, salt, createdAt, updatedAt) VALUES (#{profileName}, #{secretKey}, #{salt}, datetime('now', 'utc'), datetime('now', 'utc'));
 	</insert>
 	
 	<update id="updateMasterPassword" parameterType="com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword">
-		UPDATE OR FAIL MasterPasswords SET profileName = #{profileName}, secretKey = #{secretKey}, salt = #{salt}, createdAt = #{createdAt}, updatedAt = #{updatedAt} WHERE id = #{id};
+		UPDATE OR FAIL MasterPasswords SET profileName = #{profileName}, secretKey = #{secretKey}, salt = #{salt}, updatedAt = datetime('now', 'utc') WHERE id = #{id};
 	</update>
 	
 	
 	<!-- Stored Password Mappings -->
-	<delete id="deleteStoredPassword" parameterType="com.jbacon.passwordstorage.backend.encryption.objects.StoredPassword">
-		DELETE FROM StoredPasswords WHERE passwordName = #{passwordName} AND id = #{id};
+	<delete id="deleteStoredPassword" parameterType="com.jbacon.passwordstorage.backend.encryption.objects.StoredPassword">		
+		DELETE FROM StoredPasswords WHERE passwordName = #{encryptedPasswordName} AND id = #{id};
 	</delete>
 	
-<!-- 	<select id="getAllStoredPasswords resultMap="StoredPassword""></select> -->
-<!-- 	<select id="getStoredPasswords" resultMap="StoredPassword" parameterType="com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword"></select> -->
-<!-- 	<insert id="instertMasterPassword" parameterType="com.jbacon.passwordstorage.backend.encryption.objects.StoredPassword"></insert> -->
-<!-- 	<update id="updateMasterPassword" parameterType="com.jbacon.passwordstorage.backend.encryption.objects.StoredPassword"></update> -->
+	<select id="getStoredPasswordId" resultType="java.lang.Integer" parameterType="com.jbacon.passwordstorage.backend.encryption.objects.StoredPassword">
+		SELECT id FROM StoredPasswords WHERE profileName = #{profileName}, passwordName = #{encryptedPasswordName}, password = #{encryptedPassword}, passwordNotes = #{encryptedPasswordNotes}; 
+	</select>
+	
+	<select id="getStoredPasswordById" resultType="StoredPassword" parameterType="java.lang.Integer">
+		SELECT * FROM StoredPasswords WHERE id = #{id}; 
+	</select>
+	
+	<select id="getEveryStoredPassword" resultMap="StoredPassword">
+		SELECT * FROM StoredPasswords;
+	</select>
+	
+	<select id="getStoredPasswords" resultMap="StoredPassword" parameterType="com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword">
+		SELECT * FROM StoredPasswords WHERE profileName = #{profileName};
+	</select>
+	
+	<insert id="instertStoredPassword" parameterType="com.jbacon.passwordstorage.backend.encryption.objects.StoredPassword">
+		INSERT OR FAIL INTO StoredPasswords (profileName, passwordName, password, passwordNotes, createdAt, updatedAt) VALUES (#{profileName}, #{encryptedPasswordName}, #{encryptedPassword}, #{encryptedPasswordNotes}, datetime('now', 'utc'), datetime('now', 'utc'));
+	</insert>
+	
+	<update id="updateStoredPassword" parameterType="com.jbacon.passwordstorage.backend.encryption.objects.StoredPassword">
+		UPDATE OR FAIL StoredPasswords SET profileName = #{profileName}, passwordName = #{encryptedPasswordName}, password = #{encryptedPassword}, passwordNotes = #{encryptedPasswordNotes}, updatedAt = datetime('now', 'utc') WHERE id = #{id};
+	</update>
 	
 	
 	<!-- Database Configuration Mappings -->
@@ -63,21 +86,21 @@
 	
 	
 	<!-- Result Mappings -->
-	<resultMap id="MasterPassword" type="com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword">
-		<result column="id" 		 property="id" />
+	<resultMap id="MasterPassword" type="com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword" extends="GenericPassword">
 		<result column="profileName" property="profileName" />
 		<result column="secretKey" 	 property="encryptedSecretKey" />
 		<result column="salt" 		 property="salt" />
-		<result column="createdAt" 	 property="createdAt" javaType="java.sql.TimeStamp" jdbcType="TEXT"/>
-		<result column="updatedAt" 	 property="updatedAt" javaType="java.sql.TimeStamp" jdbcType="TEXT"/>
 	</resultMap>
 	
-	<resultMap id="StoredPassword" type="com.jbacon.passwordstorage.backend.encryption.objects.StoredPassword">
-		<result column="id" 		    property="id" />
+	<resultMap id="StoredPassword" type="com.jbacon.passwordstorage.backend.encryption.objects.StoredPassword" extends="GenericPassword">
 		<result column="profileName" 	property="profileName"/>
 		<result column="passwordName" 	property="encryptedPasswordName"/>
 		<result column="password" 		property="encryptedPassword"/>
 		<result column="passwordNotes" 	property="encryptedPasswordNotes"/>
+	</resultMap>
+	
+	<resultMap id="GenericPassword" type="com.jbacon.passwordstorage.backend.encryption.objects.GenericPassword">
+		<result column="id" 		    property="id" />
 		<result column="createdAt" 		property="createdAt" javaType="java.sql.TimeStamp" jdbcType="TEXT"/>
 		<result column="updatedAt" 		property="updatedAt" javaType="java.sql.TimeStamp" jdbcType="TEXT"/>
 	</resultMap>

@@ -2,28 +2,22 @@ package com.jbacon.passwordstorage.backend.encryption.objects;
 
 import java.sql.Timestamp;
 
-public class StoredPassword {
+public class StoredPassword extends GenericPassword {
 
-	private Integer id;
 	private String encryptedPasswordName;
 	private String encryptedPassword;
 	private String encryptedPasswordNotes;
-	private String profileName;
-	private Timestamp createdAt;
-	private Timestamp updatedAt;
 
 	public StoredPassword() {
+		super();
 	}
 
-	public StoredPassword(final String encryptedPasswordName, final String profileName, final String encryptedPassword, final String encryptedPasswordNotes) {
+	public StoredPassword(final String encryptedPasswordName, final String profileName, final String encryptedPassword, final String encryptedPasswordNotes,
+			final Timestamp createdAt, final Timestamp updatedAt, final Integer id) {
+		super(createdAt, updatedAt, id, profileName);
 		this.encryptedPasswordName = encryptedPasswordName;
-		this.profileName = profileName;
 		this.encryptedPassword = encryptedPassword;
 		this.encryptedPasswordNotes = encryptedPasswordNotes;
-	}
-
-	public Timestamp getCreatedAt() {
-		return createdAt;
 	}
 
 	public String getEncryptedPassword() {
@@ -38,22 +32,6 @@ public class StoredPassword {
 		return encryptedPasswordNotes;
 	}
 
-	public Integer getId() {
-		return id;
-	}
-
-	public String getProfileName() {
-		return profileName;
-	}
-
-	public Timestamp getUpdatedAt() {
-		return updatedAt;
-	}
-
-	public void setCreatedAt(final Timestamp createdAt) {
-		this.createdAt = createdAt;
-	}
-
 	public void setEncryptedPassword(final String encryptedPassword) {
 		this.encryptedPassword = encryptedPassword;
 	}
@@ -66,23 +44,11 @@ public class StoredPassword {
 		this.encryptedPasswordNotes = encryptedWebsiteUrl;
 	}
 
-	public void setId(final Integer id) {
-		this.id = id;
-	}
-
-	public void setProfileName(final String profileName) {
-		this.profileName = profileName;
-	}
-
-	public void setUpdatedAt(final Timestamp updatedAt) {
-		this.updatedAt = updatedAt;
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("StoredPassword [id=");
-		builder.append(id);
+		builder.append(getId());
 		builder.append(", encryptedPasswordName=");
 		builder.append(encryptedPasswordName);
 		builder.append(", encryptedPassword=");
@@ -90,11 +56,11 @@ public class StoredPassword {
 		builder.append(", encryptedPasswordNotes=");
 		builder.append(encryptedPasswordNotes);
 		builder.append(", profileName=");
-		builder.append(profileName);
+		builder.append(getProfileName());
 		builder.append(", createdAt=");
-		builder.append(createdAt);
+		builder.append(getCreatedAt());
 		builder.append(", updatedAt=");
-		builder.append(updatedAt);
+		builder.append(getUpdatedAt());
 		builder.append("]");
 		return builder.toString();
 	}

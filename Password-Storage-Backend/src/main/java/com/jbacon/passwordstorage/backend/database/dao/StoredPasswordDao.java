@@ -22,6 +22,25 @@ public interface StoredPasswordDao extends GenericDao {
 	public int deleteStoredPassword(StoredPassword storedPassword);
 
 	/**
+	 * Retrieves a specific StoredPassword.
+	 * 
+	 * @param id
+	 *            the id of the StoredPassword.
+	 * @return the retrieved StoredPassword from the database.
+	 */
+	public StoredPassword getStoredPassword(Integer id);
+
+	/**
+	 * Retrieves the ID for a newly created database entry for a MasterPassword.
+	 * 
+	 * @param storedPassword
+	 *            the StoredPassword to get an ID for.
+	 * @return the ID value of the StoredPassword, null if the StoredPassword is
+	 *         not in the database.
+	 */
+	public Integer getStoredPasswordId(StoredPassword storedPassword);
+
+	/**
 	 * Retrieves a list of all StoredPasswords from the database.
 	 * 
 	 * @return a list of every StoredPassword in the database.

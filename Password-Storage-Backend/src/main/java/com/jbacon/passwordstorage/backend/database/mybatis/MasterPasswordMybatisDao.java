@@ -18,39 +18,44 @@ public final class MasterPasswordMybatisDao extends MybatisDao implements Master
 
 	@Override
 	public int deleteMasterPassword(final MasterPassword masterPassword) {
-		return databaseConnection.delete("deleteSingleMasterPassword");
+		return databaseConnection.delete("deleteMasterPassword", masterPassword);
+	}
+
+	@Override
+	public MasterPassword getMasterPassword(final Integer id) {
+		return (MasterPassword) databaseConnection.selectOne("getMasterPasswordById", id);
 	}
 
 	@Override
 	public MasterPassword getMasterPassword(final String profileName) {
-		return (MasterPassword) databaseConnection.selectOne("getSingleMasterPassword");
+		return (MasterPassword) databaseConnection.selectOne("getMasterPasswordByProfileName", profileName);
 	}
 
 	@Override
 	public Integer getMasterPasswordId(final MasterPassword masterPassword) {
-		return (Integer) databaseConnection.selectOne("getMasterPasswordId");
+		return (Integer) databaseConnection.selectOne("getMasterPasswordId", masterPassword);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<String> getMasterPasswordNames() {
-		return (List<String>) databaseConnection.selectList("getAllMasterPasswordNames");
+		return (List<String>) databaseConnection.selectList("getMasterPasswordNames");
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<MasterPassword> getMasterPasswords() {
-		return (List<MasterPassword>) databaseConnection.selectList("getAllMasterPasswords");
+		return (List<MasterPassword>) databaseConnection.selectList("getMasterPasswords");
 	}
 
 	@Override
 	public int instertMasterPassword(final MasterPassword masterPassword) {
-		return databaseConnection.insert("instertSingleMasterPassword");
+		return databaseConnection.insert("instertMasterPassword", masterPassword);
 	}
 
 	@Override
 	public int updateMasterPassword(final MasterPassword masterPassword) {
-		return databaseConnection.update("updateSingleMasterPassword");
+		return databaseConnection.update("updateMasterPassword", masterPassword);
 	}
 
 }

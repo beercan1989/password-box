@@ -19,7 +19,17 @@ public final class StoredPasswordMybatisDao extends MybatisDao implements Stored
 
 	@Override
 	public int deleteStoredPassword(final StoredPassword storedPassword) {
-		return databaseConnection.delete("deleteSingleStoredPassword", storedPassword);
+		return databaseConnection.delete("deleteStoredPassword", storedPassword);
+	}
+
+	@Override
+	public StoredPassword getStoredPassword(final Integer id) {
+		return (StoredPassword) databaseConnection.selectOne("getStoredPasswordById", id);
+	}
+
+	@Override
+	public Integer getStoredPasswordId(final StoredPassword storedPassword) {
+		return (Integer) databaseConnection.selectOne("getStoredPasswordId");
 	}
 
 	@Override
@@ -31,17 +41,17 @@ public final class StoredPasswordMybatisDao extends MybatisDao implements Stored
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<StoredPassword> getStoredPasswords(final MasterPassword masterPassword) {
-		return (List<StoredPassword>) databaseConnection.selectList("getAllStoredPasswords", masterPassword);
+		return (List<StoredPassword>) databaseConnection.selectList("getStoredPasswords", masterPassword);
 	}
 
 	@Override
 	public int instertStoredPassword(final StoredPassword storedPassword) {
-		return databaseConnection.insert("instertSingleStoredPassword", storedPassword);
+		return databaseConnection.insert("instertStoredPassword", storedPassword);
 	}
 
 	@Override
 	public int updateStoredPassword(final StoredPassword storedPassword) {
-		return databaseConnection.update("updateSingleStoredPassword", storedPassword);
+		return databaseConnection.update("updateStoredPassword", storedPassword);
 	}
 
 }
