@@ -2,7 +2,7 @@ package com.jbacon.passwordstorage.swing.dragndrop;
 
 import java.awt.datatransfer.DataFlavor;
 
-import com.jbacon.passwordstorage.backend.encryption.objects.StoredPassword;
+import com.jbacon.passwordstorage.backend.password.StoredPassword;
 
 public class EncryptionPasswordDataFlavour extends DataFlavor {
 

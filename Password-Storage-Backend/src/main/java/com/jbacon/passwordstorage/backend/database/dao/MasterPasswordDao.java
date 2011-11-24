@@ -2,7 +2,7 @@ package com.jbacon.passwordstorage.backend.database.dao;
 
 import java.util.List;
 
-import com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword;
+import com.jbacon.passwordstorage.backend.password.MasterPassword;
 
 /**
  * MasterPassword Dao

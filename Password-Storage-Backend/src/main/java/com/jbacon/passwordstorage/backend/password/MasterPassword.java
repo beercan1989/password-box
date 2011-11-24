@@ -1,4 +1,4 @@
-package com.jbacon.passwordstorage.backend.encryption.objects;
+package com.jbacon.passwordstorage.backend.password;
 
 import java.sql.Timestamp;
 

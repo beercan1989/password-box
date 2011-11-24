@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.List;
 
 import com.jbacon.passwordstorage.backend.database.dao.StoredPasswordDao;
-import com.jbacon.passwordstorage.backend.encryption.objects.MasterPassword;
-import com.jbacon.passwordstorage.backend.encryption.objects.StoredPassword;
+import com.jbacon.passwordstorage.backend.password.MasterPassword;
+import com.jbacon.passwordstorage.backend.password.StoredPassword;
 
 public final class StoredPasswordMybatisDao extends MybatisDao implements StoredPasswordDao {
 
