@@ -1,22 +1,17 @@
 package com.jbacon.passwordstorage.backend.password.generation;
 
-public class CharSetPasswordGenerator extends AbstractPasswordGenerator implements PasswordGenerator {
+public class CharSetPasswordGenerator extends AbstractPasswordGenerator {
 
 	@Override
 	public String getPassword() {
 		StringBuilder stringBuilder = new StringBuilder();
+		Character[] charactersToSelect = CUSTOM_CHARS.get();
 
 		for (int i = 0; i <= LENGTH; i++) {
-			stringBuilder.append(CHAR_SET_CHARS[getNextRandomInt(CHAR_SET_CHARS.length)]);
+			stringBuilder.append(charactersToSelect[getNextRandomInt(charactersToSelect.length)]);
 		}
 
 		return stringBuilder.toString();
-	}
-
-	@Override
-	public String getPassword(final int length) {
-		LENGTH = length;
-		return getPassword();
 	}
 
 	@Override
@@ -26,14 +21,14 @@ public class CharSetPasswordGenerator extends AbstractPasswordGenerator implemen
 				setCharSet(property.value.toString());
 			}
 			if (PasswordGeneratorProperty.PasswordLength.equalsIgnoreCase(property.name)) {
-				LENGTH = Integer.valueOf((String) property.value);
+				setLength(property.value.toString());
 			}
 		}
 		return null;
 	}
 
 	private void setCharSet(final String charSet) {
-
+		// TODO
 	}
 
 }

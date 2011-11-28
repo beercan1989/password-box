@@ -1,23 +1,14 @@
 package com.jbacon.passwordstorage.backend.password.generation;
 
-public class AlphaNumbericPasswordGenerator extends AbstractPasswordGenerator implements PasswordGenerator {
+public class AlphaNumbericPasswordGenerator extends AbstractPasswordGenerator {
 
 	@Override
 	public String getPassword() {
-		StringBuilder stringBuilder = new StringBuilder();
-
-		for (int i = 0; i <= LENGTH; i++) {
-			stringBuilder.append(ALPHA_NUMERIC_CHARS[getNextRandomInt(ALPHA_NUMERIC_CHARS.length)]);
-		}
-
-		return stringBuilder.toString();
-
-	}
-
-	@Override
-	public String getPassword(final int length) {
-		LENGTH = length;
-		return getPassword();
+		CharSetPasswordGenerator alphaNumbericPasswordGenerator = new CharSetPasswordGenerator();
+		PasswordGeneratorProperty[] properties = new PasswordGeneratorProperty[] {
+				new PasswordGeneratorProperty(PasswordGeneratorProperty.PasswordLength, LENGTH),//
+				new PasswordGeneratorProperty(PasswordGeneratorProperty.UseCharSet, CharSetType.MIXED_ALPHA_NUMERIC) };
+		return alphaNumbericPasswordGenerator.getPassword(properties);
 	}
 
 	@Override
