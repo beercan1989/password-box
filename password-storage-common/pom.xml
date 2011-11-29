@@ -1,0 +1,104 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.jbacon.passwordstorage</groupId>
+	<artifactId>passwordstorage.common</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Password Storage - Common</name>
+	<packaging>jar</packaging>
+
+	<parent>
+		<groupId>com.jbacon.passwordstorage</groupId>
+		<artifactId>passwordstorage</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.charabia</groupId>
+			<artifactId>jsmoothgen</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.xerial</groupId>
+			<artifactId>sqlite-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk16</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+		</dependency>
+	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.mindtree.techworks.insight.releng</groupId>
+				<artifactId>maven-jsmooth-plugin</artifactId>
+				<version>${maven-jsmooth-plugin.version}</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>jsmoothcompile</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<jsmoothFile></jsmoothFile>
+					<dependencyBaseDir></dependencyBaseDir>
+					<dependencyScope>compile</dependencyScope>
+					<iconLocation></iconLocation>
+					<includeDependencies>true</includeDependencies>
+					<setExeName>true</setExeName>
+					<setJarName>true</setJarName>
+					<skipJSmooth>true</skipJSmooth>
+				</configuration>
+			</plugin>
+
+			<!-- MyBatis Migrations -->
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.mybatis.maven</groupId> -->
+<!-- 				<artifactId>maven-migration-plugin</artifactId> -->
+<!-- 				<version>1.0.0</version> -->
+<!-- 				<configuration> -->
+<!-- 					<repository>${basedir}/src/main/resources/mybatis/migrations/</repository> -->
+<!-- 				</configuration> -->
+<!-- 				<dependencies> -->
+<!-- 					<dependency> -->
+<!-- 						<groupId>org.xerial</groupId> -->
+<!-- 						<artifactId>sqlite-jdbc</artifactId> -->
+<!-- 						<version>3.6.16</version> -->
+<!-- 					</dependency> -->
+<!-- 				</dependencies> -->
+<!-- 			</plugin> -->
+		</plugins>
+	</build>
+</project>
