@@ -1,2 +1,4 @@
-/Wiki-Pages 
-Wiki-Pages
+/.settings
+.project
+.classpath
+/target
