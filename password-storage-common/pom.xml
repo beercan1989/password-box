@@ -1,9 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.jbacon.passwordstorage</groupId>
 	<artifactId>passwordstorage.common</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>Password Storage - Common</name>
 	<packaging>jar</packaging>
 
@@ -59,29 +57,29 @@
 					<target>${java.version}</target>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>com.mindtree.techworks.insight.releng</groupId>
-				<artifactId>maven-jsmooth-plugin</artifactId>
-				<version>${maven-jsmooth-plugin.version}</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>jsmoothcompile</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<jsmoothFile></jsmoothFile>
-					<dependencyBaseDir></dependencyBaseDir>
-					<dependencyScope>compile</dependencyScope>
-					<iconLocation></iconLocation>
-					<includeDependencies>true</includeDependencies>
-					<setExeName>true</setExeName>
-					<setJarName>true</setJarName>
-					<skipJSmooth>true</skipJSmooth>
-				</configuration>
-			</plugin>
+<!-- 			<plugin> -->
+<!-- 				<groupId>com.mindtree.techworks.insight.releng</groupId> -->
+<!-- 				<artifactId>maven-jsmooth-plugin</artifactId> -->
+<!-- 				<version>${maven-jsmooth-plugin.version}</version> -->
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<phase>package</phase> -->
+<!-- 						<goals> -->
+<!-- 							<goal>jsmoothcompile</goal> -->
+<!-- 						</goals> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 				<configuration> -->
+<!-- 					<jsmoothFile></jsmoothFile> -->
+<!-- 					<dependencyBaseDir></dependencyBaseDir> -->
+<!-- 					<dependencyScope>compile</dependencyScope> -->
+<!-- 					<iconLocation></iconLocation> -->
+<!-- 					<includeDependencies>true</includeDependencies> -->
+<!-- 					<setExeName>true</setExeName> -->
+<!-- 					<setJarName>true</setJarName> -->
+<!-- 					<skipJSmooth>true</skipJSmooth> -->
+<!-- 				</configuration> -->
+<!-- 			</plugin> -->
 
 			<!-- MyBatis Migrations -->
 <!-- 			<plugin> -->
