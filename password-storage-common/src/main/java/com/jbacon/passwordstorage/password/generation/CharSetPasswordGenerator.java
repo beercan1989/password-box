@@ -20,15 +20,12 @@ public class CharSetPasswordGenerator extends AbstractPasswordGenerator {
 			if (PasswordGeneratorProperty.UseCharSet.equalsIgnoreCase(property.name)) {
 				setCharSet(property.value.toString());
 			}
-			if (PasswordGeneratorProperty.PasswordLength.equalsIgnoreCase(property.name)) {
-				setLength(property.value.toString());
-			}
 		}
-		return null;
+		return getPassword(properties);
 	}
 
 	private void setCharSet(final String charSet) {
-		// TODO
+		CUSTOM_CHARS = CharSetType.valueOf(charSet);
 	}
 
 }

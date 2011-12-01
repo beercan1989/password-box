@@ -24,6 +24,16 @@ public abstract class AbstractPasswordGenerator implements PasswordGenerator {
 		return getPassword();
 	}
 
+	@Override
+	public String getPassword(final PasswordGeneratorProperty... properties) {
+		for (PasswordGeneratorProperty property : properties) {
+			if (PasswordGeneratorProperty.PasswordLength.equalsIgnoreCase(property.name)) {
+				LENGTH = Integer.valueOf((String) property.value);
+			}
+		}
+		return getPassword();
+	}
+
 	protected void setLength(final String value) {
 		LENGTH = Integer.valueOf(value);
 	}

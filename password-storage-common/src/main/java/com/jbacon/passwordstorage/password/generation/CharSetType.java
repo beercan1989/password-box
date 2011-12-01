@@ -64,7 +64,7 @@ public enum CharSetType {
 		return result;
 	}
 
-	public static Character[] concat(final CharSetType first, final CharSetType... rest) {
+	private static Character[] concat(final CharSetType first, final CharSetType... rest) {
 		Character[] result = first.get();
 
 		for (CharSetType charSet : rest) {

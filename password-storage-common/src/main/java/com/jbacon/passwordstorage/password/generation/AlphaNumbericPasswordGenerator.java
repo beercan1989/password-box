@@ -11,14 +11,4 @@ public class AlphaNumbericPasswordGenerator extends AbstractPasswordGenerator {
 		return alphaNumbericPasswordGenerator.getPassword(properties);
 	}
 
-	@Override
-	public String getPassword(final PasswordGeneratorProperty... properties) {
-		for (PasswordGeneratorProperty property : properties) {
-			if (PasswordGeneratorProperty.PasswordLength.equalsIgnoreCase(property.name)) {
-				LENGTH = Integer.valueOf((String) property.value);
-			}
-		}
-		return getPassword();
-	}
-
 }
