@@ -26,13 +26,9 @@ public class EncrypterAES extends Encrypter {
 	public byte[] doCiper(final EncryptionMode encryptionMode, final byte[] cipherText, final byte[] aesKey) throws AbstractEncrypterException {
 		try {
 			SecretKeySpec secretKeySpecification = new SecretKeySpec(aesKey, encryptionType.algorithmName);
-
 			Cipher cipher = Cipher.getInstance(encryptionType.algorithmName, EncryptionType.PROVIDER_NAME);
-
 			cipher.init(encryptionMode.mode, secretKeySpecification);
-
 			return cipher.doFinal(cipherText);
-
 		} catch (NoSuchAlgorithmException e) {
 			throw new NoSuchEncryptionException(e);
 		} catch (NoSuchPaddingException e) {

@@ -29,17 +29,14 @@ public class EncrypterPBE extends Encrypter {
 	public byte[] doCiper(final EncryptionMode encryptionMode, final byte[] salt, final byte[] cipherText, final char[] passPhrase)
 			throws AbstractEncrypterException {
 		try {
-			PBEParameterSpec parameterSpecification = new PBEParameterSpec(salt, (Integer) encryptionType.getSpecification().get(ITERATION_COUNT));
+			Integer iterationCount = encryptionType.getSpecification().get(ITERATION_COUNT);
+			PBEParameterSpec parameterSpecification = new PBEParameterSpec(salt, iterationCount);
 			PBEKeySpec keySpecification = new PBEKeySpec(passPhrase);
 			SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(encryptionType.algorithmName);
 			SecretKey secretKey = keyFactory.generateSecret(keySpecification);
-
 			Cipher cipher = Cipher.getInstance(encryptionType.algorithmName);
-
 			cipher.init(encryptionMode.mode, secretKey, parameterSpecification);
-
 			return cipher.doFinal(cipherText);
-
 		} catch (NoSuchAlgorithmException e) {
 			throw new NoSuchEncryptionException(e);
 		} catch (InvalidKeySpecException e) {
