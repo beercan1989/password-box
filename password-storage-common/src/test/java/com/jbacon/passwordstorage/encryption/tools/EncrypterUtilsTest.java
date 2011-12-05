@@ -19,7 +19,6 @@ import org.junit.Test;
 import com.jbacon.passwordstorage.encryption.EncryptionType;
 import com.jbacon.passwordstorage.encryption.errors.InvalidEncryptionTypeForSaltGeneration;
 import com.jbacon.passwordstorage.encryption.errors.NoSuchEncryptionException;
-import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 
 public class EncrypterUtilsTest {
 
@@ -82,8 +81,7 @@ public class EncrypterUtilsTest {
 	@Test(expected = InvalidEncryptionTypeForSaltGeneration.class)
 	public void shouldThrowExceptionGeneratingSaltForAES() throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchEncryptionException,
 			InvalidEncryptionTypeForSaltGeneration {
-		final byte[] generatedSalt = encrypterUtils.generateSalt(EncryptionType.AES_128);
-		assertThat(generatedSalt, is(nullValue()));
+		encrypterUtils.generateSalt(EncryptionType.AES_128);
 	}
 
 }
