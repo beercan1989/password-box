@@ -19,6 +19,7 @@ import org.junit.Test;
 import com.jbacon.passwordstorage.encryption.EncryptionType;
 import com.jbacon.passwordstorage.encryption.errors.InvalidEncryptionTypeForSaltGeneration;
 import com.jbacon.passwordstorage.encryption.errors.NoSuchEncryptionException;
+import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 
 public class EncrypterUtilsTest {
 
