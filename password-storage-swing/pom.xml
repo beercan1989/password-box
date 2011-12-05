@@ -16,7 +16,6 @@
 		<dependency>
 			<groupId>com.jbacon.passwordstorage</groupId>
 			<artifactId>passwordstorage.common</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
