@@ -10,32 +10,10 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import com.jbacon.passwordstorage.database.DatabaseType;
 import com.jbacon.passwordstorage.database.dao.GenericDao;
 import com.jbacon.passwordstorage.database.errors.UnsupportedDatabaseException;
-import com.jbacon.passwordstorage.database.mybatis.MaintenanceMybatisDao;
-import com.jbacon.passwordstorage.database.mybatis.MasterPasswordMybatisDao;
-import com.jbacon.passwordstorage.database.mybatis.StoredPasswordMybatisDao;
 
 public class DatabaseTypeTest {
-
-	@Test
-	public void shouldCreateComputerMaintenanceDao() throws UnsupportedDatabaseException, IOException {
-		GenericDao result = DatabaseType.Computer.createMaintenanceDao();
-		verifyDao(result, MaintenanceMybatisDao.class);
-	}
-
-	@Test
-	public void shouldCreateComputerMasterPasswordDao() throws UnsupportedDatabaseException, IOException {
-		GenericDao result = DatabaseType.Computer.createMasterPasswordDao();
-		verifyDao(result, MasterPasswordMybatisDao.class);
-	}
-
-	@Test
-	public void shouldCreateComputerStoredPasswordDao() throws UnsupportedDatabaseException, IOException {
-		GenericDao result = DatabaseType.Computer.createStoredPasswordDao();
-		verifyDao(result, StoredPasswordMybatisDao.class);
-	}
 
 	@Test(expected = UnsupportedDatabaseException.class)
 	public void shouldFailToGetAndroidMaintenanceDao() throws UnsupportedDatabaseException, IOException {

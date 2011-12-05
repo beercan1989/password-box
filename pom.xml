@@ -19,10 +19,12 @@
 		<hamcrest-all.version>1.1</hamcrest-all.version>
 		<bcprov-jdk16.version>1.46</bcprov-jdk16.version>
 		<mybatis.version>3.0.5</mybatis.version>
+		<passwordstorage.common.version>0.0.1-SNAPSHOT</passwordstorage.common.version>
 	</properties>
 	
 	<modules>
 		<module>password-storage-common</module>
+		<module>password-storage-database-mybatis</module>
 		<module>password-storage-swing</module>
 		<module>password-storage-android</module>
 		<module>password-storage-blackberry</module>
@@ -31,45 +33,51 @@
 	
 	<dependencyManagement>
 		<dependencies>
-		<dependency>
-			<groupId>net.charabia</groupId>
-			<artifactId>jsmoothgen</artifactId>
-			<version>${jsmoothgen.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.xerial</groupId>
-			<artifactId>sqlite-jdbc</artifactId>
-			<version>${sqlite-jdbc.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<version>${mockito-all.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-all</artifactId>
-			<version>${hamcrest-all.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk16</artifactId>
-			<version>${bcprov-jdk16.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mybatis</groupId>
-			<artifactId>mybatis</artifactId>
-			<version>${mybatis.version}</version>
-		</dependency>
-	</dependencies>
+			<dependency>
+				<groupId>com.jbacon.passwordstorage</groupId>
+				<artifactId>passwordstorage.common</artifactId>
+				<version>${passwordstorage.common.version}</version>
+			</dependency>
+		
+			<dependency>
+				<groupId>net.charabia</groupId>
+				<artifactId>jsmoothgen</artifactId>
+				<version>${jsmoothgen.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.xerial</groupId>
+				<artifactId>sqlite-jdbc</artifactId>
+				<version>${sqlite-jdbc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${junit.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-all</artifactId>
+				<version>${mockito-all.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.hamcrest</groupId>
+				<artifactId>hamcrest-all</artifactId>
+				<version>${hamcrest-all.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcprov-jdk16</artifactId>
+				<version>${bcprov-jdk16.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mybatis</groupId>
+				<artifactId>mybatis</artifactId>
+				<version>${mybatis.version}</version>
+			</dependency>
+		</dependencies>
 	</dependencyManagement>
 	
 	<repositories>
