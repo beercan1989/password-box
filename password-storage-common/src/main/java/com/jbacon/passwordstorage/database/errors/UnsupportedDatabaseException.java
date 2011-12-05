@@ -1,6 +1,6 @@
 package com.jbacon.passwordstorage.database.errors;
 
-public class UnsupportedDatabaseException extends Exception {
+public class UnsupportedDatabaseException extends DatabaseException {
 
     private static final long serialVersionUID = -8885640080641144708L;
 
