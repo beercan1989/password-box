@@ -11,8 +11,13 @@ public interface Database {
 
 	public MaintenanceDao createMaintenanceDao() throws UnsupportedDatabaseException, IOException;
 
+	public MaintenanceDao createMaintenanceDao(String configurationFile) throws UnsupportedDatabaseException, IOException;
+
 	public MasterPasswordDao createMasterPasswordDao() throws UnsupportedDatabaseException, IOException;
+
+	public MasterPasswordDao createMasterPasswordDao(String configurationFile) throws UnsupportedDatabaseException, IOException;
 
 	public StoredPasswordDao createStoredPasswordDao() throws UnsupportedDatabaseException, IOException;
 
+	public StoredPasswordDao createStoredPasswordDao(String configurationFile) throws UnsupportedDatabaseException, IOException;
 }
