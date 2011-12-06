@@ -26,18 +26,15 @@ public enum DatabaseType implements Database {
 		}
 	};
 
-	@Override
-	public MaintenanceDao createMaintenanceDao() throws UnsupportedDatabaseException, IOException {
-		throw new UnsupportedDatabaseException("Database type has not been implemented yet.");
+	public MaintenanceDao createMaintenanceDao(final String configurationFilePath) throws UnsupportedDatabaseException, IOException {
+		return new MaintenanceMybatisDao(configurationFilePath);
 	}
 
-	@Override
-	public MasterPasswordDao createMasterPasswordDao() throws UnsupportedDatabaseException, IOException {
-		throw new UnsupportedDatabaseException("Database type has not been implemented yet.");
+	public MasterPasswordDao createMasterPasswordDao(final String configurationFilePath) throws UnsupportedDatabaseException, IOException {
+		return new MasterPasswordMybatisDao(configurationFilePath);
 	}
 
-	@Override
-	public StoredPasswordDao createStoredPasswordDao() throws UnsupportedDatabaseException, IOException {
-		throw new UnsupportedDatabaseException("Database type has not been implemented yet.");
+	public StoredPasswordDao createStoredPasswordDao(final String configurationFilePath) throws UnsupportedDatabaseException, IOException {
+		return new StoredPasswordMybatisDao(configurationFilePath);
 	}
 }
