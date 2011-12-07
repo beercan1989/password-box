@@ -25,15 +25,15 @@
 	</select>
 	
 	<select id="getMasterPasswordId" resultType="java.lang.Integer" parameterType="com.jbacon.passwordstorage.password.MasterPassword">
-		SELECT id FROM MasterPasswords WHERE profileName = #{profileName} AND secretKey = #{secretKey} AND  salt = #{salt} AND  createdAt = #{createdAt} AND  updatedAt = #{updatedAt}; 
+		SELECT id FROM MasterPasswords WHERE profileName = #{profileName} AND secretKey = #{encryptedSecretKey} AND  salt = #{salt} AND  createdAt = #{createdAt} AND  updatedAt = #{updatedAt}; 
 	</select>
 	
 	<insert id="instertMasterPassword" parameterType="com.jbacon.passwordstorage.password.MasterPassword">
-		INSERT OR FAIL INTO MasterPasswords (profileName, secretKey, salt, createdAt, updatedAt) VALUES (#{profileName}, #{secretKey}, #{salt}, datetime('now', 'utc'), datetime('now', 'utc'));
+		INSERT OR FAIL INTO MasterPasswords (profileName, secretKey, salt, createdAt, updatedAt) VALUES (#{profileName}, #{encryptedSecretKey}, #{salt}, datetime('now', 'utc'), datetime('now', 'utc'));
 	</insert>
 	
 	<update id="updateMasterPassword" parameterType="com.jbacon.passwordstorage.password.MasterPassword">
-		UPDATE OR FAIL MasterPasswords SET profileName = #{profileName}, secretKey = #{secretKey}, salt = #{salt}, updatedAt = datetime('now', 'utc') WHERE id = #{id};
+		UPDATE OR FAIL MasterPasswords SET profileName = #{profileName}, secretKey = #{encryptedSecretKey}, salt = #{salt}, updatedAt = datetime('now', 'utc') WHERE id = #{id};
 	</update>
 	
 	
