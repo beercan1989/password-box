@@ -12,7 +12,7 @@
 		SELECT * FROM MasterPasswords WHERE profileName = #{profileName};
 	</select>
 	
-	<select id="getMasterPasswordById" resultType="MasterPassword" parameterType="java.lang.Integer">
+	<select id="getMasterPasswordById" resultMap="MasterPassword" parameterType="java.lang.Integer">
 		SELECT * FROM MasterPasswords WHERE id = #{id}; 
 	</select>
 	
@@ -46,7 +46,7 @@
 		SELECT id FROM StoredPasswords WHERE profileName = #{profileName}, passwordName = #{encryptedPasswordName}, password = #{encryptedPassword}, passwordNotes = #{encryptedPasswordNotes}; 
 	</select>
 	
-	<select id="getStoredPasswordById" resultType="StoredPassword" parameterType="java.lang.Integer">
+	<select id="getStoredPasswordById" resultMap="StoredPassword" parameterType="java.lang.Integer">
 		SELECT * FROM StoredPasswords WHERE id = #{id}; 
 	</select>
 	
