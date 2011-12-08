@@ -20,6 +20,6 @@ public abstract class MybatisDao {
 
 	private void setupDatabaseConnection(final String configuration) throws IOException {
 		Reader reader = Resources.getResourceAsReader(configuration);
-		databaseConnection = new SqlSessionWrapper(new SqlSessionFactoryBuilder().build(reader).openSession());
+		databaseConnection = new SqlSessionWrapper(new SqlSessionFactoryBuilder().build(reader));
 	}
 }

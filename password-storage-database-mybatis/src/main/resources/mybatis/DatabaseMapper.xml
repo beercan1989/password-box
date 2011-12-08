@@ -25,7 +25,7 @@
 	</select>
 	
 	<select id="getMasterPasswordId" resultType="java.lang.Integer" parameterType="com.jbacon.passwordstorage.password.MasterPassword">
-		SELECT id FROM MasterPasswords WHERE profileName = #{profileName} AND secretKey = #{encryptedSecretKey} AND  salt = #{salt} AND  createdAt = #{createdAt} AND  updatedAt = #{updatedAt}; 
+		SELECT id FROM MasterPasswords WHERE profileName = #{profileName} AND secretKey = #{encryptedSecretKey} AND  salt = #{salt}; 
 	</select>
 	
 	<insert id="instertMasterPassword" parameterType="com.jbacon.passwordstorage.password.MasterPassword">

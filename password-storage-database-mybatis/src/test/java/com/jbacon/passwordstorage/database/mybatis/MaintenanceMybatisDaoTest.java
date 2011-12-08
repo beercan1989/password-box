@@ -7,46 +7,46 @@ import static org.hamcrest.Matchers.is;
 import java.io.IOException;
 
 import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.jbacon.passwordstorage.database.mybatis.MaintenanceMybatisDao;
 import com.jbacon.test.tools.RemoveTestFiles;
 
 public class MaintenanceMybatisDaoTest {
+
+	private static MaintenanceMybatisDao MAINTENANCE_DAO;
 
 	@AfterClass
 	public static void cleanUp() throws IOException {
 		RemoveTestFiles.remove("dbTest.sqlite");
 	}
 
-	MaintenanceMybatisDao dao;
-
-	public MaintenanceMybatisDaoTest() throws IOException {
-		dao = new MaintenanceMybatisDao("mybatisTest/Configuration.xml");
+	@BeforeClass
+	public static void setup() throws IOException {
+		MAINTENANCE_DAO = new MaintenanceMybatisDao("mybatisTest/Configuration.xml");
 	}
 
 	@Test
 	public void shouldCreateMasterPasswordTable() {
-		int result = dao.createMasterPasswordTable();
+		int result = MAINTENANCE_DAO.createMasterPasswordTable();
 		assertThat(result, is(equalTo(0)));
 	}
 
 	@Test
 	public void shouldCreateStoredPasswordTable() {
-		int result = dao.createStoredPasswordTable();
+		int result = MAINTENANCE_DAO.createStoredPasswordTable();
 		assertThat(result, is(equalTo(0)));
 	}
 
 	@Test
 	public void shouldDropMasterPasswordTable() {
-		int result = dao.dropMasterPasswordTable();
+		int result = MAINTENANCE_DAO.dropMasterPasswordTable();
 		assertThat(result, is(equalTo(0)));
 	}
 
 	@Test
 	public void shouldDropStoredPasswordTable() {
-		int result = dao.dropStoredPasswordTable();
+		int result = MAINTENANCE_DAO.dropStoredPasswordTable();
 		assertThat(result, is(equalTo(0)));
 	}
-
 }

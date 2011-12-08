@@ -8,7 +8,6 @@ import static org.hamcrest.Matchers.nullValue;
 
 import java.io.IOException;
 
-import org.junit.AfterClass;
 import org.junit.Test;
 
 import com.jbacon.passwordstorage.database.dao.GenericDao;
@@ -16,11 +15,6 @@ import com.jbacon.passwordstorage.database.errors.UnsupportedDatabaseException;
 import com.jbacon.test.tools.RemoveTestFiles;
 
 public class DatabaseTypeTest {
-
-	@AfterClass
-	public static void cleanUp() throws IOException {
-		RemoveTestFiles.remove("dbTest.sqlite");
-	}
 
 	@Test
 	public void shouldCreateComputerMaintenanceDao() throws UnsupportedDatabaseException, IOException {
@@ -38,6 +32,11 @@ public class DatabaseTypeTest {
 	public void shouldCreateComputerStoredPasswordDao() throws UnsupportedDatabaseException, IOException {
 		GenericDao result = DatabaseType.MyBatis.createStoredPasswordDao("mybatisTest/Configuration.xml");
 		verifyDao(result, StoredPasswordMybatisDao.class);
+	}
+
+	@Test(expected = AssertionError.class)
+	public void shouldNotHaveCreatedAnything() throws IOException {
+		RemoveTestFiles.remove("dbTest.sqlite");
 	}
 
 	private void verifyDao(final GenericDao result, final Class<?> mybatisDaoType) {
