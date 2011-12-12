@@ -43,7 +43,7 @@
 	</delete>
 	
 	<select id="getStoredPasswordId" resultType="java.lang.Integer" parameterType="com.jbacon.passwordstorage.password.StoredPassword">
-		SELECT id FROM StoredPasswords WHERE profileName = #{profileName}, passwordName = #{encryptedPasswordName}, password = #{encryptedPassword}, passwordNotes = #{encryptedPasswordNotes}; 
+		SELECT id FROM StoredPasswords WHERE profileName = #{profileName} AND password = #{encryptedPassword} AND passwordNotes = #{encryptedPasswordNotes}; 
 	</select>
 	
 	<select id="getStoredPasswordById" resultMap="StoredPassword" parameterType="java.lang.Integer">

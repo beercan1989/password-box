@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -52,10 +51,6 @@ public class MasterPasswordMybatisDaoTest {
 	public static void setupBeforeClass() throws IOException {
 		dropTables();
 		createTables();
-	}
-
-	@Before
-	public void setupBefore() throws IOException {
 		MASTER_PASSWORD_DAO = new MasterPasswordMybatisDao(TEST_MYBATIS_CONFIGURATION_FILENAME);
 	}
 
