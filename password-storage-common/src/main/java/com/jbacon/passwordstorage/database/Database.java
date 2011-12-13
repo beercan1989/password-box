@@ -14,5 +14,4 @@ public interface Database {
 	public MasterPasswordDao createMasterPasswordDao() throws UnsupportedDatabaseException, IOException;
 
 	public StoredPasswordDao createStoredPasswordDao() throws UnsupportedDatabaseException, IOException;
-
 }

@@ -19,7 +19,8 @@ public class EncryptionSpecificationPBE implements EncryptionSpecification {
 	}
 
 	@Override
-	public Object get(final String attributeName) {
-		return attributeMap.get(attributeName);
+	@SuppressWarnings("unchecked")
+	public <T> T get(final String attributeName) {
+		return (T) attributeMap.get(attributeName);
 	}
 }

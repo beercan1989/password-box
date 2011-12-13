@@ -25,15 +25,17 @@ public class EncrypterUtils {
 
 	public byte[] generateAesEncryptionKey(final EncryptionType encryptionType) throws NoSuchAlgorithmException, NoSuchProviderException,
 			NoSuchEncryptionException {
+		Integer keySize = encryptionType.getSpecification().get(KEY_SIZE);
 		KeyGenerator keyGenerator = KeyGenerator.getInstance(encryptionType.algorithmName);
-		keyGenerator.init((Integer) encryptionType.getSpecification().get(KEY_SIZE));
+		keyGenerator.init(keySize);
 		SecretKey secretKey = keyGenerator.generateKey();
 		return secretKey.getEncoded();
 	}
 
 	public byte[] generateSalt(final EncryptionType encryptionType) throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchEncryptionException,
 			InvalidEncryptionTypeForSaltGeneration {
-		return generateSalt(encryptionType, (Integer) encryptionType.getSpecification().get(SALT_SIZE));
+		Integer saltSize = encryptionType.getSpecification().get(SALT_SIZE);
+		return generateSalt(encryptionType, saltSize);
 	}
 
 	public byte[] generateSalt(final EncryptionType encryptionType, final Integer numberOfBytes) throws NoSuchAlgorithmException, NoSuchProviderException,
@@ -44,7 +46,8 @@ public class EncrypterUtils {
 		case PBE_WITH_SHA1_AND_256_AES_CBC_BC:
 		case PBE_WITH_SHA_AND_3_KEY_TRIPPLE_DES_CBC:
 			byte[] salt = new byte[numberOfBytes];
-			SecureRandom saltGen = SecureRandom.getInstance((String) encryptionType.getSpecification().get(SECURE_SALT_ALGORITHM));
+			String secureSaltAlgorithm = encryptionType.getSpecification().get(SECURE_SALT_ALGORITHM);
+			SecureRandom saltGen = SecureRandom.getInstance(secureSaltAlgorithm);
 			saltGen.nextBytes(salt);
 			return salt;
 		default:

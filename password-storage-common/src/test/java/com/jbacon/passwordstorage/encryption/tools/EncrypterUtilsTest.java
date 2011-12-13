@@ -82,8 +82,7 @@ public class EncrypterUtilsTest {
 	@Test(expected = InvalidEncryptionTypeForSaltGeneration.class)
 	public void shouldThrowExceptionGeneratingSaltForAES() throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchEncryptionException,
 			InvalidEncryptionTypeForSaltGeneration {
-		final byte[] generatedSalt = encrypterUtils.generateSalt(EncryptionType.AES_128);
-		assertThat(generatedSalt, is(nullValue()));
+		encrypterUtils.generateSalt(EncryptionType.AES_128);
 	}
 
 }

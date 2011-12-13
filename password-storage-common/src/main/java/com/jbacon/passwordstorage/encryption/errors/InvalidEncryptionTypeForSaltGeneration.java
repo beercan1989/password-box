@@ -1,6 +1,6 @@
 package com.jbacon.passwordstorage.encryption.errors;
 
-public class InvalidEncryptionTypeForSaltGeneration extends Exception {
+public class InvalidEncryptionTypeForSaltGeneration extends AbstractEncrypterException {
 
 	private static final long serialVersionUID = 1214391968720704824L;
 
