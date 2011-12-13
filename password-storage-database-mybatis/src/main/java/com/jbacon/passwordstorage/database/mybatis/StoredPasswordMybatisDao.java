@@ -29,7 +29,7 @@ public final class StoredPasswordMybatisDao extends MybatisDao implements Stored
 
 	@Override
 	public Integer getStoredPasswordId(final StoredPassword storedPassword) {
-		return (Integer) databaseConnection.selectOne("getStoredPasswordId");
+		return (Integer) databaseConnection.selectOne("getStoredPasswordId", storedPassword);
 	}
 
 	@Override
