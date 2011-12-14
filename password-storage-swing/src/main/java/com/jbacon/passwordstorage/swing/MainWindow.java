@@ -117,12 +117,9 @@ public class MainWindow {
 		JPanel centreJPanel = new JPanel();
 		frmPasswordBox.getContentPane().add(centreJPanel, BorderLayout.CENTER);
 
-		tableOfPasswords = new JTable();
-		tableOfPasswords.setColumnSelectionAllowed(true);
-		tableOfPasswords.setFillsViewportHeight(true);
-		tableOfPasswords.setModel(new DefaultTableModel(new Object[][] { { null, null, null, null, null }, { null, null, null, null, null },
-				{ null, null, null, null, null }, { null, null, null, null, null }, { null, null, null, null, null }, }, new String[] { "ID", "Profile Name",
-				"Password Name [E]", "Password [E]", "Password Notes [E]" }) {
+		tableOfPasswords = SwingComponantFactory.createPasswordJTable(new DefaultTableModel(new Object[][] { { null, null, null, null, null },
+				{ null, null, null, null, null }, { null, null, null, null, null }, { null, null, null, null, null }, { null, null, null, null, null }, },
+				new String[] { "ID", "Profile Name", "Password Name [E]", "Password [E]", "Password Notes [E]" }) {
 			boolean[] columnEditables = new boolean[] { false, false, false, false, false };
 
 			@Override

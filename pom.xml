@@ -20,6 +20,7 @@
 		<bcprov-jdk16.version>1.46</bcprov-jdk16.version>
 		<mybatis.version>3.0.5</mybatis.version>
 		<passwordstorage.common.version>0.0.1-SNAPSHOT</passwordstorage.common.version>
+		<apache.commons-lang.version>2.6</apache.commons-lang.version>
 	</properties>
 	
 	<modules>
@@ -37,6 +38,12 @@
 				<groupId>com.jbacon.passwordstorage</groupId>
 				<artifactId>passwordstorage.common</artifactId>
 				<version>${passwordstorage.common.version}</version>
+			</dependency>
+			
+			<dependency>
+			    <groupId>commons-lang</groupId>
+			    <artifactId>commons-lang</artifactId>
+			    <version>${apache.commons-lang.version}</version>
 			</dependency>
 		
 			<dependency>
