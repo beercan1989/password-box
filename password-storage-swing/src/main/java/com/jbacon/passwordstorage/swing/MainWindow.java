@@ -1,16 +1,33 @@
 package com.jbacon.passwordstorage.swing;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.sql.Timestamp;
 
+import javax.swing.AbstractListModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
+
+import com.jbacon.passwordstorage.password.StoredPassword;
+import com.jbacon.passwordstorage.swing.table.StoredPasswordTableModel;
 
 public class MainWindow {
 
@@ -32,7 +49,8 @@ public class MainWindow {
 	}
 
 	private JFrame frmPasswordBox;
-	private JTable tableOfPasswords;
+	private StoredPasswordTableModel storedPasswordsModel;
+	private JTable storedPasswordsJTable;
 
 	/**
 	 * Create the application.
@@ -80,6 +98,18 @@ public class MainWindow {
 		JMenuItem mntmSettings = new JMenuItem("Settings");
 		mnEdit.add(mntmSettings);
 
+		JMenu mnView = new JMenu("View");
+		menuBar.add(mnView);
+
+		JCheckBoxMenuItem chckbxmntmToggleSidebar = new JCheckBoxMenuItem("Sidebar");
+		mnView.add(chckbxmntmToggleSidebar);
+
+		JCheckBoxMenuItem chckbxmntmToggleActionButtons = new JCheckBoxMenuItem("Action Buttons");
+		mnView.add(chckbxmntmToggleActionButtons);
+
+		JCheckBoxMenuItem chckbxmntmToggleAvailableProfiles = new JCheckBoxMenuItem("Available Profiles");
+		mnView.add(chckbxmntmToggleAvailableProfiles);
+
 		JMenu mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
 
@@ -113,26 +143,115 @@ public class MainWindow {
 
 		JPanel westJPanel = new JPanel();
 		frmPasswordBox.getContentPane().add(westJPanel, BorderLayout.WEST);
+		westJPanel.setLayout(new BorderLayout(0, 0));
 
-		JPanel centreJPanel = new JPanel();
-		frmPasswordBox.getContentPane().add(centreJPanel, BorderLayout.CENTER);
+		JPanel availableProfilesNorthButtonJPanel = new JPanel();
+		availableProfilesNorthButtonJPanel.setBackground(Color.WHITE);
+		availableProfilesNorthButtonJPanel.setBorder(new EmptyBorder(5, 5, 0, 5));
+		westJPanel.add(availableProfilesNorthButtonJPanel, BorderLayout.NORTH);
+		GridBagLayout gbl_availableProfilesNorthButtonJPanel = new GridBagLayout();
+		gbl_availableProfilesNorthButtonJPanel.columnWidths = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+		gbl_availableProfilesNorthButtonJPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+		gbl_availableProfilesNorthButtonJPanel.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gbl_availableProfilesNorthButtonJPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		availableProfilesNorthButtonJPanel.setLayout(gbl_availableProfilesNorthButtonJPanel);
 
-		tableOfPasswords = SwingComponantFactory.createPasswordJTable(new DefaultTableModel(new Object[][] { { null, null, null, null, null },
-				{ null, null, null, null, null }, { null, null, null, null, null }, { null, null, null, null, null }, { null, null, null, null, null }, },
-				new String[] { "ID", "Profile Name", "Password Name [E]", "Password [E]", "Password Notes [E]" }) {
-			boolean[] columnEditables = new boolean[] { false, false, false, false, false };
+		JButton newProfileJButton = new JButton("New Profile");
+		GridBagConstraints gbc_newProfileJButton = new GridBagConstraints();
+		gbc_newProfileJButton.fill = GridBagConstraints.HORIZONTAL;
+		gbc_newProfileJButton.insets = new Insets(0, 0, 5, 0);
+		gbc_newProfileJButton.gridx = 0;
+		gbc_newProfileJButton.gridy = 0;
+		availableProfilesNorthButtonJPanel.add(newProfileJButton, gbc_newProfileJButton);
+
+		JButton loadProfileJButton = new JButton("Load Profile");
+		GridBagConstraints gbc_loadProfileJButton = new GridBagConstraints();
+		gbc_loadProfileJButton.fill = GridBagConstraints.HORIZONTAL;
+		gbc_loadProfileJButton.insets = new Insets(0, 0, 5, 0);
+		gbc_loadProfileJButton.gridx = 0;
+		gbc_loadProfileJButton.gridy = 1;
+		availableProfilesNorthButtonJPanel.add(loadProfileJButton, gbc_loadProfileJButton);
+
+		JButton deleteProfileJButton = new JButton("Delete Profile");
+		GridBagConstraints gbc_deleteProfileJButton = new GridBagConstraints();
+		gbc_deleteProfileJButton.insets = new Insets(0, 0, 5, 0);
+		gbc_deleteProfileJButton.fill = GridBagConstraints.HORIZONTAL;
+		gbc_deleteProfileJButton.gridx = 0;
+		gbc_deleteProfileJButton.gridy = 2;
+		availableProfilesNorthButtonJPanel.add(deleteProfileJButton, gbc_deleteProfileJButton);
+
+		JSeparator availableProfilesButtonSeparator = new JSeparator();
+		availableProfilesButtonSeparator.setForeground(Color.BLACK);
+		GridBagConstraints gbc_availableProfilesButtonSeparator = new GridBagConstraints();
+		gbc_availableProfilesButtonSeparator.fill = GridBagConstraints.BOTH;
+		gbc_availableProfilesButtonSeparator.insets = new Insets(0, 0, 5, 0);
+		gbc_availableProfilesButtonSeparator.gridx = 0;
+		gbc_availableProfilesButtonSeparator.gridy = 3;
+		availableProfilesNorthButtonJPanel.add(availableProfilesButtonSeparator, gbc_availableProfilesButtonSeparator);
+
+		JButton newPasswordJBbutton = new JButton("New Password");
+		GridBagConstraints gbc_newPasswordJBbutton = new GridBagConstraints();
+		gbc_newPasswordJBbutton.fill = GridBagConstraints.HORIZONTAL;
+		gbc_newPasswordJBbutton.insets = new Insets(0, 0, 5, 0);
+		gbc_newPasswordJBbutton.gridx = 0;
+		gbc_newPasswordJBbutton.gridy = 4;
+		availableProfilesNorthButtonJPanel.add(newPasswordJBbutton, gbc_newPasswordJBbutton);
+
+		JButton openPasswordJButton = new JButton("Open Password");
+		GridBagConstraints gbc_openPasswordJButton = new GridBagConstraints();
+		gbc_openPasswordJButton.insets = new Insets(0, 0, 5, 0);
+		gbc_openPasswordJButton.fill = GridBagConstraints.HORIZONTAL;
+		gbc_openPasswordJButton.gridx = 0;
+		gbc_openPasswordJButton.gridy = 5;
+		availableProfilesNorthButtonJPanel.add(openPasswordJButton, gbc_openPasswordJButton);
+
+		JButton deletePasswordJButton = new JButton("Delete Password");
+		GridBagConstraints gbc_deletePasswordJButton = new GridBagConstraints();
+		gbc_deletePasswordJButton.gridx = 0;
+		gbc_deletePasswordJButton.gridy = 6;
+		availableProfilesNorthButtonJPanel.add(deletePasswordJButton, gbc_deletePasswordJButton);
+
+		JList availableProfilesJList = new JList();
+		availableProfilesJList.setModel(new AbstractListModel() {
+			String[] values = new String[] { "James' Profile", "Fish", "Bacon's" };
 
 			@Override
-			public boolean isCellEditable(final int row, final int column) {
-				return columnEditables[column];
+			public Object getElementAt(final int index) {
+				return values[index];
+			}
+
+			@Override
+			public int getSize() {
+				return values.length;
 			}
 		});
-		tableOfPasswords.getColumnModel().getColumn(1).setPreferredWidth(92);
-		tableOfPasswords.getColumnModel().getColumn(2).setPreferredWidth(130);
-		tableOfPasswords.getColumnModel().getColumn(3).setPreferredWidth(89);
-		tableOfPasswords.getColumnModel().getColumn(4).setPreferredWidth(133);
-		centreJPanel.setLayout(new BorderLayout(0, 0));
-		centreJPanel.add(tableOfPasswords);
-	}
+		availableProfilesJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		availableProfilesJList.setBorder(new CompoundBorder(new EmptyBorder(10, 5, 5, 5), new TitledBorder(new LineBorder(new Color(184, 207, 229)),
+				"Available Profiles", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(51, 51, 51))));
+		westJPanel.add(availableProfilesJList, BorderLayout.CENTER);
 
+		JPanel centreJPanel = new JPanel();
+		centreJPanel.setBackground(Color.WHITE);
+		centreJPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		frmPasswordBox.getContentPane().add(centreJPanel, BorderLayout.CENTER);
+
+		storedPasswordsModel = new StoredPasswordTableModel();
+		storedPasswordsModel.add(new StoredPassword("encryptedPasswordName", "profileName", "encryptedPassword", "encryptedPasswordNotes", new Timestamp(0, 0,
+				0, 0, 0, 0, 0), new Timestamp(0, 0, 0, 0, 0, 0, 0), 1));
+		storedPasswordsModel.add(new StoredPassword("encryptedPasswordName", "profileName", "encryptedPassword", "encryptedPasswordNotes", new Timestamp(0, 0,
+				0, 0, 0, 0, 0), new Timestamp(0, 0, 0, 0, 0, 0, 0), 2));
+		storedPasswordsModel.add(new StoredPassword("encryptedPasswordName", "profileName", "encryptedPassword", "encryptedPasswordNotes", new Timestamp(0, 0,
+				0, 0, 0, 0, 0), new Timestamp(0, 0, 0, 0, 0, 0, 0), 3));
+		storedPasswordsModel.add(new StoredPassword("encryptedPasswordName", "profileName", "encryptedPassword", "encryptedPasswordNotes", new Timestamp(0, 0,
+				0, 0, 0, 0, 0), new Timestamp(0, 0, 0, 0, 0, 0, 0), 4));
+		storedPasswordsModel.add(new StoredPassword("encryptedPasswordName", "profileName", "encryptedPassword", "encryptedPasswordNotes", new Timestamp(0, 0,
+				0, 0, 0, 0, 0), new Timestamp(0, 0, 0, 0, 0, 0, 0), 5));
+		centreJPanel.setLayout(new BorderLayout(0, 0));
+
+		JScrollPane storedPasswordsJScrollPane = new JScrollPane();
+		centreJPanel.add(storedPasswordsJScrollPane, BorderLayout.CENTER);
+
+		storedPasswordsJTable = SwingComponantFactory.createPasswordJTable(storedPasswordsModel);
+		storedPasswordsJScrollPane.setViewportView(storedPasswordsJTable);
+	}
 }

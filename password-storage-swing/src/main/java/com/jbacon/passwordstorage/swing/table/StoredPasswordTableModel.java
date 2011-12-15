@@ -20,10 +20,6 @@ public class StoredPasswordTableModel extends AbstractTableModel implements Seri
 			EnumSet.allOf(StoredPasswordTableColumns.class));
 	private final List<StoredPassword> tableData = new ArrayList<StoredPassword>();
 
-	public StoredPasswordTableModel() {
-
-	}
-
 	public void add(final StoredPassword storedPassword) {
 		tableData.add(storedPassword);
 	}
@@ -52,6 +48,10 @@ public class StoredPasswordTableModel extends AbstractTableModel implements Seri
 		return TABLE_COLUMNS.get(columnIndex).getName();
 	}
 
+	public StoredPassword getRow(final int rowIndex) {
+		return tableData.get(rowIndex);
+	}
+
 	@Override
 	public int getRowCount() {
 		return tableData.size();
@@ -59,8 +59,30 @@ public class StoredPasswordTableModel extends AbstractTableModel implements Seri
 
 	@Override
 	public Object getValueAt(final int rowIndex, final int columnIndex) {
-		// TODO Auto-generated method stub
-		return null;
+		StoredPassword row = tableData.get(rowIndex);
+
+		if (row == null) {
+			return null;
+		}
+
+		switch (columnIndex) {
+		case 0:
+			return row.getId();
+		case 1:
+			return row.getProfileName();
+		case 2:
+			return row.getEncryptedPasswordName();
+		case 3:
+			return row.getEncryptedPassword();
+		case 4:
+			return row.getEncryptedPasswordNotes();
+		case 5:
+			return row.getCreatedAt();
+		case 6:
+			return row.getUpdatedAt();
+		default:
+			return null;
+		}
 	}
 
 	@Override
@@ -70,7 +92,7 @@ public class StoredPasswordTableModel extends AbstractTableModel implements Seri
 
 	@Override
 	public void setValueAt(final Object value, final int rowIndex, final int columnIndex) {
-		// TODO Auto-generated method stub
+		return;
 	}
 
 }

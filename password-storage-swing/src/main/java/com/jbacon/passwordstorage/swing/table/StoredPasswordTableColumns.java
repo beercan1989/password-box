@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 
 import org.apache.commons.lang.WordUtils;
 
+import com.jbacon.passwordstorage.tools.StringUtils;
+
 public enum StoredPasswordTableColumns {
 	PASSWORD_ID(Integer.class), //
 	PROFILE_NAME(String.class), //
@@ -14,7 +16,7 @@ public enum StoredPasswordTableColumns {
 	UPDATED_AT(Timestamp.class);
 
 	public static StoredPasswordTableColumns stringToEnum(final String name) {
-		return valueOf(name.replaceAll(" ", "_").toUpperCase());
+		return valueOf(name.replaceAll(StringUtils.SPACE, StringUtils.UNDER_SCORE).toUpperCase());
 	}
 
 	private final Class<?> type;
@@ -24,7 +26,7 @@ public enum StoredPasswordTableColumns {
 	}
 
 	public String getName() {
-		return WordUtils.capitalizeFully(this.name(), new char[] { '_' }).replaceAll("_", " ");
+		return WordUtils.capitalizeFully(this.name().replaceAll(StringUtils.UNDER_SCORE, StringUtils.SPACE));
 	}
 
 	public Class<?> getType() {
