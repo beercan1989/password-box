@@ -2,6 +2,8 @@ package com.jbacon.passwordstorage.password;
 
 import java.sql.Timestamp;
 
+import com.jbacon.passwordstorage.formatters.TimestampFormatter;
+
 public abstract class GenericPassword {
 	private Integer id;
 	private Timestamp createdAt;
@@ -22,12 +24,24 @@ public abstract class GenericPassword {
 		return createdAt;
 	}
 
+	public String getCreatedAtAsString() {
+		return TimestampFormatter.format(createdAt);
+	}
+
 	public Integer getId() {
 		return id;
 	}
 
+	public String getProfileName() {
+		return profileName;
+	}
+
 	public Timestamp getUpdatedAt() {
 		return updatedAt;
+	}
+
+	public String getUpdatedAtAsString() {
+		return TimestampFormatter.format(updatedAt);
 	}
 
 	public void setCreatedAt(final Timestamp createdAt) {
@@ -38,15 +52,11 @@ public abstract class GenericPassword {
 		this.id = id;
 	}
 
+	public void setProfileName(final String profileName) {
+		this.profileName = profileName;
+	}
+
 	public void setUpdatedAt(final Timestamp updatedAt) {
 		this.updatedAt = updatedAt;
-	}
-
-	public String getProfileName() {
-		return profileName;
-	}
-
-	public void setProfileName(String profileName) {
-		this.profileName = profileName;
 	}
 }

@@ -1,7 +1,5 @@
 package com.jbacon.passwordstorage.swing.table;
 
-import java.sql.Timestamp;
-
 import org.apache.commons.lang.WordUtils;
 
 import com.jbacon.passwordstorage.tools.StringUtils;
@@ -12,8 +10,8 @@ public enum StoredPasswordTableColumns {
 	PASSWORD_NAME(String.class), //
 	PASSWORD(String.class), //
 	PASSWORD_NOTES(String.class), //
-	CREATED_AT(Timestamp.class), //
-	UPDATED_AT(Timestamp.class);
+	CREATED_AT(String.class), //
+	UPDATED_AT(String.class);
 
 	public static StoredPasswordTableColumns stringToEnum(final String name) {
 		return valueOf(name.replaceAll(StringUtils.SPACE, StringUtils.UNDER_SCORE).toUpperCase());

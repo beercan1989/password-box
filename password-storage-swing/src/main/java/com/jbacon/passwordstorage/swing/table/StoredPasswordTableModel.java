@@ -77,9 +77,9 @@ public class StoredPasswordTableModel extends AbstractTableModel implements Seri
 		case 4:
 			return row.getEncryptedPasswordNotes();
 		case 5:
-			return row.getCreatedAt();
+			return row.getCreatedAtAsString();
 		case 6:
-			return row.getUpdatedAt();
+			return row.getUpdatedAtAsString();
 		default:
 			return null;
 		}

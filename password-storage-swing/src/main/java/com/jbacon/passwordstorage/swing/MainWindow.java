@@ -6,7 +6,10 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.Timestamp;
+import java.util.GregorianCalendar;
 
 import javax.swing.AbstractListModel;
 import javax.swing.JButton;
@@ -52,6 +55,37 @@ public class MainWindow {
 	private StoredPasswordTableModel storedPasswordsModel;
 	private JTable storedPasswordsJTable;
 
+	private JMenuBar menuBar;
+	private JMenu mnFile;
+	private JMenu mnEdit;
+	private JMenu mnView;
+	private JMenu mnHelp;
+	private JMenuItem mntmOpenProfile;
+	private JMenuItem mntmNewProfile;
+	private JMenuItem mntmNewPassword;
+	private JMenuItem mntmExit;
+	private JMenuItem mntmSettings;
+	private JMenuItem mntmAbout;
+	private JMenuItem mntmCheckForUpdates;
+	private JMenuItem mntmFaq;
+	private JMenuItem mntmHelpContents;
+	private JMenuItem mntmOpenWikiPage;
+	private JMenuItem mntmOpenDownloadPage;
+
+	private JSeparator separator_3;
+	private JSeparator separator_4;
+	private JSeparator separator;
+
+	private JCheckBoxMenuItem chckbxmntmToggleSidebar;
+	private JSeparator viewMenuSeparator;
+	private JCheckBoxMenuItem chckbxmntmToggleActionButtons;
+	private JCheckBoxMenuItem chckbxmntmToggleAvailableProfiles;
+
+	private JPanel westJPanel;
+	private JPanel availableProfilesNorthButtonJPanel;
+
+	private JList availableProfilesJList;
+
 	/**
 	 * Create the application.
 	 */
@@ -68,91 +102,118 @@ public class MainWindow {
 		frmPasswordBox.setBounds(100, 100, 800, 600);
 		frmPasswordBox.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		JMenuBar menuBar = new JMenuBar();
+		menuBar = new JMenuBar();
 		frmPasswordBox.setJMenuBar(menuBar);
 
-		JMenu mnFile = new JMenu("File");
+		mnFile = new JMenu("File");
 		menuBar.add(mnFile);
 
-		JMenuItem mntmOpenProfile = new JMenuItem("Open Profile");
+		mntmOpenProfile = new JMenuItem("Open Profile");
 		mnFile.add(mntmOpenProfile);
 
-		JMenuItem mntmNewProfile = new JMenuItem("New Profile");
+		mntmNewProfile = new JMenuItem("New Profile");
 		mnFile.add(mntmNewProfile);
 
 		JSeparator separator_1 = new JSeparator();
 		mnFile.add(separator_1);
 
-		JMenuItem mntmNewPassword = new JMenuItem("New Password");
+		mntmNewPassword = new JMenuItem("New Password");
 		mnFile.add(mntmNewPassword);
 
 		JSeparator separator_2 = new JSeparator();
 		mnFile.add(separator_2);
 
-		JMenuItem mntmExit = new JMenuItem("Exit");
+		mntmExit = new JMenuItem("Exit");
 		mnFile.add(mntmExit);
 
-		JMenu mnEdit = new JMenu("Edit");
+		mnEdit = new JMenu("Edit");
 		menuBar.add(mnEdit);
 
-		JMenuItem mntmSettings = new JMenuItem("Settings");
+		mntmSettings = new JMenuItem("Settings");
 		mnEdit.add(mntmSettings);
 
-		JMenu mnView = new JMenu("View");
+		mnView = new JMenu("View");
 		menuBar.add(mnView);
 
-		JCheckBoxMenuItem chckbxmntmToggleSidebar = new JCheckBoxMenuItem("Sidebar");
+		chckbxmntmToggleSidebar = new JCheckBoxMenuItem("Sidebar");
+		chckbxmntmToggleSidebar.setSelected(true);
+		chckbxmntmToggleSidebar.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent evt) {
+				westJPanel.setVisible(chckbxmntmToggleSidebar.isSelected());
+				chckbxmntmToggleActionButtons.setEnabled(chckbxmntmToggleSidebar.isSelected());
+				chckbxmntmToggleAvailableProfiles.setEnabled(chckbxmntmToggleSidebar.isSelected());
+			}
+		});
 		mnView.add(chckbxmntmToggleSidebar);
 
-		JCheckBoxMenuItem chckbxmntmToggleActionButtons = new JCheckBoxMenuItem("Action Buttons");
+		viewMenuSeparator = new JSeparator();
+		mnView.add(viewMenuSeparator);
+
+		chckbxmntmToggleActionButtons = new JCheckBoxMenuItem("Action Buttons");
+		chckbxmntmToggleActionButtons.setSelected(true);
+		chckbxmntmToggleActionButtons.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent evt) {
+				availableProfilesNorthButtonJPanel.setVisible(chckbxmntmToggleActionButtons.isSelected());
+			}
+		});
 		mnView.add(chckbxmntmToggleActionButtons);
 
-		JCheckBoxMenuItem chckbxmntmToggleAvailableProfiles = new JCheckBoxMenuItem("Available Profiles");
+		chckbxmntmToggleAvailableProfiles = new JCheckBoxMenuItem("Available Profiles");
+		chckbxmntmToggleAvailableProfiles.setSelected(true);
+		chckbxmntmToggleAvailableProfiles.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent evt) {
+				availableProfilesJList.setVisible(chckbxmntmToggleAvailableProfiles.isSelected());
+			}
+		});
 		mnView.add(chckbxmntmToggleAvailableProfiles);
 
-		JMenu mnHelp = new JMenu("Help");
+		mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
 
-		JMenuItem mntmCheckForUpdates = new JMenuItem("Check For Updates");
+		mntmCheckForUpdates = new JMenuItem("Check For Updates");
 		mnHelp.add(mntmCheckForUpdates);
 
-		JSeparator separator_4 = new JSeparator();
+		separator_4 = new JSeparator();
 		mnHelp.add(separator_4);
 
-		JMenuItem mntmOpenWikiPage = new JMenuItem("Open Wiki Page");
+		mntmOpenWikiPage = new JMenuItem("Open Wiki Page");
 		mnHelp.add(mntmOpenWikiPage);
 
-		JMenuItem mntmOpenDownloadPage = new JMenuItem("Open Download Page");
+		mntmOpenDownloadPage = new JMenuItem("Open Download Page");
 		mnHelp.add(mntmOpenDownloadPage);
 
-		JSeparator separator_3 = new JSeparator();
+		separator_3 = new JSeparator();
 		mnHelp.add(separator_3);
 
-		JMenuItem mntmFaq = new JMenuItem("F.A.Q.");
+		mntmFaq = new JMenuItem("F.A.Q.");
 		mnHelp.add(mntmFaq);
 
-		JMenuItem mntmHelpContents = new JMenuItem("Help Contents");
+		mntmHelpContents = new JMenuItem("Help Contents");
 		mnHelp.add(mntmHelpContents);
 
-		JSeparator separator = new JSeparator();
+		separator = new JSeparator();
 		mnHelp.add(separator);
 
-		JMenuItem mntmAbout = new JMenuItem("About Password Box");
+		mntmAbout = new JMenuItem("About Password Box");
 		mnHelp.add(mntmAbout);
 		frmPasswordBox.getContentPane().setLayout(new BorderLayout(0, 0));
 
-		JPanel westJPanel = new JPanel();
+		westJPanel = new JPanel();
+		westJPanel.setBackground(Color.WHITE);
 		frmPasswordBox.getContentPane().add(westJPanel, BorderLayout.WEST);
 		westJPanel.setLayout(new BorderLayout(0, 0));
 
-		JPanel availableProfilesNorthButtonJPanel = new JPanel();
+		availableProfilesNorthButtonJPanel = new JPanel();
 		availableProfilesNorthButtonJPanel.setBackground(Color.WHITE);
 		availableProfilesNorthButtonJPanel.setBorder(new EmptyBorder(5, 5, 0, 5));
 		westJPanel.add(availableProfilesNorthButtonJPanel, BorderLayout.NORTH);
 		GridBagLayout gbl_availableProfilesNorthButtonJPanel = new GridBagLayout();
-		gbl_availableProfilesNorthButtonJPanel.columnWidths = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+		gbl_availableProfilesNorthButtonJPanel.columnWidths = new int[] { 0, 0 };
 		gbl_availableProfilesNorthButtonJPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
-		gbl_availableProfilesNorthButtonJPanel.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gbl_availableProfilesNorthButtonJPanel.columnWeights = new double[] { 0.0, Double.MIN_VALUE };
 		gbl_availableProfilesNorthButtonJPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		availableProfilesNorthButtonJPanel.setLayout(gbl_availableProfilesNorthButtonJPanel);
 
@@ -211,7 +272,7 @@ public class MainWindow {
 		gbc_deletePasswordJButton.gridy = 6;
 		availableProfilesNorthButtonJPanel.add(deletePasswordJButton, gbc_deletePasswordJButton);
 
-		JList availableProfilesJList = new JList();
+		availableProfilesJList = new JList();
 		availableProfilesJList.setModel(new AbstractListModel() {
 			String[] values = new String[] { "James' Profile", "Fish", "Bacon's" };
 
@@ -236,16 +297,17 @@ public class MainWindow {
 		frmPasswordBox.getContentPane().add(centreJPanel, BorderLayout.CENTER);
 
 		storedPasswordsModel = new StoredPasswordTableModel();
-		storedPasswordsModel.add(new StoredPassword("encryptedPasswordName", "profileName", "encryptedPassword", "encryptedPasswordNotes", new Timestamp(0, 0,
-				0, 0, 0, 0, 0), new Timestamp(0, 0, 0, 0, 0, 0, 0), 1));
-		storedPasswordsModel.add(new StoredPassword("encryptedPasswordName", "profileName", "encryptedPassword", "encryptedPasswordNotes", new Timestamp(0, 0,
-				0, 0, 0, 0, 0), new Timestamp(0, 0, 0, 0, 0, 0, 0), 2));
-		storedPasswordsModel.add(new StoredPassword("encryptedPasswordName", "profileName", "encryptedPassword", "encryptedPasswordNotes", new Timestamp(0, 0,
-				0, 0, 0, 0, 0), new Timestamp(0, 0, 0, 0, 0, 0, 0), 3));
-		storedPasswordsModel.add(new StoredPassword("encryptedPasswordName", "profileName", "encryptedPassword", "encryptedPasswordNotes", new Timestamp(0, 0,
-				0, 0, 0, 0, 0), new Timestamp(0, 0, 0, 0, 0, 0, 0), 4));
-		storedPasswordsModel.add(new StoredPassword("encryptedPasswordName", "profileName", "encryptedPassword", "encryptedPasswordNotes", new Timestamp(0, 0,
-				0, 0, 0, 0, 0), new Timestamp(0, 0, 0, 0, 0, 0, 0), 5));
+		storedPasswordsModel.add(new StoredPassword("encryptedPasswordName", "profileName", "encryptedPassword", "encryptedPasswordNotes", new Timestamp(
+				new GregorianCalendar().getTimeInMillis()), new Timestamp(new GregorianCalendar().getTimeInMillis()), 1));
+		storedPasswordsModel.add(new StoredPassword("encryptedPasswordName", "profileName", "encryptedPassword", "encryptedPasswordNotes", new Timestamp(
+				new GregorianCalendar().getTimeInMillis()), new Timestamp(new GregorianCalendar().getTimeInMillis()), 2));
+		storedPasswordsModel.add(new StoredPassword("encryptedPasswordName", "profileName", "encryptedPassword", "encryptedPasswordNotes", new Timestamp(
+				new GregorianCalendar().getTimeInMillis()), new Timestamp(new GregorianCalendar().getTimeInMillis()), 3));
+		storedPasswordsModel.add(new StoredPassword("encryptedPasswordName", "profileName", "encryptedPassword", "encryptedPasswordNotes", new Timestamp(
+				new GregorianCalendar().getTimeInMillis()), new Timestamp(new GregorianCalendar().getTimeInMillis()), 4));
+		storedPasswordsModel.add(new StoredPassword("encryptedPasswordName", "profileName", "encryptedPassword", "encryptedPasswordNotes", new Timestamp(
+				new GregorianCalendar().getTimeInMillis()), new Timestamp(new GregorianCalendar().getTimeInMillis()), 5));
+
 		centreJPanel.setLayout(new BorderLayout(0, 0));
 
 		JScrollPane storedPasswordsJScrollPane = new JScrollPane();
