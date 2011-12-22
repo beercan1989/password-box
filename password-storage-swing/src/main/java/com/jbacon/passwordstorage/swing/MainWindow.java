@@ -21,6 +21,7 @@ import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -35,6 +36,8 @@ import com.jbacon.passwordstorage.password.StoredPassword;
 import com.jbacon.passwordstorage.swing.table.StoredPasswordTableModel;
 
 public class MainWindow {
+
+	private static final String BLANK_STRING = "";
 
 	public static void main(final String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -137,6 +140,10 @@ public class MainWindow {
 
 	private void deleteProfile() {
 		printMessage("deleteProfile");
+	}
+
+	private void errorMessage(final String message, final String title) {
+		JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
 	}
 
 	private void exitProgram() {
@@ -462,6 +469,14 @@ public class MainWindow {
 		storedPasswordsJScrollPane.setViewportView(storedPasswordsJTable);
 	}
 
+	private boolean isValid(final NewProfilePanel newProfile) {
+		if (newProfile.getProfileName() == null || BLANK_STRING.equals(newProfile.getProfileName().trim()) || newProfile.getPassword().length == 0
+				|| newProfile.getSalt().length == 0) {
+			return false;
+		}
+		return true;
+	}
+
 	private void loadProfile() {
 		printMessage("loadProfile");
 	}
@@ -472,6 +487,14 @@ public class MainWindow {
 
 	private void newProfile() {
 		printMessage("newProfile");
+		NewProfilePanel newProfile = new NewProfilePanel();
+		if (JOptionPane.showConfirmDialog(null, newProfile, "New Profile", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.YES_OPTION) {
+			if (!isValid(newProfile)) {
+				errorMessage("Failed to create a new profile, as you did not fill in all the fields.", "Failed To Create New Profile");
+				return;
+			}
+			printMessage(newProfile.getProfileName() + " - " + String.valueOf(newProfile.getPassword()) + " - " + String.valueOf(newProfile.getSalt()));
+		}
 	}
 
 	private void openPassword() {
