@@ -9,6 +9,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 
@@ -105,10 +107,10 @@ public class MainWindow {
 	private JButton loadProfileJButton;
 	private JButton deleteProfileJButton;
 	private JButton newPasswordJBbutton;
-	private JButton openPasswordJButton;
+	private JButton viewPasswordJButton;
 	private JButton deletePasswordJButton;
 	private JMenuItem mntmDeleteProfile;
-	private JMenuItem mntmOpenPassword;
+	private JMenuItem mntmViewPassword;
 
 	private JMenuItem mntmDeletePassword;
 
@@ -140,6 +142,16 @@ public class MainWindow {
 
 	private void deleteProfile() {
 		printMessage("deleteProfile");
+	}
+
+	private void displayStoredPassword(final MouseEvent mouseEvent) {
+		if (mouseEvent.getClickCount() >= 2) {
+			viewPassword();
+		}
+	}
+
+	private void editPassword() {
+
 	}
 
 	private void errorMessage(final String message, final String title) {
@@ -201,14 +213,14 @@ public class MainWindow {
 		});
 		mnFile.add(mntmNewPassword);
 
-		mntmOpenPassword = new JMenuItem("Open Password");
-		mntmOpenPassword.addActionListener(new ActionListener() {
+		mntmViewPassword = new JMenuItem("View Password");
+		mntmViewPassword.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				openPassword();
+				viewPassword();
 			}
 		});
-		mnFile.add(mntmOpenPassword);
+		mnFile.add(mntmViewPassword);
 
 		mntmDeletePassword = new JMenuItem("Delete Password");
 		mntmDeletePassword.addActionListener(new ActionListener() {
@@ -391,11 +403,11 @@ public class MainWindow {
 		gbc_newPasswordJBbutton.gridy = 4;
 		availableProfilesNorthButtonJPanel.add(newPasswordJBbutton, gbc_newPasswordJBbutton);
 
-		openPasswordJButton = new JButton("Open Password");
-		openPasswordJButton.addActionListener(new ActionListener() {
+		viewPasswordJButton = new JButton("View Password");
+		viewPasswordJButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				openPassword();
+				viewPassword();
 			}
 		});
 		GridBagConstraints gbc_openPasswordJButton = new GridBagConstraints();
@@ -403,7 +415,7 @@ public class MainWindow {
 		gbc_openPasswordJButton.fill = GridBagConstraints.HORIZONTAL;
 		gbc_openPasswordJButton.gridx = 0;
 		gbc_openPasswordJButton.gridy = 5;
-		availableProfilesNorthButtonJPanel.add(openPasswordJButton, gbc_openPasswordJButton);
+		availableProfilesNorthButtonJPanel.add(viewPasswordJButton, gbc_openPasswordJButton);
 
 		deletePasswordJButton = new JButton("Delete Password");
 		deletePasswordJButton.addActionListener(new ActionListener() {
@@ -460,6 +472,12 @@ public class MainWindow {
 		centreJPanel.add(storedPasswordsJScrollPane, BorderLayout.CENTER);
 
 		storedPasswordsJTable = new JTable();
+		storedPasswordsJTable.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(final MouseEvent mouseEvent) {
+				displayStoredPassword(mouseEvent);
+			}
+		});
 		storedPasswordsJTable.setFillsViewportHeight(true);
 		storedPasswordsJTable.setModel(storedPasswordsModel);
 		storedPasswordsJTable.setColumnSelectionAllowed(false);
@@ -488,7 +506,7 @@ public class MainWindow {
 	private void newProfile() {
 		printMessage("newProfile");
 		NewProfilePanel newProfile = new NewProfilePanel();
-		if (JOptionPane.showConfirmDialog(null, newProfile, "New Profile", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.YES_OPTION) {
+		if (showInputWindow(newProfile, "New Profile") == JOptionPane.YES_OPTION) {
 			if (!isValid(newProfile)) {
 				errorMessage("Failed to create a new profile, as you did not fill in all the fields.", "Failed To Create New Profile");
 				return;
@@ -497,7 +515,14 @@ public class MainWindow {
 		}
 	}
 
-	private void openPassword() {
-		printMessage("openPassword");
+	private int showInputWindow(final Object message, final String title) {
+		return JOptionPane.showConfirmDialog(null, message, title, JOptionPane.OK_CANCEL_OPTION);
+	}
+
+	private void viewPassword() {
+		printMessage("viewPassword");
+		StoredPassword password = storedPasswordsModel.getRow(storedPasswordsJTable.getSelectedRow());
+		ViewStoredPasswordPanel viewStoredPassword = new ViewStoredPasswordPanel(password);
+		showInputWindow(viewStoredPassword, "View Stored Password");
 	}
 }
