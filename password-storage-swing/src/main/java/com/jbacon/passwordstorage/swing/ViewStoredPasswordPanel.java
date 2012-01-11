@@ -1,5 +1,6 @@
 package com.jbacon.passwordstorage.swing;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -199,6 +200,10 @@ public class ViewStoredPasswordPanel extends JPanel {
 		gbc_textArea.gridx = 1;
 		gbc_textArea.gridy = 6;
 		add(passwordNotesJTextArea, gbc_textArea);
+
+		Dimension preferedSize = new Dimension(600, 400);
+		this.setPreferredSize(preferedSize);
+		this.setMinimumSize(preferedSize);
 
 		insertPasswordDetails();
 	}

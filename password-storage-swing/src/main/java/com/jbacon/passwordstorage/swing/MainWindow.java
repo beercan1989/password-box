@@ -33,6 +33,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.TableColumn;
 
 import com.jbacon.passwordstorage.password.StoredPassword;
 import com.jbacon.passwordstorage.swing.table.StoredPasswordTableModel;
@@ -40,6 +41,10 @@ import com.jbacon.passwordstorage.swing.table.StoredPasswordTableModel;
 public class MainWindow {
 
 	private static final String BLANK_STRING = "";
+
+	private static void errorMessage(final String message, final String title) {
+		JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
+	}
 
 	public static void main(final String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -60,21 +65,17 @@ public class MainWindow {
 	}
 
 	private JFrame mainWindowJFrame;
-
 	private StoredPasswordTableModel storedPasswordsModel;
-
 	private JTable storedPasswordsJTable;
-
 	private JList availableProfilesJList;
-
 	private JScrollPane storedPasswordsJScrollPane;
-
 	private JMenuBar menuBar;
+
 	private JMenu mnFile;
 	private JMenu mnEdit;
 	private JMenu mnView;
-
 	private JMenu mnHelp;
+
 	private JMenuItem mntmLoadProfile;
 	private JMenuItem mntmNewProfile;
 	private JMenuItem mntmNewPassword;
@@ -85,34 +86,36 @@ public class MainWindow {
 	private JMenuItem mntmFaq;
 	private JMenuItem mntmHelpContents;
 	private JMenuItem mntmOpenWikiPage;
-
 	private JMenuItem mntmOpenDownloadPage;
+
 	private JSeparator firstFileMenuJSeparator;
 	private JSeparator secondFileMenuJSeparator;
 	private JSeparator secondHelpMenuJSeparator;
 	private JSeparator firstHelpMenuJSeparator;
 	private JSeparator thirdHelpMenuJSeparator;
 	private JSeparator viewMenuSeparator;
-
 	private JSeparator availableProfilesButtonSeparator;
+
 	private JCheckBoxMenuItem chckbxmntmToggleSidebar;
 	private JCheckBoxMenuItem chckbxmntmToggleActionButtons;
-
 	private JCheckBoxMenuItem chckbxmntmToggleAvailableProfiles;
+
 	private JPanel westJPanel;
 	private JPanel centreJPanel;
-
 	private JPanel availableProfilesNorthButtonJPanel;
+
 	private JButton newProfileJButton;
 	private JButton loadProfileJButton;
 	private JButton deleteProfileJButton;
 	private JButton newPasswordJBbutton;
 	private JButton viewPasswordJButton;
 	private JButton deletePasswordJButton;
+
 	private JMenuItem mntmDeleteProfile;
 	private JMenuItem mntmViewPassword;
-
 	private JMenuItem mntmDeletePassword;
+	private JButton editPasswordJButton;
+	private JMenuItem mntmEditPassword;
 
 	public MainWindow() {
 		initialize();
@@ -152,10 +155,6 @@ public class MainWindow {
 
 	private void editPassword() {
 
-	}
-
-	private void errorMessage(final String message, final String title) {
-		JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
 	}
 
 	private void exitProgram() {
@@ -229,6 +228,9 @@ public class MainWindow {
 				deletePassword();
 			}
 		});
+
+		mntmEditPassword = new JMenuItem("Edit Password");
+		mnFile.add(mntmEditPassword);
 		mnFile.add(mntmDeletePassword);
 
 		secondFileMenuJSeparator = new JSeparator();
@@ -333,9 +335,9 @@ public class MainWindow {
 		westJPanel.add(availableProfilesNorthButtonJPanel, BorderLayout.NORTH);
 		GridBagLayout gbl_availableProfilesNorthButtonJPanel = new GridBagLayout();
 		gbl_availableProfilesNorthButtonJPanel.columnWidths = new int[] { 0, 0 };
-		gbl_availableProfilesNorthButtonJPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+		gbl_availableProfilesNorthButtonJPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 		gbl_availableProfilesNorthButtonJPanel.columnWeights = new double[] { 0.0, Double.MIN_VALUE };
-		gbl_availableProfilesNorthButtonJPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gbl_availableProfilesNorthButtonJPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		availableProfilesNorthButtonJPanel.setLayout(gbl_availableProfilesNorthButtonJPanel);
 
 		newProfileJButton = new JButton("New Profile");
@@ -424,9 +426,17 @@ public class MainWindow {
 				deletePassword();
 			}
 		});
+
+		editPasswordJButton = new JButton("Edit Password");
+		GridBagConstraints gbc_editPasswordJButton = new GridBagConstraints();
+		gbc_editPasswordJButton.fill = GridBagConstraints.HORIZONTAL;
+		gbc_editPasswordJButton.insets = new Insets(0, 0, 5, 0);
+		gbc_editPasswordJButton.gridx = 0;
+		gbc_editPasswordJButton.gridy = 6;
+		availableProfilesNorthButtonJPanel.add(editPasswordJButton, gbc_editPasswordJButton);
 		GridBagConstraints gbc_deletePasswordJButton = new GridBagConstraints();
 		gbc_deletePasswordJButton.gridx = 0;
-		gbc_deletePasswordJButton.gridy = 6;
+		gbc_deletePasswordJButton.gridy = 7;
 		availableProfilesNorthButtonJPanel.add(deletePasswordJButton, gbc_deletePasswordJButton);
 
 		availableProfilesJList = new JList();
@@ -444,8 +454,8 @@ public class MainWindow {
 			}
 		});
 		availableProfilesJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		availableProfilesJList.setBorder(new CompoundBorder(new EmptyBorder(10, 5, 5, 5), new TitledBorder(new LineBorder(new Color(184, 207, 229)),
-				"Available Profiles", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(51, 51, 51))));
+		availableProfilesJList.setBorder(new CompoundBorder(new EmptyBorder(10, 5, 5, 5), new CompoundBorder(new TitledBorder(new LineBorder(new Color(184,
+				207, 229)), "Available Profiles", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(51, 51, 51)), new EmptyBorder(0, 3, 3, 3))));
 		availableProfilesJList.setPreferredSize(new java.awt.Dimension(165, 0));
 		westJPanel.add(availableProfilesJList, BorderLayout.CENTER);
 
@@ -484,6 +494,10 @@ public class MainWindow {
 		storedPasswordsJTable.setCellSelectionEnabled(false);
 		storedPasswordsJTable.setRowSelectionAllowed(true);
 		storedPasswordsJTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		storedPasswordsJTable.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+		TableColumn storedPasswordsIdColumn = storedPasswordsJTable.getColumnModel().getColumn(0);
+		storedPasswordsIdColumn.setMaxWidth(20);
+		storedPasswordsIdColumn.setResizable(false);
 		storedPasswordsJScrollPane.setViewportView(storedPasswordsJTable);
 	}
 
@@ -506,7 +520,7 @@ public class MainWindow {
 	private void newProfile() {
 		printMessage("newProfile");
 		NewProfilePanel newProfile = new NewProfilePanel();
-		if (showInputWindow(newProfile, "New Profile") == JOptionPane.YES_OPTION) {
+		if (showDefaultInputWindow(newProfile, "New Profile") == JOptionPane.YES_OPTION) {
 			if (!isValid(newProfile)) {
 				errorMessage("Failed to create a new profile, as you did not fill in all the fields.", "Failed To Create New Profile");
 				return;
@@ -515,14 +529,18 @@ public class MainWindow {
 		}
 	}
 
-	private int showInputWindow(final Object message, final String title) {
+	private int showDefaultInputWindow(final Object message, final String title) {
 		return JOptionPane.showConfirmDialog(null, message, title, JOptionPane.OK_CANCEL_OPTION);
+	}
+
+	private void showMessageWindow(final Object message, final String title) {
+		JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	private void viewPassword() {
 		printMessage("viewPassword");
 		StoredPassword password = storedPasswordsModel.getRow(storedPasswordsJTable.getSelectedRow());
 		ViewStoredPasswordPanel viewStoredPassword = new ViewStoredPasswordPanel(password);
-		showInputWindow(viewStoredPassword, "View Stored Password");
+		showMessageWindow(viewStoredPassword, "View Stored Password");
 	}
 }

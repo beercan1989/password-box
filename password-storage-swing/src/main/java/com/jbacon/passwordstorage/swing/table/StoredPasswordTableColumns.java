@@ -5,7 +5,7 @@ import org.apache.commons.lang.WordUtils;
 import com.jbacon.passwordstorage.tools.StringUtils;
 
 public enum StoredPasswordTableColumns {
-	PASSWORD_ID(Integer.class), //
+	ID(Integer.class), //
 	PROFILE_NAME(String.class), //
 	PASSWORD_NAME(String.class), //
 	PASSWORD(String.class), //
