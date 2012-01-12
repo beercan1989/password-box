@@ -37,19 +37,19 @@ public class MasterPassword extends GenericPassword {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("MasterPassword [id=");
-		builder.append(getId());
-		builder.append(", profileName=");
+		// builder.append("MasterPassword [id=");
+		// builder.append(getId());
+		// builder.append(", profileName=");
 		builder.append(getProfileName());
-		builder.append(", encryptedSecretKey=");
-		builder.append(encryptedSecretKey);
-		builder.append(", salt=");
-		builder.append(salt);
-		builder.append(", createdAt=");
-		builder.append(getCreatedAt());
-		builder.append(", updatedAt=");
-		builder.append(getUpdatedAt());
-		builder.append("]");
+		// builder.append(", encryptedSecretKey=");
+		// builder.append(encryptedSecretKey);
+		// builder.append(", salt=");
+		// builder.append(salt);
+		// builder.append(", createdAt=");
+		// builder.append(getCreatedAt());
+		// builder.append(", updatedAt=");
+		// builder.append(getUpdatedAt());
+		// builder.append("]");
 		return builder.toString();
 	}
 

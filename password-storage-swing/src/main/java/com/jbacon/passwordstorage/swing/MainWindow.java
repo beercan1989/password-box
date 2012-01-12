@@ -15,7 +15,6 @@ import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 
 import javax.swing.AbstractButton;
-import javax.swing.AbstractListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -35,7 +34,9 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.TableColumn;
 
+import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
+import com.jbacon.passwordstorage.swing.list.MasterPasswordListModel;
 import com.jbacon.passwordstorage.swing.table.StoredPasswordTableModel;
 
 public class MainWindow {
@@ -66,6 +67,7 @@ public class MainWindow {
 
 	private JFrame mainWindowJFrame;
 	private StoredPasswordTableModel storedPasswordsModel;
+	private MasterPasswordListModel availableProfilesModel;
 	private JTable storedPasswordsJTable;
 	private JList availableProfilesJList;
 	private JScrollPane storedPasswordsJScrollPane;
@@ -336,7 +338,7 @@ public class MainWindow {
 		GridBagLayout gbl_availableProfilesNorthButtonJPanel = new GridBagLayout();
 		gbl_availableProfilesNorthButtonJPanel.columnWidths = new int[] { 0, 0 };
 		gbl_availableProfilesNorthButtonJPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-		gbl_availableProfilesNorthButtonJPanel.columnWeights = new double[] { 0.0, Double.MIN_VALUE };
+		gbl_availableProfilesNorthButtonJPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
 		gbl_availableProfilesNorthButtonJPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		availableProfilesNorthButtonJPanel.setLayout(gbl_availableProfilesNorthButtonJPanel);
 
@@ -376,8 +378,8 @@ public class MainWindow {
 			}
 		});
 		GridBagConstraints gbc_deleteProfileJButton = new GridBagConstraints();
-		gbc_deleteProfileJButton.insets = new Insets(0, 0, 5, 0);
 		gbc_deleteProfileJButton.fill = GridBagConstraints.HORIZONTAL;
+		gbc_deleteProfileJButton.insets = new Insets(0, 0, 5, 0);
 		gbc_deleteProfileJButton.gridx = 0;
 		gbc_deleteProfileJButton.gridy = 2;
 		availableProfilesNorthButtonJPanel.add(deleteProfileJButton, gbc_deleteProfileJButton);
@@ -413,8 +415,8 @@ public class MainWindow {
 			}
 		});
 		GridBagConstraints gbc_openPasswordJButton = new GridBagConstraints();
-		gbc_openPasswordJButton.insets = new Insets(0, 0, 5, 0);
 		gbc_openPasswordJButton.fill = GridBagConstraints.HORIZONTAL;
+		gbc_openPasswordJButton.insets = new Insets(0, 0, 5, 0);
 		gbc_openPasswordJButton.gridx = 0;
 		gbc_openPasswordJButton.gridy = 5;
 		availableProfilesNorthButtonJPanel.add(viewPasswordJButton, gbc_openPasswordJButton);
@@ -435,28 +437,22 @@ public class MainWindow {
 		gbc_editPasswordJButton.gridy = 6;
 		availableProfilesNorthButtonJPanel.add(editPasswordJButton, gbc_editPasswordJButton);
 		GridBagConstraints gbc_deletePasswordJButton = new GridBagConstraints();
+		gbc_deletePasswordJButton.fill = GridBagConstraints.HORIZONTAL;
 		gbc_deletePasswordJButton.gridx = 0;
 		gbc_deletePasswordJButton.gridy = 7;
 		availableProfilesNorthButtonJPanel.add(deletePasswordJButton, gbc_deletePasswordJButton);
 
+		availableProfilesModel = new MasterPasswordListModel();
+		availableProfilesModel.add(new MasterPassword("James' Profile", "ASDAFSDGVcvbdfg23412345aUERP9FSDFLf!\"£\"$%tg", "ABCDEF12346569074", new Timestamp(
+				new GregorianCalendar().getTimeInMillis()), new Timestamp(new GregorianCalendar().getTimeInMillis()), 1));
+
 		availableProfilesJList = new JList();
-		availableProfilesJList.setModel(new AbstractListModel() {
-			String[] values = new String[] { "James' Profile", "Fish", "Bacon's" };
-
-			@Override
-			public Object getElementAt(final int index) {
-				return values[index];
-			}
-
-			@Override
-			public int getSize() {
-				return values.length;
-			}
-		});
+		availableProfilesJList.setModel(availableProfilesModel);
 		availableProfilesJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		availableProfilesJList.setBorder(new CompoundBorder(new EmptyBorder(10, 5, 5, 5), new CompoundBorder(new TitledBorder(new LineBorder(new Color(184,
 				207, 229)), "Available Profiles", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(51, 51, 51)), new EmptyBorder(0, 3, 3, 3))));
-		availableProfilesJList.setPreferredSize(new java.awt.Dimension(165, 0));
+		// availableProfilesJList.setPreferredSize(new java.awt.Dimension(165,
+		// 0));
 		westJPanel.add(availableProfilesJList, BorderLayout.CENTER);
 
 		centreJPanel = new JPanel();
@@ -510,21 +506,29 @@ public class MainWindow {
 	}
 
 	private void loadProfile() {
-		printMessage("loadProfile");
+		printMessage("Loading a Profile");
 	}
 
 	private void newPassword() {
-		printMessage("newPassword");
+		printMessage("Creating a new Password");
 	}
 
 	private void newProfile() {
-		printMessage("newProfile");
+		printMessage("Creating a new Profile");
 		NewProfilePanel newProfile = new NewProfilePanel();
 		if (showDefaultInputWindow(newProfile, "New Profile") == JOptionPane.YES_OPTION) {
+
 			if (!isValid(newProfile)) {
 				errorMessage("Failed to create a new profile, as you did not fill in all the fields.", "Failed To Create New Profile");
 				return;
 			}
+
+			MasterPassword masterPassword = new MasterPassword();
+			masterPassword.setProfileName(newProfile.getProfileName());
+			masterPassword.setEncryptedSecretKey(new String(newProfile.getPassword()));
+			masterPassword.setSalt(new String(newProfile.getSalt()));
+			availableProfilesModel.add(masterPassword);
+
 			printMessage(newProfile.getProfileName() + " - " + String.valueOf(newProfile.getPassword()) + " - " + String.valueOf(newProfile.getSalt()));
 		}
 	}
@@ -538,7 +542,7 @@ public class MainWindow {
 	}
 
 	private void viewPassword() {
-		printMessage("viewPassword");
+		printMessage("Viewing a Password");
 		StoredPassword password = storedPasswordsModel.getRow(storedPasswordsJTable.getSelectedRow());
 		ViewStoredPasswordPanel viewStoredPassword = new ViewStoredPasswordPanel(password);
 		showMessageWindow(viewStoredPassword, "View Stored Password");
