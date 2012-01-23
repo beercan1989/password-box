@@ -17,14 +17,14 @@ public enum EncryptionType {
 
 	PBE_WITH_SHA_AND_3_KEY_TRIPPLE_DES_CBC("PbeWithSHAAnd3-KeyTripleDES-CBC", true),
 
-	PBE_WITH_SHA_AND_TWOFISH_CBC("PbeWithSHAAndTwofish-CBC", true),
+	PBE_WITH_SHA_AND_TWOFISH_CBC("PbeWithSHAAndTwofish-CBC", true);
 
 	/** Unsupported - Test Value */
-	UNSUPPORTED_TYPE("", false);
+	// UNSUPPORTED_TYPE("", false);
 
 	private static final int AES_128_KEY_SIZE = 128;
 	private static final int AES_256_KEY_SIZE = 256;
-	private static final int DEFAULT_SALT_SIZE = 8;
+	public static final int DEFAULT_SALT_SIZE = 8;
 	private static final int DEFAULT_ITERATION_COUNT = 20;
 	private static final String DEFAULT_SALT_ALGORITHM = "SHA1PRNG";
 

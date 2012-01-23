@@ -11,8 +11,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
@@ -34,6 +36,12 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.TableColumn;
 
+import com.jbacon.passwordstorage.database.dao.MaintenanceDao;
+import com.jbacon.passwordstorage.database.dao.MasterPasswordDao;
+import com.jbacon.passwordstorage.database.dao.StoredPasswordDao;
+import com.jbacon.passwordstorage.database.mybatis.MaintenanceMybatisDao;
+import com.jbacon.passwordstorage.database.mybatis.MasterPasswordMybatisDao;
+import com.jbacon.passwordstorage.database.mybatis.StoredPasswordMybatisDao;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
 import com.jbacon.passwordstorage.swing.list.MasterPasswordListModel;
@@ -64,6 +72,10 @@ public class MainWindow {
 	private static void printMessage(final String message) {
 		System.out.println(message);
 	}
+
+	private final MaintenanceDao maintenanceDao;
+	private final MasterPasswordDao masterPasswordDao;
+	private final StoredPasswordDao storedPasswordDao;
 
 	private JFrame mainWindowJFrame;
 	private StoredPasswordTableModel storedPasswordsModel;
@@ -120,7 +132,17 @@ public class MainWindow {
 	private JMenuItem mntmEditPassword;
 
 	public MainWindow() {
+		maintenanceDao = setupMaintenanceDao();
+		masterPasswordDao = setupMasterPasswordDao();
+		storedPasswordDao = setupStoredPasswordDao();
+
+		maintenanceDao.createMasterPasswordTable();
+		maintenanceDao.createStoredPasswordTable();
+
 		initialize();
+
+		List<MasterPassword> savedProfiles = masterPasswordDao.getMasterPasswords();
+		availableProfilesModel.addAll(savedProfiles);
 	}
 
 	private void areEnabled(final boolean isEnabled, final Component... components) {
@@ -232,6 +254,12 @@ public class MainWindow {
 		});
 
 		mntmEditPassword = new JMenuItem("Edit Password");
+		mntmEditPassword.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				editPassword();
+			}
+		});
 		mnFile.add(mntmEditPassword);
 		mnFile.add(mntmDeletePassword);
 
@@ -430,6 +458,12 @@ public class MainWindow {
 		});
 
 		editPasswordJButton = new JButton("Edit Password");
+		editPasswordJButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				editPassword();
+			}
+		});
 		GridBagConstraints gbc_editPasswordJButton = new GridBagConstraints();
 		gbc_editPasswordJButton.fill = GridBagConstraints.HORIZONTAL;
 		gbc_editPasswordJButton.insets = new Insets(0, 0, 5, 0);
@@ -443,8 +477,6 @@ public class MainWindow {
 		availableProfilesNorthButtonJPanel.add(deletePasswordJButton, gbc_deletePasswordJButton);
 
 		availableProfilesModel = new MasterPasswordListModel();
-		availableProfilesModel.add(new MasterPassword("James' Profile", "ASDAFSDGVcvbdfg23412345aUERP9FSDFLf!\"£\"$%tg", "ABCDEF12346569074", new Timestamp(
-				new GregorianCalendar().getTimeInMillis()), new Timestamp(new GregorianCalendar().getTimeInMillis()), 1));
 
 		availableProfilesJList = new JList();
 		availableProfilesJList.setModel(availableProfilesModel);
@@ -531,6 +563,36 @@ public class MainWindow {
 
 			printMessage(newProfile.getProfileName() + " - " + String.valueOf(newProfile.getPassword()) + " - " + String.valueOf(newProfile.getSalt()));
 		}
+	}
+
+	private MaintenanceMybatisDao setupMaintenanceDao() {
+		MaintenanceMybatisDao maintenance = null;
+		try {
+			maintenance = new MaintenanceMybatisDao();
+		} catch (IOException e) {
+			errorMessage("Failed to load mybatis configuration details", "Mybatis Fail");
+		}
+		return maintenance;
+	}
+
+	private MasterPasswordMybatisDao setupMasterPasswordDao() {
+		MasterPasswordMybatisDao master = null;
+		try {
+			master = new MasterPasswordMybatisDao();
+		} catch (IOException e) {
+			errorMessage("Failed to load mybatis configuration details", "Mybatis Fail");
+		}
+		return master;
+	}
+
+	private StoredPasswordMybatisDao setupStoredPasswordDao() {
+		StoredPasswordMybatisDao stored = null;
+		try {
+			stored = new StoredPasswordMybatisDao();
+		} catch (IOException e) {
+			errorMessage("Failed to load mybatis configuration details", "Mybatis Fail");
+		}
+		return stored;
 	}
 
 	private int showDefaultInputWindow(final Object message, final String title) {
