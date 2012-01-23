@@ -42,14 +42,13 @@ import com.jbacon.passwordstorage.database.dao.StoredPasswordDao;
 import com.jbacon.passwordstorage.database.mybatis.MaintenanceMybatisDao;
 import com.jbacon.passwordstorage.database.mybatis.MasterPasswordMybatisDao;
 import com.jbacon.passwordstorage.database.mybatis.StoredPasswordMybatisDao;
+import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
 import com.jbacon.passwordstorage.swing.list.MasterPasswordListModel;
 import com.jbacon.passwordstorage.swing.table.StoredPasswordTableModel;
 
 public class MainWindow {
-
-	private static final String BLANK_STRING = "";
 
 	private static void errorMessage(final String message, final String title) {
 		JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
@@ -201,7 +200,12 @@ public class MainWindow {
 		mntmNewProfile.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				newProfile();
+				try {
+					newProfile();
+				} catch (AbstractEncrypterException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		mnFile.add(mntmNewProfile);
@@ -374,7 +378,12 @@ public class MainWindow {
 		newProfileJButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				newProfile();
+				try {
+					newProfile();
+				} catch (AbstractEncrypterException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		GridBagConstraints gbc_newProfileJButton = new GridBagConstraints();
@@ -530,11 +539,7 @@ public class MainWindow {
 	}
 
 	private boolean isValid(final NewProfilePanel newProfile) {
-		if (newProfile.getProfileName() == null || BLANK_STRING.equals(newProfile.getProfileName().trim()) || newProfile.getPassword().length == 0
-				|| newProfile.getSalt().length == 0) {
-			return false;
-		}
-		return true;
+		return NewProfilePanel.isValid(newProfile);
 	}
 
 	private void loadProfile() {
@@ -545,7 +550,7 @@ public class MainWindow {
 		printMessage("Creating a new Password");
 	}
 
-	private void newProfile() {
+	private void newProfile() throws AbstractEncrypterException {
 		printMessage("Creating a new Profile");
 		NewProfilePanel newProfile = new NewProfilePanel();
 		if (showDefaultInputWindow(newProfile, "New Profile") == JOptionPane.YES_OPTION) {
@@ -555,13 +560,11 @@ public class MainWindow {
 				return;
 			}
 
-			MasterPassword masterPassword = new MasterPassword();
-			masterPassword.setProfileName(newProfile.getProfileName());
-			masterPassword.setEncryptedSecretKey(new String(newProfile.getPassword()));
-			masterPassword.setSalt(new String(newProfile.getSalt()));
+			MasterPassword masterPassword = newProfile.buildProfile();
 			availableProfilesModel.add(masterPassword);
 
-			printMessage(newProfile.getProfileName() + " - " + String.valueOf(newProfile.getPassword()) + " - " + String.valueOf(newProfile.getSalt()));
+			printMessage(masterPassword.getProfileName() + " - " + String.valueOf(masterPassword.getEncryptedSecretKey()) + " - "
+					+ String.valueOf(newProfile.getSalt()));
 		}
 	}
 

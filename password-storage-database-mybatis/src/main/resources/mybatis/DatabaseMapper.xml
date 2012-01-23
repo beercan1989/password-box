@@ -29,7 +29,7 @@
 	</select>
 	
 	<insert id="instertMasterPassword" parameterType="com.jbacon.passwordstorage.password.MasterPassword">
-		INSERT OR FAIL INTO MasterPasswords (profileName, secretKey, salt, createdAt, updatedAt) VALUES (#{profileName}, #{encryptedSecretKey}, #{salt}, datetime('now', 'utc'), datetime('now', 'utc'));
+		INSERT OR FAIL INTO MasterPasswords (profileName, secretKey, salt, createdAt, updatedAt, masterET, storedET) VALUES (#{profileName}, #{encryptedSecretKey}, #{salt}, datetime('now', 'utc'), datetime('now', 'utc'), #{masterPasswordEncryptionType}, #{storedPasswordEncryptionType});
 	</insert>
 	
 	<update id="updateMasterPassword" parameterType="com.jbacon.passwordstorage.password.MasterPassword">
@@ -73,7 +73,7 @@
 		CREATE TABLE IF NOT EXISTS StoredPasswords (id INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE ON CONFLICT FAIL, profileName TEXT NOT NULL, passwordName TEXT NOT NULL, password TEXT NOT NULL, passwordNotes TEXT NOT NULL, createdAt TEXT NOT NULL, updatedAt TEXT NOT NULL);
 	</update>
 	<update id="createMasterPasswordTable">
-		CREATE TABLE IF NOT EXISTS MasterPasswords (id INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE ON CONFLICT FAIL, profileName TEXT NOT NULL UNIQUE ON CONFLICT FAIL, secretKey TEXT NOT NULL, salt TEXT NOT NULL, createdAt TEXT NOT NULL, updatedAt TEXT NOT NULL);
+		CREATE TABLE IF NOT EXISTS MasterPasswords (id INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE ON CONFLICT FAIL, profileName TEXT NOT NULL UNIQUE ON CONFLICT FAIL, secretKey TEXT NOT NULL, salt TEXT NOT NULL, createdAt TEXT NOT NULL, updatedAt TEXT NOT NULL, masterET TEXT NOT NULL, storedET TEXT NOT NULL);
 	</update>
 	
 	<!-- Drop DB tables. -->
@@ -94,8 +94,10 @@
 	</resultMap>
 	
 	<resultMap id="MasterPassword" type="com.jbacon.passwordstorage.password.MasterPassword" extends="GenericPassword">
-		<result column="secretKey" 	 property="encryptedSecretKey" />
-		<result column="salt" 		 property="salt" />
+		<result column="secretKey"		property="encryptedSecretKey" />
+		<result column="salt" 			property="salt" />
+		<result column="masterET"		property="masterPasswordEncryptionType" />
+		<result column="storedET" 		property="storedPasswordsEncryptionType" />
 	</resultMap>
 	
 	<resultMap id="StoredPassword" type="com.jbacon.passwordstorage.password.StoredPassword" extends="GenericPassword">

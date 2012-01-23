@@ -13,10 +13,6 @@ import java.security.NoSuchAlgorithmException;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.jbacon.passwordstorage.encryption.EncrypterAES;
-import com.jbacon.passwordstorage.encryption.EncrypterFactory;
-import com.jbacon.passwordstorage.encryption.EncryptionMode;
-import com.jbacon.passwordstorage.encryption.EncryptionType;
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.encryption.errors.NoSuchEncryptionException;
 
@@ -31,8 +27,7 @@ public class EncrypterAESTest {
 
 	@Before
 	public void setupBeforeTest() throws NoSuchEncryptionException {
-		final EncrypterFactory encrypterFactory = new EncrypterFactory();
-		encrypter = (EncrypterAES) encrypterFactory.getEncrypter(EncryptionType.AES_256);
+		encrypter = (EncrypterAES) EncryptionType.AES_256.getEncrypter();
 	}
 
 	@Test

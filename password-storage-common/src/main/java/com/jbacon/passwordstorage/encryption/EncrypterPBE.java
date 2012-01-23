@@ -1,21 +1,12 @@
 package com.jbacon.passwordstorage.encryption;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
-import com.jbacon.passwordstorage.encryption.errors.NoSuchEncryptionException;
 
 public class EncrypterPBE extends Encrypter {
 
@@ -37,20 +28,23 @@ public class EncrypterPBE extends Encrypter {
 			Cipher cipher = Cipher.getInstance(encryptionType.algorithmName);
 			cipher.init(encryptionMode.mode, secretKey, parameterSpecification);
 			return cipher.doFinal(cipherText);
-		} catch (NoSuchAlgorithmException e) {
-			throw new NoSuchEncryptionException(e);
-		} catch (InvalidKeySpecException e) {
-			throw new NoSuchEncryptionException(e);
-		} catch (NoSuchPaddingException e) {
-			throw new NoSuchEncryptionException(e);
-		} catch (InvalidKeyException e) {
-			throw new NoSuchEncryptionException(e);
-		} catch (InvalidAlgorithmParameterException e) {
-			throw new NoSuchEncryptionException(e);
-		} catch (IllegalBlockSizeException e) {
-			throw new NoSuchEncryptionException(e);
-		} catch (BadPaddingException e) {
-			throw new NoSuchEncryptionException(e);
+		} catch (Exception e) {
+			throw new AbstractEncrypterException(e);
 		}
+		// catch (NoSuchAlgorithmException e) {
+		// throw new NoSuchEncryptionException(e);
+		// } catch (InvalidKeySpecException e) {
+		// throw new NoSuchEncryptionException(e);
+		// } catch (NoSuchPaddingException e) {
+		// throw new NoSuchEncryptionException(e);
+		// } catch (InvalidKeyException e) {
+		// throw new NoSuchEncryptionException(e);
+		// } catch (InvalidAlgorithmParameterException e) {
+		// throw new NoSuchEncryptionException(e);
+		// } catch (IllegalBlockSizeException e) {
+		// throw new NoSuchEncryptionException(e);
+		// } catch (BadPaddingException e) {
+		// throw new NoSuchEncryptionException(e);
+		// }
 	}
 }

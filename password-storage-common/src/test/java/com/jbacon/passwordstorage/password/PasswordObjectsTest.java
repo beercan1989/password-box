@@ -11,6 +11,8 @@ import java.sql.Timestamp;
 
 import org.junit.Test;
 
+import com.jbacon.passwordstorage.encryption.EncryptionType;
+
 public class PasswordObjectsTest {
 
 	private static final String PASSWORD_NAME = "password Name";
@@ -30,7 +32,8 @@ public class PasswordObjectsTest {
 
 	@Test
 	public void shouldCreateAFilledInMasterPassword() {
-		MasterPassword masterPassword = new MasterPassword(PROFILE_NAME, ENCRYPTED_SECRET_KEY, SALT, getCreatedAt(), getUpdatedAt(), 1);
+		MasterPassword masterPassword = new MasterPassword(PROFILE_NAME, ENCRYPTED_SECRET_KEY, SALT, getCreatedAt(), getUpdatedAt(), 1, EncryptionType.AES_256,
+				EncryptionType.PBE_WITH_MD5_AND_DES);
 		assertThat(masterPassword, is(not(nullValue())));
 		assertThat(masterPassword.getCreatedAt(), is(equalTo(getCreatedAt())));
 		assertThat(masterPassword.getUpdatedAt(), is(equalTo(getUpdatedAt())));

@@ -8,18 +8,16 @@ import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 
 import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.Security;
 
+import org.apache.commons.codec.DecoderException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.jbacon.passwordstorage.encryption.EncryptionType;
+import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.encryption.errors.InvalidEncryptionTypeForSaltGeneration;
-import com.jbacon.passwordstorage.encryption.errors.NoSuchEncryptionException;
-import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 
 public class EncrypterUtilsTest {
 
@@ -40,7 +38,7 @@ public class EncrypterUtilsTest {
 	}
 
 	@Test
-	public void shouldConvertStringToByteArray() throws UnsupportedEncodingException {
+	public void shouldConvertStringToByteArray() throws UnsupportedEncodingException, DecoderException {
 		assertThat(encrypterUtils.stringToByte("Hello World"), is(equalTo(new byte[] { 72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100 })));
 	}
 
@@ -54,14 +52,13 @@ public class EncrypterUtilsTest {
 	}
 
 	@Test
-	public void shouldGenerateAesEncryptionKey() throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchEncryptionException {
+	public void shouldGenerateAesEncryptionKey() throws AbstractEncrypterException {
 		assertThat(encrypterUtils.generateAesEncryptionKey(EncryptionType.AES_256).length, is(equalTo(32)));
 		assertThat(encrypterUtils.generateAesEncryptionKey(EncryptionType.AES_128).length, is(equalTo(16)));
 	}
 
 	@Test
-	public void shouldGenerateDefaultSaltValueForPBEWithMD5AndDES() throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchEncryptionException,
-			InvalidEncryptionTypeForSaltGeneration {
+	public void shouldGenerateDefaultSaltValueForPBEWithMD5AndDES() throws AbstractEncrypterException {
 		final byte[] generatedSalt = encrypterUtils.generateSalt(EncryptionType.PBE_WITH_MD5_AND_DES);
 		assertThat(generatedSalt, is(not(nullValue())));
 		assertThat(generatedSalt.length, is(not(lessThanOrEqualTo(0))));
@@ -70,8 +67,7 @@ public class EncrypterUtilsTest {
 	}
 
 	@Test
-	public void shouldGenerateSaltValueForPBEWithMD5AndDES() throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchEncryptionException,
-			InvalidEncryptionTypeForSaltGeneration {
+	public void shouldGenerateSaltValueForPBEWithMD5AndDES() throws AbstractEncrypterException {
 		final byte[] generatedSalt = encrypterUtils.generateSalt(EncryptionType.PBE_WITH_MD5_AND_DES, 18);
 		assertThat(generatedSalt, is(not(nullValue())));
 		assertThat(generatedSalt.length, is(not(lessThanOrEqualTo(0))));
@@ -80,8 +76,7 @@ public class EncrypterUtilsTest {
 	}
 
 	@Test(expected = InvalidEncryptionTypeForSaltGeneration.class)
-	public void shouldThrowExceptionGeneratingSaltForAES() throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchEncryptionException,
-			InvalidEncryptionTypeForSaltGeneration {
+	public void shouldThrowExceptionGeneratingSaltForAES() throws AbstractEncrypterException {
 		encrypterUtils.generateSalt(EncryptionType.AES_128);
 	}
 

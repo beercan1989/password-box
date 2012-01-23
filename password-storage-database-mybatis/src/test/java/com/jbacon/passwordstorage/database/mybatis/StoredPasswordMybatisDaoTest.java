@@ -13,6 +13,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.jbacon.passwordstorage.encryption.EncryptionType;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
 import com.jbacon.test.tools.RemoveTestFiles;
@@ -38,7 +39,8 @@ public class StoredPasswordMybatisDaoTest {
 	}
 
 	private static MasterPassword generateMasterPassword(final int id) {
-		return new MasterPassword(TV_MP_PROFILE_NAME + id, TV_MP_ENCRYPTED_SECRET_KEY + id, TV_MP_SALT + id, null, null, null);
+		return new MasterPassword(TV_MP_PROFILE_NAME + id, TV_MP_ENCRYPTED_SECRET_KEY + id, TV_MP_SALT + id, null, null, null, EncryptionType.AES_256,
+				EncryptionType.PBE_WITH_MD5_AND_DES);
 	}
 
 	private static StoredPassword generateStoredPassword(final int spId, final int mpId) {

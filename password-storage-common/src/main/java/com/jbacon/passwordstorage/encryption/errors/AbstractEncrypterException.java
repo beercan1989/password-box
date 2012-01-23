@@ -1,6 +1,6 @@
 package com.jbacon.passwordstorage.encryption.errors;
 
-public abstract class AbstractEncrypterException extends Exception {
+public class AbstractEncrypterException extends Exception {
 
 	private static final long serialVersionUID = -1128746862562678562L;
 

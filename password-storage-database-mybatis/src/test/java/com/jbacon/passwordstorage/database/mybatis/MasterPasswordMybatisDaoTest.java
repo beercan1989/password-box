@@ -13,6 +13,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.jbacon.passwordstorage.encryption.EncryptionType;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.test.tools.RemoveTestFiles;
 
@@ -44,7 +45,8 @@ public class MasterPasswordMybatisDaoTest {
 	}
 
 	private static MasterPassword generateMasterPassword(final int id) {
-		return new MasterPassword(TEST_VALUE_PROFILE_NAME + id, TEST_VALUE_ENCRYPTED_SECRET_KEY + id, TEST_VALUE_SALT + id, null, null, null);
+		return new MasterPassword(TEST_VALUE_PROFILE_NAME + id, TEST_VALUE_ENCRYPTED_SECRET_KEY + id, TEST_VALUE_SALT + id, null, null, null,
+				EncryptionType.PBE_WITH_MD5_AND_DES, EncryptionType.AES_256);
 	}
 
 	@BeforeClass
@@ -83,6 +85,8 @@ public class MasterPasswordMybatisDaoTest {
 		assertThat(result.getId(), is(equalTo(1)));
 		assertThat(result.getEncryptedSecretKey(), is(equalTo(TEST_VALUE_ENCRYPTED_SECRET_KEY + 1)));
 		assertThat(result.getSalt(), is(equalTo(TEST_VALUE_SALT + 1)));
+		assertThat(result.getMasterPasswordEncryptionType(), is(equalTo(EncryptionType.PBE_WITH_MD5_AND_DES)));
+		assertThat(result.getStoredPasswordEncryptionType(), is(equalTo(EncryptionType.AES_256)));
 	}
 
 	@Test
