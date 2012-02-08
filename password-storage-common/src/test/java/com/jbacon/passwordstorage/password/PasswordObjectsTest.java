@@ -119,6 +119,7 @@ public class PasswordObjectsTest {
 		assertThat(storedPassword.toString(), is(not(nullValue())));
 		assertThat(storedPassword.toString(), containsString("encryptedPasswordName"));
 		assertThat(masterPassword.toString(), is(not(nullValue())));
-		assertThat(masterPassword.toString(), containsString("encryptedSecretKey"));
+		// assertThat(masterPassword.toString(),
+		// containsString("encryptedSecretKey"));
 	}
 }

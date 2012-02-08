@@ -28,6 +28,11 @@ public class StoredPasswordTableModel extends AbstractTableModel implements Seri
 		tableData.addAll(storedPasswords);
 	}
 
+	public void clear() {
+		tableData.clear();
+		fireTableDataChanged();
+	}
+
 	@Override
 	public int findColumn(final String columnName) {
 		return TABLE_COLUMNS.indexOf(StoredPasswordTableColumns.stringToEnum(columnName));

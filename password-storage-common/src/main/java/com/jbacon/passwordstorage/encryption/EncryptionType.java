@@ -1,5 +1,9 @@
 package com.jbacon.passwordstorage.encryption;
 
+import static com.jbacon.passwordstorage.tools.GenericUtils.areNull;
+import static com.jbacon.passwordstorage.tools.GenericUtils.isNotNull;
+import static com.jbacon.passwordstorage.tools.GenericUtils.isNull;
+
 import com.jbacon.passwordstorage.encryption.errors.NoSuchEncryptionException;
 import com.jbacon.passwordstorage.encryption.specifications.EncryptionSpecification;
 import com.jbacon.passwordstorage.encryption.specifications.EncryptionSpecificationAES;
@@ -29,7 +33,36 @@ public enum EncryptionType {
 	private static final String DEFAULT_SALT_ALGORITHM = "SHA1PRNG";
 
 	public static final String PROVIDER_NAME = "BC";
+
+	public static boolean areValid(final EncryptionType... encryptionTypes) {
+
+		if (areNull(encryptionTypes)) {
+			return false;
+		}
+
+		for (EncryptionType encryptionType : encryptionTypes) {
+			if (!isValid(encryptionType)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static boolean isValid(final EncryptionType encryptionType) {
+
+		if (isNull(encryptionType)) {
+			return false;
+		}
+
+		try {
+			return isNotNull(encryptionType.getEncrypter());
+		} catch (NoSuchEncryptionException e) {
+			return false;
+		}
+	}
+
 	public final String algorithmName;
+
 	public final boolean isSupported;
 
 	private EncryptionType(final String algorithm, final boolean isSupported) {

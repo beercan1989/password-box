@@ -25,6 +25,7 @@ import com.jbacon.passwordstorage.encryption.EncryptionType;
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 import com.jbacon.passwordstorage.password.MasterPassword;
+import com.jbacon.passwordstorage.tools.GenericUtils;
 import com.jbacon.passwordstorage.tools.StringUtils;
 
 public class NewProfilePanel extends JPanel {
@@ -35,11 +36,17 @@ public class NewProfilePanel extends JPanel {
 	private static final long serialVersionUID = 8536565892859901568L;
 
 	public static boolean isValid(final NewProfilePanel newProfile) {
-		if (newProfile.getProfileName() == null || StringUtils.BLANK.equals(newProfile.getProfileName().trim()) || newProfile.getPassword().length == 0
-				|| newProfile.getSalt().length == 0) {
+		try {
+			boolean encryptionTypesValid = EncryptionType.areValid(newProfile.getProfileEncryptionType(), newProfile.getPasswordEncryptionType());
+			boolean saltIsNotNull = GenericUtils.isNotNull(newProfile.getSalt());
+			boolean areNotEmpty = StringUtils.areNotEmpty(newProfile.getEncryptedSecretKey(), newProfile.getProfileName());
+			if (encryptionTypesValid && saltIsNotNull && areNotEmpty) {
+				return true;
+			}
+		} catch (AbstractEncrypterException e) {
 			return false;
 		}
-		return true;
+		return false;
 	}
 
 	private final JLabel profileNameJLabel;
@@ -232,7 +239,7 @@ public class NewProfilePanel extends JPanel {
 	public MasterPassword buildProfile() throws AbstractEncrypterException {
 		MasterPassword profile = new MasterPassword();
 		profile.setProfileName(getProfileName());
-		profile.setSalt(new String(getSalt()));
+		profile.setSalt(encrypterUtils.byteToHexString(getSalt()));
 		profile.setMasterPasswordEncryptionType(getProfileEncryptionType());
 		profile.setStoredPasswordsEncryptionType(getPasswordEncryptionType());
 		profile.setEncryptedSecretKey(getEncryptedSecretKey());

@@ -1,5 +1,7 @@
 package com.jbacon.passwordstorage.swing;
 
+import static com.jbacon.passwordstorage.tools.GenericUtils.isNotNull;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -42,15 +44,17 @@ import com.jbacon.passwordstorage.database.dao.StoredPasswordDao;
 import com.jbacon.passwordstorage.database.mybatis.MaintenanceMybatisDao;
 import com.jbacon.passwordstorage.database.mybatis.MasterPasswordMybatisDao;
 import com.jbacon.passwordstorage.database.mybatis.StoredPasswordMybatisDao;
+import com.jbacon.passwordstorage.encryption.EncryptionType;
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
 import com.jbacon.passwordstorage.swing.list.MasterPasswordListModel;
 import com.jbacon.passwordstorage.swing.table.StoredPasswordTableModel;
+import com.jbacon.passwordstorage.tools.StringUtils;
 
 public class MainWindow {
 
-	private static void errorMessage(final String message, final String title) {
+	private static void errorMessage(final String message, final String title, final Exception e) {
 		JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
 	}
 
@@ -129,6 +133,8 @@ public class MainWindow {
 	private JMenuItem mntmDeletePassword;
 	private JButton editPasswordJButton;
 	private JMenuItem mntmEditPassword;
+	private JButton deleteDatabaseJButton;
+	private JSeparator deleteDatabaseJSeparator;
 
 	public MainWindow() {
 		maintenanceDao = setupMaintenanceDao();
@@ -162,12 +168,46 @@ public class MainWindow {
 		}
 	}
 
+	protected void deleteDatabase() {
+		maintenanceDao.dropMasterPasswordTable();
+		maintenanceDao.dropStoredPasswordTable();
+
+		maintenanceDao.createMasterPasswordTable();
+		maintenanceDao.createStoredPasswordTable();
+
+		availableProfilesModel.clear();
+		storedPasswordsModel.clear();
+
+		availableProfilesModel.addAll(masterPasswordDao.getMasterPasswords());
+
+		showMessageWindow("You have successfully deleted the database.", "Database Delete Successfull");
+	}
+
 	private void deletePassword() {
 		printMessage("deletePassword");
 	}
 
 	private void deleteProfile() {
 		printMessage("deleteProfile");
+
+		int selection = availableProfilesJList.getSelectedIndex();
+		if (selection < 0) {
+			showMessageWindow("Please select a profile from the \"Available Profiles\" to remove.", "Please Select A Profile");
+			return;
+		}
+		MasterPassword masterPassword = availableProfilesModel.get(selection);
+
+		masterPasswordDao.deleteMasterPassword(masterPassword);
+
+		List<StoredPassword> storedPasswords = storedPasswordDao.getStoredPasswords(masterPassword);
+		for (StoredPassword storedPassword : storedPasswords) {
+			storedPasswordDao.deleteStoredPassword(storedPassword);
+		}
+
+		updateAvailableProfiles();
+		updateStoredPasswords();
+
+		showMessageWindow("Profile " + masterPassword.getProfileName() + " has successfully been deleted.", "Profile Successfully Deleted");
 	}
 
 	private void displayStoredPassword(final MouseEvent mouseEvent) {
@@ -369,9 +409,9 @@ public class MainWindow {
 		westJPanel.add(availableProfilesNorthButtonJPanel, BorderLayout.NORTH);
 		GridBagLayout gbl_availableProfilesNorthButtonJPanel = new GridBagLayout();
 		gbl_availableProfilesNorthButtonJPanel.columnWidths = new int[] { 0, 0 };
-		gbl_availableProfilesNorthButtonJPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		gbl_availableProfilesNorthButtonJPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 		gbl_availableProfilesNorthButtonJPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-		gbl_availableProfilesNorthButtonJPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gbl_availableProfilesNorthButtonJPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		availableProfilesNorthButtonJPanel.setLayout(gbl_availableProfilesNorthButtonJPanel);
 
 		newProfileJButton = new JButton("New Profile");
@@ -458,14 +498,6 @@ public class MainWindow {
 		gbc_openPasswordJButton.gridy = 5;
 		availableProfilesNorthButtonJPanel.add(viewPasswordJButton, gbc_openPasswordJButton);
 
-		deletePasswordJButton = new JButton("Delete Password");
-		deletePasswordJButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				deletePassword();
-			}
-		});
-
 		editPasswordJButton = new JButton("Edit Password");
 		editPasswordJButton.addActionListener(new ActionListener() {
 			@Override
@@ -479,11 +511,42 @@ public class MainWindow {
 		gbc_editPasswordJButton.gridx = 0;
 		gbc_editPasswordJButton.gridy = 6;
 		availableProfilesNorthButtonJPanel.add(editPasswordJButton, gbc_editPasswordJButton);
+
+		deletePasswordJButton = new JButton("Delete Password");
+		deletePasswordJButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				deletePassword();
+			}
+		});
 		GridBagConstraints gbc_deletePasswordJButton = new GridBagConstraints();
+		gbc_deletePasswordJButton.insets = new Insets(0, 0, 5, 0);
 		gbc_deletePasswordJButton.fill = GridBagConstraints.HORIZONTAL;
 		gbc_deletePasswordJButton.gridx = 0;
 		gbc_deletePasswordJButton.gridy = 7;
 		availableProfilesNorthButtonJPanel.add(deletePasswordJButton, gbc_deletePasswordJButton);
+
+		deleteDatabaseJSeparator = new JSeparator();
+		deleteDatabaseJSeparator.setForeground(Color.BLACK);
+		GridBagConstraints gbc_deleteDatabaseJSeparator = new GridBagConstraints();
+		gbc_deleteDatabaseJSeparator.fill = GridBagConstraints.BOTH;
+		gbc_deleteDatabaseJSeparator.insets = new Insets(0, 0, 5, 0);
+		gbc_deleteDatabaseJSeparator.gridx = 0;
+		gbc_deleteDatabaseJSeparator.gridy = 8;
+		availableProfilesNorthButtonJPanel.add(deleteDatabaseJSeparator, gbc_deleteDatabaseJSeparator);
+
+		deleteDatabaseJButton = new JButton("Delete Database");
+		deleteDatabaseJButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				deleteDatabase();
+			}
+		});
+		GridBagConstraints gbc_deleteDatabaseJButton = new GridBagConstraints();
+		gbc_deleteDatabaseJButton.fill = GridBagConstraints.HORIZONTAL;
+		gbc_deleteDatabaseJButton.gridx = 0;
+		gbc_deleteDatabaseJButton.gridy = 9;
+		availableProfilesNorthButtonJPanel.add(deleteDatabaseJButton, gbc_deleteDatabaseJButton);
 
 		availableProfilesModel = new MasterPasswordListModel();
 
@@ -556,15 +619,25 @@ public class MainWindow {
 		if (showDefaultInputWindow(newProfile, "New Profile") == JOptionPane.YES_OPTION) {
 
 			if (!isValid(newProfile)) {
-				errorMessage("Failed to create a new profile, as you did not fill in all the fields.", "Failed To Create New Profile");
+				errorMessage("Failed to create a new profile, as you did not fill in all the fields.", "Failed To Create New Profile", null);
 				return;
 			}
 
 			MasterPassword masterPassword = newProfile.buildProfile();
-			availableProfilesModel.add(masterPassword);
 
-			printMessage(masterPassword.getProfileName() + " - " + String.valueOf(masterPassword.getEncryptedSecretKey()) + " - "
-					+ String.valueOf(newProfile.getSalt()));
+			if (!validateNewProfile(masterPassword)) {
+				errorMessage("Failed to create a new profile, as the new profile is not valid, either fields were empty or none existant.",
+						"Failed To Create New Profile", null);
+				return;
+			}
+
+			if (unsuccessfulImport(masterPasswordDao.instertMasterPassword(masterPassword))) {
+				errorMessage("Failed to create a new profile, inserting into the database failed.", "Failed To Create New Profile", null);
+				return;
+			}
+
+			updateAvailableProfiles();
+			printMessage("Created masterPassword with a name of " + masterPassword.getProfileName());
 		}
 	}
 
@@ -573,7 +646,7 @@ public class MainWindow {
 		try {
 			maintenance = new MaintenanceMybatisDao();
 		} catch (IOException e) {
-			errorMessage("Failed to load mybatis configuration details", "Mybatis Fail");
+			errorMessage("Failed to load mybatis configuration details", "Mybatis Fail", e);
 		}
 		return maintenance;
 	}
@@ -583,7 +656,7 @@ public class MainWindow {
 		try {
 			master = new MasterPasswordMybatisDao();
 		} catch (IOException e) {
-			errorMessage("Failed to load mybatis configuration details", "Mybatis Fail");
+			errorMessage("Failed to load mybatis configuration details", "Mybatis Fail", e);
 		}
 		return master;
 	}
@@ -593,7 +666,7 @@ public class MainWindow {
 		try {
 			stored = new StoredPasswordMybatisDao();
 		} catch (IOException e) {
-			errorMessage("Failed to load mybatis configuration details", "Mybatis Fail");
+			errorMessage("Failed to load mybatis configuration details", "Mybatis Fail", e);
 		}
 		return stored;
 	}
@@ -604,6 +677,49 @@ public class MainWindow {
 
 	private void showMessageWindow(final Object message, final String title) {
 		JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	private boolean unsuccessfulImport(final int result) {
+		if (result == 1) {
+			return false;
+		}
+		return true;
+	}
+
+	private void updateAvailableProfiles() {
+		List<MasterPassword> masterPasswords = masterPasswordDao.getMasterPasswords();
+		if (masterPasswords != null) {
+			availableProfilesModel.clear();
+			availableProfilesModel.addAll(masterPasswords);
+		}
+	}
+
+	private void updateStoredPasswords() {
+		int selected = availableProfilesJList.getSelectedIndex();
+		if (selected < 0) {
+			return;
+		}
+		MasterPassword masterPassword = availableProfilesModel.get(selected);
+		List<StoredPassword> storedPasswords = storedPasswordDao.getStoredPasswords(masterPassword);
+		if (storedPasswords != null) {
+			storedPasswordsModel.clear();
+			storedPasswordsModel.addAll(storedPasswords);
+		}
+	}
+
+	private boolean validateNewProfile(final MasterPassword profile) {
+		boolean encryptionTypesValid = EncryptionType.areValid(profile.getMasterPasswordEncryptionType(), profile.getStoredPasswordEncryptionType());
+		boolean areNotEmpty = StringUtils.areNotEmpty(profile.getEncryptedSecretKey(), profile.getProfileName(), profile.getSalt());
+
+		if (encryptionTypesValid && areNotEmpty) {
+			List<String> currentProfileNames = masterPasswordDao.getMasterPasswordNames();
+			if (isNotNull(currentProfileNames) && currentProfileNames.contains(profile.getProfileName())) {
+				return false;
+			}
+			return true;
+		}
+
+		return false;
 	}
 
 	private void viewPassword() {
