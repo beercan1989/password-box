@@ -1,10 +1,15 @@
 package com.jbacon.passwordstorage.swing;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.Arrays;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -17,7 +22,9 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 import com.jbacon.passwordstorage.encryption.EncrypterPBE;
 import com.jbacon.passwordstorage.encryption.EncryptionMode;
@@ -70,6 +77,12 @@ public class NewProfilePanel extends JPanel {
 
 	private byte[] encryptedSecretKey;
 
+	private static final Border INVALID_JPASSWORDFIELD = new LineBorder(Color.RED, 2);
+	private static final Border VALID_JPASSWORDFIELD = new JPasswordField().getBorder();
+
+	private final JPasswordField reTypedPasswordJPasswordField;
+	private final JLabel reTypedPasswordJLabel;
+
 	/**
 	 * Create the panel.
 	 */
@@ -77,9 +90,9 @@ public class NewProfilePanel extends JPanel {
 		setBorder(new EmptyBorder(10, 10, 10, 10));
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0 };
-		gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
-		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, 0.0, Double.MIN_VALUE };
-		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, 1.0, Double.MIN_VALUE };
+		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		setLayout(gridBagLayout);
 
 		txtrPleaseEnterThe = new JTextArea();
@@ -128,6 +141,22 @@ public class NewProfilePanel extends JPanel {
 		gbc_passwordJPasswordField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_passwordJPasswordField.gridx = 1;
 		gbc_passwordJPasswordField.gridy = 2;
+		passwordJPasswordField.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(final KeyEvent e) {
+				updatePasswordFieldValidation();
+			}
+
+			@Override
+			public void keyReleased(final KeyEvent e) {
+				updatePasswordFieldValidation();
+			}
+
+			@Override
+			public void keyTyped(final KeyEvent e) {
+				updatePasswordFieldValidation();
+			}
+		});
 		add(passwordJPasswordField, gbc_passwordJPasswordField);
 
 		generatePasswordJButton = new JButton("Generate");
@@ -138,12 +167,46 @@ public class NewProfilePanel extends JPanel {
 		gbc_generatePasswordJButton.gridy = 2;
 		add(generatePasswordJButton, gbc_generatePasswordJButton);
 
+		reTypedPasswordJLabel = new JLabel("Re-Type Password");
+		GridBagConstraints gbc_reTypedPasswordJLabel = new GridBagConstraints();
+		gbc_reTypedPasswordJLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_reTypedPasswordJLabel.anchor = GridBagConstraints.EAST;
+		gbc_reTypedPasswordJLabel.gridx = 0;
+		gbc_reTypedPasswordJLabel.gridy = 4;
+		add(reTypedPasswordJLabel, gbc_reTypedPasswordJLabel);
+
+		reTypedPasswordJPasswordField = new JPasswordField();
+		reTypedPasswordJPasswordField.setPreferredSize(new Dimension(101, 25));
+		reTypedPasswordJPasswordField.setEchoChar('*');
+		GridBagConstraints gbc_reTypedPasswordJPasswordField = new GridBagConstraints();
+		gbc_reTypedPasswordJPasswordField.insets = new Insets(0, 0, 5, 5);
+		gbc_reTypedPasswordJPasswordField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_reTypedPasswordJPasswordField.gridx = 1;
+		gbc_reTypedPasswordJPasswordField.gridy = 4;
+		reTypedPasswordJPasswordField.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(final KeyEvent e) {
+				updatePasswordFieldValidation();
+			}
+
+			@Override
+			public void keyReleased(final KeyEvent e) {
+				updatePasswordFieldValidation();
+			}
+
+			@Override
+			public void keyTyped(final KeyEvent e) {
+				updatePasswordFieldValidation();
+			}
+		});
+		add(reTypedPasswordJPasswordField, gbc_reTypedPasswordJPasswordField);
+
 		saltJLabel = new JLabel("Salt");
 		GridBagConstraints gbc_saltJLabel = new GridBagConstraints();
 		gbc_saltJLabel.anchor = GridBagConstraints.EAST;
 		gbc_saltJLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_saltJLabel.gridx = 0;
-		gbc_saltJLabel.gridy = 3;
+		gbc_saltJLabel.gridy = 5;
 		add(saltJLabel, gbc_saltJLabel);
 
 		saltJPasswordField = new JPasswordField();
@@ -153,7 +216,7 @@ public class NewProfilePanel extends JPanel {
 		gbc_saltJPasswordField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_saltJPasswordField.insets = new Insets(0, 0, 5, 5);
 		gbc_saltJPasswordField.gridx = 1;
-		gbc_saltJPasswordField.gridy = 3;
+		gbc_saltJPasswordField.gridy = 5;
 		add(saltJPasswordField, gbc_saltJPasswordField);
 
 		generateSaltJButton = new JButton("Generate");
@@ -171,7 +234,7 @@ public class NewProfilePanel extends JPanel {
 		GridBagConstraints gbc_generateSaltJButton = new GridBagConstraints();
 		gbc_generateSaltJButton.insets = new Insets(0, 0, 5, 0);
 		gbc_generateSaltJButton.gridx = 2;
-		gbc_generateSaltJButton.gridy = 3;
+		gbc_generateSaltJButton.gridy = 5;
 		add(generateSaltJButton, gbc_generateSaltJButton);
 
 		saltJPasswordField.setPreferredSize(generateSaltJButton.getPreferredSize());
@@ -183,7 +246,7 @@ public class NewProfilePanel extends JPanel {
 		gbc_saltLengthJLabel.anchor = GridBagConstraints.EAST;
 		gbc_saltLengthJLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_saltLengthJLabel.gridx = 0;
-		gbc_saltLengthJLabel.gridy = 4;
+		gbc_saltLengthJLabel.gridy = 6;
 		add(saltLengthJLabel, gbc_saltLengthJLabel);
 
 		saltLengthJSpinner = new JSpinner();
@@ -192,7 +255,7 @@ public class NewProfilePanel extends JPanel {
 		gbc_saltLengthJSpinner.fill = GridBagConstraints.HORIZONTAL;
 		gbc_saltLengthJSpinner.insets = new Insets(0, 0, 5, 5);
 		gbc_saltLengthJSpinner.gridx = 1;
-		gbc_saltLengthJSpinner.gridy = 4;
+		gbc_saltLengthJSpinner.gridy = 6;
 		add(saltLengthJSpinner, gbc_saltLengthJSpinner);
 
 		profileEncryptionTypeJComboBox = new JComboBox();
@@ -205,7 +268,7 @@ public class NewProfilePanel extends JPanel {
 		gbc_profileEncryptionTypeJLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_profileEncryptionTypeJLabel.anchor = GridBagConstraints.EAST;
 		gbc_profileEncryptionTypeJLabel.gridx = 0;
-		gbc_profileEncryptionTypeJLabel.gridy = 5;
+		gbc_profileEncryptionTypeJLabel.gridy = 7;
 		add(profileEncryptionTypeJLabel, gbc_profileEncryptionTypeJLabel);
 		profileEncryptionTypeJComboBox.setModel(new DefaultComboBoxModel(masterPasswordJComboBoxOptions));
 		profileEncryptionTypeJComboBox.setSelectedItem(EncryptionType.PBE_WITH_SHA1_AND_256_AES_CBC_BC);
@@ -213,7 +276,7 @@ public class NewProfilePanel extends JPanel {
 		gbc_profileEncryptionTypeJComboBox.fill = GridBagConstraints.HORIZONTAL;
 		gbc_profileEncryptionTypeJComboBox.insets = new Insets(0, 0, 5, 5);
 		gbc_profileEncryptionTypeJComboBox.gridx = 1;
-		gbc_profileEncryptionTypeJComboBox.gridy = 5;
+		gbc_profileEncryptionTypeJComboBox.gridy = 7;
 		add(profileEncryptionTypeJComboBox, gbc_profileEncryptionTypeJComboBox);
 
 		passwordEncryptionTypeJComboBox = new JComboBox();
@@ -224,7 +287,7 @@ public class NewProfilePanel extends JPanel {
 		gbc_passwordEncryptionTypeJLabel.insets = new Insets(0, 0, 0, 5);
 		gbc_passwordEncryptionTypeJLabel.anchor = GridBagConstraints.EAST;
 		gbc_passwordEncryptionTypeJLabel.gridx = 0;
-		gbc_passwordEncryptionTypeJLabel.gridy = 6;
+		gbc_passwordEncryptionTypeJLabel.gridy = 8;
 		add(passwordEncryptionTypeJLabel, gbc_passwordEncryptionTypeJLabel);
 		passwordEncryptionTypeJComboBox.setModel(new DefaultComboBoxModel(storedPAsswordJComboBoxOptions));
 		passwordEncryptionTypeJComboBox.setSelectedItem(EncryptionType.AES_256);
@@ -232,7 +295,7 @@ public class NewProfilePanel extends JPanel {
 		gbc_passwordEncryptionTypeJComboBox.insets = new Insets(0, 0, 0, 5);
 		gbc_passwordEncryptionTypeJComboBox.fill = GridBagConstraints.HORIZONTAL;
 		gbc_passwordEncryptionTypeJComboBox.gridx = 1;
-		gbc_passwordEncryptionTypeJComboBox.gridy = 6;
+		gbc_passwordEncryptionTypeJComboBox.gridy = 8;
 		add(passwordEncryptionTypeJComboBox, gbc_passwordEncryptionTypeJComboBox);
 	}
 
@@ -283,5 +346,23 @@ public class NewProfilePanel extends JPanel {
 
 	private int getSaltLength() {
 		return (Integer) saltLengthJSpinner.getValue();
+	}
+
+	private boolean passwordsEqual() {
+		char[] password = passwordJPasswordField.getPassword();
+		char[] retypedPassword = reTypedPasswordJPasswordField.getPassword();
+
+		return (password == null || retypedPassword == null) ? false : Arrays.equals(password, retypedPassword);
+	}
+
+	protected void updatePasswordFieldValidation() {
+		if (passwordsEqual()) {
+			passwordJPasswordField.setBorder(VALID_JPASSWORDFIELD);
+			reTypedPasswordJPasswordField.setBorder(VALID_JPASSWORDFIELD);
+		} else {
+			passwordJPasswordField.setBorder(INVALID_JPASSWORDFIELD);
+			reTypedPasswordJPasswordField.setBorder(INVALID_JPASSWORDFIELD);
+		}
+
 	}
 }

@@ -14,8 +14,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.swing.AbstractButton;
@@ -76,23 +74,40 @@ public class MainWindow {
 		System.out.println(message);
 	}
 
+	private static int showDefaultInputWindow(final Object message, final String title) {
+		return JOptionPane.showConfirmDialog(null, message, title, JOptionPane.OK_CANCEL_OPTION);
+	}
+
+	private static void showMessageWindow(final Object message, final String title) {
+		JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	private static String showSimpleInputWindow(final String message, final String title) {
+		return JOptionPane.showInputDialog(null, message, title, JOptionPane.PLAIN_MESSAGE);
+	}
+
 	private final MaintenanceDao maintenanceDao;
 	private final MasterPasswordDao masterPasswordDao;
-	private final StoredPasswordDao storedPasswordDao;
 
+	private final StoredPasswordDao storedPasswordDao;
+	private static final MasterPassword DEFAULT_ACTIVE_PROFILE = new MasterPassword();
+
+	private static final String DEFAULT_CURRENT_PASSWORD = "### --- Default Current Password --- ###";
+	private static MasterPassword ACTIVE_PROFILE = DEFAULT_ACTIVE_PROFILE;
+	private static String CURRENT_PASSWORD = DEFAULT_CURRENT_PASSWORD;
 	private JFrame mainWindowJFrame;
 	private StoredPasswordTableModel storedPasswordsModel;
 	private MasterPasswordListModel availableProfilesModel;
 	private JTable storedPasswordsJTable;
+
 	private JList availableProfilesJList;
 	private JScrollPane storedPasswordsJScrollPane;
 	private JMenuBar menuBar;
-
 	private JMenu mnFile;
+
 	private JMenu mnEdit;
 	private JMenu mnView;
 	private JMenu mnHelp;
-
 	private JMenuItem mntmLoadProfile;
 	private JMenuItem mntmNewProfile;
 	private JMenuItem mntmNewPassword;
@@ -101,14 +116,15 @@ public class MainWindow {
 	private JMenuItem mntmAbout;
 	private JMenuItem mntmCheckForUpdates;
 	private JMenuItem mntmFaq;
+
 	private JMenuItem mntmHelpContents;
 	private JMenuItem mntmOpenWikiPage;
 	private JMenuItem mntmOpenDownloadPage;
-
 	private JSeparator firstFileMenuJSeparator;
 	private JSeparator secondFileMenuJSeparator;
 	private JSeparator secondHelpMenuJSeparator;
 	private JSeparator firstHelpMenuJSeparator;
+
 	private JSeparator thirdHelpMenuJSeparator;
 	private JSeparator viewMenuSeparator;
 	private JSeparator availableProfilesButtonSeparator;
@@ -120,20 +136,22 @@ public class MainWindow {
 	private JPanel westJPanel;
 	private JPanel centreJPanel;
 	private JPanel availableProfilesNorthButtonJPanel;
-
 	private JButton newProfileJButton;
 	private JButton loadProfileJButton;
 	private JButton deleteProfileJButton;
+
 	private JButton newPasswordJBbutton;
 	private JButton viewPasswordJButton;
 	private JButton deletePasswordJButton;
-
 	private JMenuItem mntmDeleteProfile;
 	private JMenuItem mntmViewPassword;
 	private JMenuItem mntmDeletePassword;
 	private JButton editPasswordJButton;
+
 	private JMenuItem mntmEditPassword;
+
 	private JButton deleteDatabaseJButton;
+
 	private JSeparator deleteDatabaseJSeparator;
 
 	public MainWindow() {
@@ -178,7 +196,8 @@ public class MainWindow {
 		availableProfilesModel.clear();
 		storedPasswordsModel.clear();
 
-		availableProfilesModel.addAll(masterPasswordDao.getMasterPasswords());
+		updateAvailableProfiles();
+		updateStoredPasswords();
 
 		showMessageWindow("You have successfully deleted the database.", "Database Delete Successfull");
 	}
@@ -211,8 +230,14 @@ public class MainWindow {
 	}
 
 	private void displayStoredPassword(final MouseEvent mouseEvent) {
-		if (mouseEvent.getClickCount() >= 2) {
+		if (isDoubleClick(mouseEvent)) {
 			viewPassword();
+		}
+	}
+
+	private void displayStoredPasswords(final MouseEvent mouseEvent) {
+		if (isDoubleClick(mouseEvent)) {
+			loadProfile();
 		}
 	}
 
@@ -399,6 +424,7 @@ public class MainWindow {
 		mainWindowJFrame.getContentPane().setLayout(new BorderLayout(0, 0));
 
 		westJPanel = new JPanel();
+		westJPanel.setBorder(new EmptyBorder(5, 5, 5, 0));
 		westJPanel.setBackground(Color.WHITE);
 		mainWindowJFrame.getContentPane().add(westJPanel, BorderLayout.WEST);
 		westJPanel.setLayout(new BorderLayout(0, 0));
@@ -420,9 +446,8 @@ public class MainWindow {
 			public void actionPerformed(final ActionEvent e) {
 				try {
 					newProfile();
-				} catch (AbstractEncrypterException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+				} catch (AbstractEncrypterException error) {
+					errorMessage("An error has been encountered when performing an encryption/decryption attempt", "Encryption Problem", error);
 				}
 			}
 		});
@@ -549,38 +574,31 @@ public class MainWindow {
 		availableProfilesNorthButtonJPanel.add(deleteDatabaseJButton, gbc_deleteDatabaseJButton);
 
 		availableProfilesModel = new MasterPasswordListModel();
-
 		availableProfilesJList = new JList();
+		availableProfilesJList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(final MouseEvent mouseEvent) {
+				displayStoredPasswords(mouseEvent);
+			}
+		});
 		availableProfilesJList.setModel(availableProfilesModel);
 		availableProfilesJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		availableProfilesJList.setBorder(new CompoundBorder(new EmptyBorder(10, 5, 5, 5), new CompoundBorder(new TitledBorder(new LineBorder(new Color(184,
 				207, 229)), "Available Profiles", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(51, 51, 51)), new EmptyBorder(0, 3, 3, 3))));
-		// availableProfilesJList.setPreferredSize(new java.awt.Dimension(165,
-		// 0));
+		availableProfilesJList.setPreferredSize(new java.awt.Dimension(165, 0));
 		westJPanel.add(availableProfilesJList, BorderLayout.CENTER);
 
 		centreJPanel = new JPanel();
 		centreJPanel.setBackground(Color.WHITE);
-		centreJPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		centreJPanel.setBorder(new EmptyBorder(10, 5, 10, 10));
 		mainWindowJFrame.getContentPane().add(centreJPanel, BorderLayout.CENTER);
-
-		storedPasswordsModel = new StoredPasswordTableModel();
-		storedPasswordsModel.add(new StoredPassword("encryptedPasswordName", "profileName", "encryptedPassword", "encryptedPasswordNotes", new Timestamp(
-				new GregorianCalendar().getTimeInMillis()), new Timestamp(new GregorianCalendar().getTimeInMillis()), 1));
-		storedPasswordsModel.add(new StoredPassword("encryptedPasswordName", "profileName", "encryptedPassword", "encryptedPasswordNotes", new Timestamp(
-				new GregorianCalendar().getTimeInMillis()), new Timestamp(new GregorianCalendar().getTimeInMillis()), 2));
-		storedPasswordsModel.add(new StoredPassword("encryptedPasswordName", "profileName", "encryptedPassword", "encryptedPasswordNotes", new Timestamp(
-				new GregorianCalendar().getTimeInMillis()), new Timestamp(new GregorianCalendar().getTimeInMillis()), 3));
-		storedPasswordsModel.add(new StoredPassword("encryptedPasswordName", "profileName", "encryptedPassword", "encryptedPasswordNotes", new Timestamp(
-				new GregorianCalendar().getTimeInMillis()), new Timestamp(new GregorianCalendar().getTimeInMillis()), 4));
-		storedPasswordsModel.add(new StoredPassword("encryptedPasswordName", "profileName", "encryptedPassword", "encryptedPasswordNotes", new Timestamp(
-				new GregorianCalendar().getTimeInMillis()), new Timestamp(new GregorianCalendar().getTimeInMillis()), 5));
 
 		centreJPanel.setLayout(new BorderLayout(0, 0));
 
 		storedPasswordsJScrollPane = new JScrollPane();
 		centreJPanel.add(storedPasswordsJScrollPane, BorderLayout.CENTER);
 
+		storedPasswordsModel = new StoredPasswordTableModel();
 		storedPasswordsJTable = new JTable();
 		storedPasswordsJTable.addMouseListener(new MouseAdapter() {
 			@Override
@@ -601,12 +619,57 @@ public class MainWindow {
 		storedPasswordsJScrollPane.setViewportView(storedPasswordsJTable);
 	}
 
+	private boolean isDoubleClick(final MouseEvent mouseEvent) {
+		return mouseEvent.getClickCount() >= 2;
+	}
+
+	private boolean isPasswordCorrect(final MasterPassword masterPassword, final String enteredPassword) {
+		return false;
+	}
+
 	private boolean isValid(final NewProfilePanel newProfile) {
 		return NewProfilePanel.isValid(newProfile);
 	}
 
 	private void loadProfile() {
-		printMessage("Loading a Profile");
+
+		// is a profile selected
+		int selectedProfileIndex = availableProfilesJList.getSelectedIndex();
+		if (selectedProfileIndex < 0) {
+			showMessageWindow("Please select a profile to load and try again.", "Select A Profile");
+			return;
+		}
+
+		final MasterPassword masterPassword = availableProfilesModel.get(selectedProfileIndex);
+		if (masterPassword == null) {
+			errorMessage("The Selected Profile Returned Null From The Database", "Profile Was Null", null);
+			return;
+		}
+
+		// prompt for password
+		String enteredPassword = promptUserForProfilePassword();
+
+		// verify password is not null, blank & is correct.
+		if (enteredPassword == null) {
+			errorMessage("User has canclled the process to load a profile, when entering the password.", "User Cancelled Profile Load", null);
+			return;
+		}
+
+		while (enteredPassword != null && enteredPassword == StringUtils.BLANK && isPasswordCorrect(masterPassword, enteredPassword)) {
+			if (enteredPassword == StringUtils.BLANK) {
+				errorMessage("User has entered a blank password.", "User Has Entered A Blank Password", null);
+			}
+
+			showMessageWindow("The password you entered was incorrect, please try again.", "Please Enter A Correct Password");
+			enteredPassword = promptUserForProfilePassword();
+		}
+
+		// set ActiveProfile to the selected MP
+		// set CurrentPassword to the entered password
+
+		// Load all the StoredPasswords for the selected ActiveProfile
+
+		printMessage("Loading a Profile - ");
 	}
 
 	private void newPassword() {
@@ -616,7 +679,7 @@ public class MainWindow {
 	private void newProfile() throws AbstractEncrypterException {
 		printMessage("Creating a new Profile");
 		NewProfilePanel newProfile = new NewProfilePanel();
-		if (showDefaultInputWindow(newProfile, "New Profile") == JOptionPane.YES_OPTION) {
+		if (showDefaultInputWindow(newProfile, "New Profile") == JOptionPane.OK_OPTION) {
 
 			if (!isValid(newProfile)) {
 				errorMessage("Failed to create a new profile, as you did not fill in all the fields.", "Failed To Create New Profile", null);
@@ -639,6 +702,14 @@ public class MainWindow {
 			updateAvailableProfiles();
 			printMessage("Created masterPassword with a name of " + masterPassword.getProfileName());
 		}
+	}
+
+	private String promptUserForProfilePassword() {
+		ProfilePasswordEntryPanel passwordEntryPanel = new ProfilePasswordEntryPanel();
+		if (showDefaultInputWindow(passwordEntryPanel, "Enter Profile Password") == JOptionPane.OK_OPTION) {
+			return (passwordEntryPanel.getPassword() == null) ? StringUtils.BLANK : passwordEntryPanel.getPassword();
+		}
+		return null;
 	}
 
 	private MaintenanceMybatisDao setupMaintenanceDao() {
@@ -671,14 +742,6 @@ public class MainWindow {
 		return stored;
 	}
 
-	private int showDefaultInputWindow(final Object message, final String title) {
-		return JOptionPane.showConfirmDialog(null, message, title, JOptionPane.OK_CANCEL_OPTION);
-	}
-
-	private void showMessageWindow(final Object message, final String title) {
-		JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
-	}
-
 	private boolean unsuccessfulImport(final int result) {
 		if (result == 1) {
 			return false;
@@ -687,22 +750,34 @@ public class MainWindow {
 	}
 
 	private void updateAvailableProfiles() {
+		availableProfilesModel.clear();
 		List<MasterPassword> masterPasswords = masterPasswordDao.getMasterPasswords();
+
 		if (masterPasswords != null) {
-			availableProfilesModel.clear();
 			availableProfilesModel.addAll(masterPasswords);
 		}
 	}
 
 	private void updateStoredPasswords() {
+		storedPasswordsModel.clear();
+
 		int selected = availableProfilesJList.getSelectedIndex();
+
 		if (selected < 0) {
+			errorMessage("There is no selected profile.", "No Profile Selected", null);
 			return;
 		}
+
 		MasterPassword masterPassword = availableProfilesModel.get(selected);
+
+		if (masterPassword == null) {
+			errorMessage("The master password was null, while updating the stored passwords table.", "Masterpassword was null", null);
+			return;
+		}
+
 		List<StoredPassword> storedPasswords = storedPasswordDao.getStoredPasswords(masterPassword);
+
 		if (storedPasswords != null) {
-			storedPasswordsModel.clear();
 			storedPasswordsModel.addAll(storedPasswords);
 		}
 	}
