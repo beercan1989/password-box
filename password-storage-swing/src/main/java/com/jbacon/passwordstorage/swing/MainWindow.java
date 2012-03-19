@@ -14,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import javax.swing.AbstractButton;
@@ -42,8 +43,12 @@ import com.jbacon.passwordstorage.database.dao.StoredPasswordDao;
 import com.jbacon.passwordstorage.database.mybatis.MaintenanceMybatisDao;
 import com.jbacon.passwordstorage.database.mybatis.MasterPasswordMybatisDao;
 import com.jbacon.passwordstorage.database.mybatis.StoredPasswordMybatisDao;
+import com.jbacon.passwordstorage.encryption.EncrypterPBE;
+import com.jbacon.passwordstorage.encryption.EncryptionMode;
 import com.jbacon.passwordstorage.encryption.EncryptionType;
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
+import com.jbacon.passwordstorage.encryption.errors.NoSuchEncryptionException;
+import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
 import com.jbacon.passwordstorage.swing.list.MasterPasswordListModel;
@@ -88,23 +93,27 @@ public class MainWindow {
 
 	private final MaintenanceDao maintenanceDao;
 	private final MasterPasswordDao masterPasswordDao;
-
 	private final StoredPasswordDao storedPasswordDao;
-	private static final MasterPassword DEFAULT_ACTIVE_PROFILE = new MasterPassword();
+	private final EncrypterUtils encrypterUtils;
 
+	private static final MasterPassword DEFAULT_ACTIVE_PROFILE = new MasterPassword();
 	private static final String DEFAULT_CURRENT_PASSWORD = "### --- Default Current Password --- ###";
+
 	private static MasterPassword ACTIVE_PROFILE = DEFAULT_ACTIVE_PROFILE;
 	private static String CURRENT_PASSWORD = DEFAULT_CURRENT_PASSWORD;
+
 	private JFrame mainWindowJFrame;
 	private StoredPasswordTableModel storedPasswordsModel;
 	private MasterPasswordListModel availableProfilesModel;
 	private JTable storedPasswordsJTable;
-
 	private JList availableProfilesJList;
 	private JScrollPane storedPasswordsJScrollPane;
+	private JPanel westJPanel;
+	private JPanel centreJPanel;
+	private JPanel availableProfilesNorthButtonJPanel;
+
 	private JMenuBar menuBar;
 	private JMenu mnFile;
-
 	private JMenu mnEdit;
 	private JMenu mnView;
 	private JMenu mnHelp;
@@ -116,40 +125,31 @@ public class MainWindow {
 	private JMenuItem mntmAbout;
 	private JMenuItem mntmCheckForUpdates;
 	private JMenuItem mntmFaq;
-
 	private JMenuItem mntmHelpContents;
 	private JMenuItem mntmOpenWikiPage;
 	private JMenuItem mntmOpenDownloadPage;
+	private JMenuItem mntmDeleteProfile;
+	private JMenuItem mntmViewPassword;
+	private JMenuItem mntmDeletePassword;
+	private JMenuItem mntmEditPassword;
 	private JSeparator firstFileMenuJSeparator;
 	private JSeparator secondFileMenuJSeparator;
 	private JSeparator secondHelpMenuJSeparator;
 	private JSeparator firstHelpMenuJSeparator;
-
 	private JSeparator thirdHelpMenuJSeparator;
 	private JSeparator viewMenuSeparator;
 	private JSeparator availableProfilesButtonSeparator;
-
 	private JCheckBoxMenuItem chckbxmntmToggleSidebar;
 	private JCheckBoxMenuItem chckbxmntmToggleActionButtons;
 	private JCheckBoxMenuItem chckbxmntmToggleAvailableProfiles;
 
-	private JPanel westJPanel;
-	private JPanel centreJPanel;
-	private JPanel availableProfilesNorthButtonJPanel;
 	private JButton newProfileJButton;
 	private JButton loadProfileJButton;
 	private JButton deleteProfileJButton;
-
 	private JButton newPasswordJBbutton;
 	private JButton viewPasswordJButton;
 	private JButton deletePasswordJButton;
-	private JMenuItem mntmDeleteProfile;
-	private JMenuItem mntmViewPassword;
-	private JMenuItem mntmDeletePassword;
 	private JButton editPasswordJButton;
-
-	private JMenuItem mntmEditPassword;
-
 	private JButton deleteDatabaseJButton;
 
 	private JSeparator deleteDatabaseJSeparator;
@@ -161,6 +161,8 @@ public class MainWindow {
 
 		maintenanceDao.createMasterPasswordTable();
 		maintenanceDao.createStoredPasswordTable();
+
+		encrypterUtils = new EncrypterUtils();
 
 		initialize();
 
@@ -197,7 +199,7 @@ public class MainWindow {
 		storedPasswordsModel.clear();
 
 		updateAvailableProfiles();
-		updateStoredPasswords();
+		updateStoredPasswords(false);
 
 		showMessageWindow("You have successfully deleted the database.", "Database Delete Successfull");
 	}
@@ -224,7 +226,7 @@ public class MainWindow {
 		}
 
 		updateAvailableProfiles();
-		updateStoredPasswords();
+		updateStoredPasswords(false);
 
 		showMessageWindow("Profile " + masterPassword.getProfileName() + " has successfully been deleted.", "Profile Successfully Deleted");
 	}
@@ -624,6 +626,38 @@ public class MainWindow {
 	}
 
 	private boolean isPasswordCorrect(final MasterPassword masterPassword, final String enteredPassword) {
+		if (masterPassword == null || enteredPassword == null) {
+			return false;
+		}
+
+		EncryptionType encryptionType = masterPassword.getMasterPasswordEncryptionType();
+
+		try {
+			if (encryptionType.getEncrypter() instanceof EncrypterPBE) {
+				final EncrypterPBE encrypter = (EncrypterPBE) encryptionType.getEncrypter();
+
+				final byte[] salt = encrypterUtils.stringToByte(masterPassword.getSalt());
+				final byte[] cipherText = encrypterUtils.stringToByte(masterPassword.getEncryptedSecretKey());
+				final char[] passPhrase = encrypterUtils.stringToChar(enteredPassword);
+
+				final byte[] result = encrypter.doCiper(EncryptionMode.DECRYPT_MODE, salt, cipherText, passPhrase);
+
+				if (result == null) {
+					return false;
+				}
+
+				return true;
+			}
+		} catch (NoSuchEncryptionException e) {
+			e.printStackTrace();
+			return false;
+		} catch (AbstractEncrypterException e) {
+			e.printStackTrace();
+			return false;
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return false;
+		}
 		return false;
 	}
 
@@ -649,15 +683,10 @@ public class MainWindow {
 		// prompt for password
 		String enteredPassword = promptUserForProfilePassword();
 
-		// verify password is not null, blank & is correct.
-		if (enteredPassword == null) {
-			errorMessage("User has canclled the process to load a profile, when entering the password.", "User Cancelled Profile Load", null);
-			return;
-		}
-
-		while (enteredPassword != null && enteredPassword == StringUtils.BLANK && isPasswordCorrect(masterPassword, enteredPassword)) {
-			if (enteredPassword == StringUtils.BLANK) {
-				errorMessage("User has entered a blank password.", "User Has Entered A Blank Password", null);
+		while (!isPasswordCorrect(masterPassword, enteredPassword)) {
+			if (enteredPassword == null) {
+				errorMessage("User has canclled the process to load a profile, when entering the password.", "User Cancelled Profile Load", null);
+				return;
 			}
 
 			showMessageWindow("The password you entered was incorrect, please try again.", "Please Enter A Correct Password");
@@ -668,6 +697,7 @@ public class MainWindow {
 		// set CurrentPassword to the entered password
 
 		// Load all the StoredPasswords for the selected ActiveProfile
+		updateStoredPasswords(true);
 
 		printMessage("Loading a Profile - ");
 	}
@@ -758,20 +788,24 @@ public class MainWindow {
 		}
 	}
 
-	private void updateStoredPasswords() {
+	private void updateStoredPasswords(final boolean showErrorMessages) {
 		storedPasswordsModel.clear();
 
 		int selected = availableProfilesJList.getSelectedIndex();
 
 		if (selected < 0) {
-			errorMessage("There is no selected profile.", "No Profile Selected", null);
+			if (showErrorMessages) {
+				errorMessage("There is no selected profile.", "No Profile Selected", null);
+			}
 			return;
 		}
 
 		MasterPassword masterPassword = availableProfilesModel.get(selected);
 
 		if (masterPassword == null) {
-			errorMessage("The master password was null, while updating the stored passwords table.", "Masterpassword was null", null);
+			if (showErrorMessages) {
+				errorMessage("The master password was null, while updating the stored passwords table.", "Masterpassword was null", null);
+			}
 			return;
 		}
 
