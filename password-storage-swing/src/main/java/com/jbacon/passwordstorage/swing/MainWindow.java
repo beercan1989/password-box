@@ -6,6 +6,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -14,13 +15,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -36,6 +37,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.TableColumn;
+
+import org.apache.commons.codec.DecoderException;
 
 import com.jbacon.passwordstorage.database.dao.MaintenanceDao;
 import com.jbacon.passwordstorage.database.dao.MasterPasswordDao;
@@ -153,6 +156,8 @@ public class MainWindow {
 	private JButton deleteDatabaseJButton;
 
 	private JSeparator deleteDatabaseJSeparator;
+	private JPanel activeProfileJPanel;
+	private JLabel activeProfileJLabel;
 
 	public MainWindow() {
 		maintenanceDao = setupMaintenanceDao();
@@ -590,6 +595,16 @@ public class MainWindow {
 		availableProfilesJList.setPreferredSize(new java.awt.Dimension(165, 0));
 		westJPanel.add(availableProfilesJList, BorderLayout.CENTER);
 
+		activeProfileJPanel = new JPanel();
+		activeProfileJPanel.setBackground(Color.WHITE);
+		activeProfileJPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 5, 4, 5), new CompoundBorder(new TitledBorder(new LineBorder(new Color(184, 207,
+				229)), "Active Profile", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(51, 51, 51)), new EmptyBorder(0, 3, 3, 3))));
+		westJPanel.add(activeProfileJPanel, BorderLayout.SOUTH);
+
+		activeProfileJLabel = new JLabel("N/A");
+		activeProfileJLabel.setFont(new Font("Dialog", Font.BOLD, 12));
+		activeProfileJPanel.add(activeProfileJLabel);
+
 		centreJPanel = new JPanel();
 		centreJPanel.setBackground(Color.WHITE);
 		centreJPanel.setBorder(new EmptyBorder(10, 5, 10, 10));
@@ -636,8 +651,8 @@ public class MainWindow {
 			if (encryptionType.getEncrypter() instanceof EncrypterPBE) {
 				final EncrypterPBE encrypter = (EncrypterPBE) encryptionType.getEncrypter();
 
-				final byte[] salt = encrypterUtils.stringToByte(masterPassword.getSalt());
-				final byte[] cipherText = encrypterUtils.stringToByte(masterPassword.getEncryptedSecretKey());
+				final byte[] salt = encrypterUtils.hexStringToByte(masterPassword.getSalt());
+				final byte[] cipherText = encrypterUtils.hexStringToByte(masterPassword.getEncryptedSecretKey());
 				final char[] passPhrase = encrypterUtils.stringToChar(enteredPassword);
 
 				final byte[] result = encrypter.doCiper(EncryptionMode.DECRYPT_MODE, salt, cipherText, passPhrase);
@@ -652,9 +667,12 @@ public class MainWindow {
 			e.printStackTrace();
 			return false;
 		} catch (AbstractEncrypterException e) {
+			if (e.getCause() instanceof javax.crypto.BadPaddingException) {
+				return false;
+			}
 			e.printStackTrace();
 			return false;
-		} catch (UnsupportedEncodingException e) {
+		} catch (DecoderException e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -694,12 +712,16 @@ public class MainWindow {
 		}
 
 		// set ActiveProfile to the selected MP
+		ACTIVE_PROFILE = masterPassword;
+
 		// set CurrentPassword to the entered password
+		CURRENT_PASSWORD = enteredPassword;
 
 		// Load all the StoredPasswords for the selected ActiveProfile
 		updateStoredPasswords(true);
+		activeProfileJLabel.setText(ACTIVE_PROFILE.getProfileName());
 
-		printMessage("Loading a Profile - ");
+		printMessage("Loading a Profile - " + ACTIVE_PROFILE);
 	}
 
 	private void newPassword() {
@@ -785,6 +807,10 @@ public class MainWindow {
 
 		if (masterPasswords != null) {
 			availableProfilesModel.addAll(masterPasswords);
+			if (!masterPasswords.contains(ACTIVE_PROFILE)) {
+				ACTIVE_PROFILE = DEFAULT_ACTIVE_PROFILE;
+				activeProfileJLabel.setText("N/A");
+			}
 		}
 	}
 
@@ -833,8 +859,18 @@ public class MainWindow {
 
 	private void viewPassword() {
 		printMessage("Viewing a Password");
-		StoredPassword password = storedPasswordsModel.getRow(storedPasswordsJTable.getSelectedRow());
-		ViewStoredPasswordPanel viewStoredPassword = new ViewStoredPasswordPanel(password);
-		showMessageWindow(viewStoredPassword, "View Stored Password");
+		int selectedRow = storedPasswordsJTable.getSelectedRow();
+		if (selectedRow >= 0) {
+			StoredPassword password = storedPasswordsModel.getRow(selectedRow);
+			if (password != null) {
+				ViewStoredPasswordPanel viewStoredPassword = new ViewStoredPasswordPanel(password);
+				showMessageWindow(viewStoredPassword, "View Stored Password");
+			} else {
+				errorMessage("The Storedpassword was null, while trying to view a password", "Storedpassword was null", null);
+			}
+		} else {
+			showMessageWindow("Please select a password and try again.", "No Password Selected");
+		}
+
 	}
 }

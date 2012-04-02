@@ -26,6 +26,10 @@ public class EncrypterUtils {
 		return new String(Hex.encodeHex(byteToString));
 	}
 
+	/**
+	 * @deprecated Use byteToHexString
+	 */
+	@Deprecated
 	public String byteToString(final byte[] byteToString) throws UnsupportedEncodingException {
 		return new String(byteToString, TEXT_ENCODING_TYPE);
 	}
@@ -79,6 +83,10 @@ public class EncrypterUtils {
 		return Hex.decodeHex(hexToByte.toCharArray());
 	}
 
+	/**
+	 * @deprecated Use hexStringToByte
+	 */
+	@Deprecated
 	public byte[] stringToByte(final String stringToByte) throws UnsupportedEncodingException {
 		return stringToByte.getBytes(TEXT_ENCODING_TYPE);
 	}
