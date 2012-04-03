@@ -60,7 +60,7 @@ import com.jbacon.passwordstorage.tools.StringUtils;
 
 public class MainWindow {
 
-	private static void errorMessage(final String message, final String title, final Exception e) {
+	public static void errorMessage(final String message, final String title, final Exception e) {
 		JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
 	}
 
@@ -726,6 +726,14 @@ public class MainWindow {
 
 	private void newPassword() {
 		printMessage("Creating a new Password");
+		if (ACTIVE_PROFILE.equals(DEFAULT_ACTIVE_PROFILE)) {
+			errorMessage("You need to create or load a profile first.", "No Profile Loaded", null);
+			return;
+		}
+		NewPasswordPanel newPassword = new NewPasswordPanel(ACTIVE_PROFILE);
+		if (showDefaultInputWindow(newPassword, "New Profile") == JOptionPane.OK_OPTION) {
+
+		}
 	}
 
 	private void newProfile() throws AbstractEncrypterException {
