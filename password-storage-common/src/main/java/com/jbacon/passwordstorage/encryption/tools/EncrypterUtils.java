@@ -22,7 +22,7 @@ public class EncrypterUtils {
 	private static final String SECURE_SALT_ALGORITHM = "secureSaltAlgorithm";
 	private static final String TEXT_ENCODING_TYPE = "UTF-8";
 
-	public String byteToHexString(final byte[] byteToString) {
+	public static String byteToHexString(final byte[] byteToString) {
 		return new String(Hex.encodeHex(byteToString));
 	}
 
@@ -30,11 +30,11 @@ public class EncrypterUtils {
 	 * @deprecated Use byteToHexString
 	 */
 	@Deprecated
-	public String byteToString(final byte[] byteToString) throws UnsupportedEncodingException {
+	public static String byteToString(final byte[] byteToString) throws UnsupportedEncodingException {
 		return new String(byteToString, TEXT_ENCODING_TYPE);
 	}
 
-	public byte[] generateAesEncryptionKey(final EncryptionType encryptionType) throws AbstractEncrypterException {
+	public static byte[] generateAesEncryptionKey(final EncryptionType encryptionType) throws AbstractEncrypterException {
 		try {
 			Integer keySize = encryptionType.getSpecification().get(KEY_SIZE);
 			KeyGenerator keyGenerator = KeyGenerator.getInstance(encryptionType.algorithmName);
@@ -48,7 +48,7 @@ public class EncrypterUtils {
 		}
 	}
 
-	public byte[] generateSalt(final EncryptionType encryptionType) throws AbstractEncrypterException {
+	public static byte[] generateSalt(final EncryptionType encryptionType) throws AbstractEncrypterException {
 		try {
 			Integer saltSize = encryptionType.getSpecification().get(SALT_SIZE);
 			return generateSalt(encryptionType, saltSize);
@@ -57,7 +57,7 @@ public class EncrypterUtils {
 		}
 	}
 
-	public byte[] generateSalt(final EncryptionType encryptionType, final Integer numberOfBytes) throws AbstractEncrypterException {
+	public static byte[] generateSalt(final EncryptionType encryptionType, final Integer numberOfBytes) throws AbstractEncrypterException {
 		try {
 			switch (encryptionType) {
 			case PBE_WITH_MD5_AND_DES:
@@ -79,7 +79,7 @@ public class EncrypterUtils {
 		}
 	}
 
-	public byte[] hexStringToByte(final String hexToByte) throws DecoderException {
+	public static byte[] hexStringToByte(final String hexToByte) throws DecoderException {
 		return Hex.decodeHex(hexToByte.toCharArray());
 	}
 
@@ -87,11 +87,11 @@ public class EncrypterUtils {
 	 * @deprecated Use hexStringToByte
 	 */
 	@Deprecated
-	public byte[] stringToByte(final String stringToByte) throws UnsupportedEncodingException {
+	public static byte[] stringToByte(final String stringToByte) throws UnsupportedEncodingException {
 		return stringToByte.getBytes(TEXT_ENCODING_TYPE);
 	}
 
-	public char[] stringToChar(final String stringToChar) {
+	public static char[] stringToChar(final String stringToChar) {
 		return stringToChar.toCharArray();
 	}
 }
