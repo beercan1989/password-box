@@ -6,7 +6,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Password Storage</name>
 	<packaging>pom</packaging>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.6</java.version>
@@ -22,8 +22,10 @@
 		<passwordstorage.common.version>${project.version}</passwordstorage.common.version>
 		<apache.commons-lang.version>2.6</apache.commons-lang.version>
 		<apache.commons-codec.version>1.6</apache.commons-codec.version>
+		<apache.commons-logging.version>1.1.1</apache.commons-logging.version>
+		<apache.log4j.version>1.2.16</apache.log4j.version>
 	</properties>
-	
+
 	<modules>
 		<module>password-storage-common</module>
 		<module>password-storage-database-mybatis</module>
@@ -32,7 +34,7 @@
 		<module>password-storage-blackberry</module>
 		<module>password-storage-appengine-api</module>
 	</modules>
-	
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -40,18 +42,28 @@
 				<artifactId>passwordstorage.common</artifactId>
 				<version>${passwordstorage.common.version}</version>
 			</dependency>
-			
+
 			<dependency>
-			    <groupId>commons-lang</groupId>
-			    <artifactId>commons-lang</artifactId>
-			    <version>${apache.commons-lang.version}</version>
+				<groupId>commons-lang</groupId>
+				<artifactId>commons-lang</artifactId>
+				<version>${apache.commons-lang.version}</version>
 			</dependency>
 			<dependency>
-			    <groupId>commons-codec</groupId>
-			    <artifactId>commons-codec</artifactId>
-			    <version>${apache.commons-codec.version}</version>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>${apache.commons-codec.version}</version>
 			</dependency>
-		
+			<dependency>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging</artifactId>
+				<version>${apache.commons-logging.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
+				<version>${apache.log4j.version}</version>
+			</dependency>
+
 			<dependency>
 				<groupId>net.charabia</groupId>
 				<artifactId>jsmoothgen</artifactId>
@@ -92,7 +104,7 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
+
 	<repositories>
 		<repository>
 			<id>insight-releases</id>
