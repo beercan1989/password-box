@@ -10,8 +10,12 @@
 		</layout>
 	</appender>
 
+<!-- 	<logger name="com.jbacon.passwordstorage.*"> -->
+<!-- 		<level value="debug" /> -->
+<!-- 	</logger> -->
+
 	<root>
-		<priority value="debug" />
+		<level value="debug" />
 		<appender-ref ref="console" />
 	</root>
 

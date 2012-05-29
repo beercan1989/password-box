@@ -58,8 +58,13 @@ public class NewProfilePanel extends JPanel {
 			final boolean saltIsNotNull = GenericUtils.isNotNull(newProfile.getSalt());
 			final boolean areNotEmpty = StringUtils.areNotEmpty(newProfile.getEncryptedSecretKey(), newProfile.getProfileName());
 
+			LOG.debug(encryptionTypesValid);
+			LOG.debug(saltIsNotNull);
+			LOG.debug(areNotEmpty);
+
 			return encryptionTypesValid && saltIsNotNull && areNotEmpty;
 		} catch (final AbstractEncrypterException e) {
+			LOG.error(e);
 			return false;
 		}
 	}
