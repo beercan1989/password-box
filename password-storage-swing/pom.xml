@@ -69,43 +69,25 @@
 							<classpathPrefix>lib/</classpathPrefix>
 							<mainClass>com.jbacon.passwordstorage.swing.MainWindow</mainClass>
 						</manifest>
+						
 					</archive>
+					
 				</configuration>
 			</plugin>
 			<plugin>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
+						<id>copy-dependencies</id>
 						<phase>package</phase>
 						<goals>
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
 							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-							<excludeGroupIds>org.mockito,org.hamcrest,junit</excludeGroupIds>
+							<includeScope>compile</includeScope>
+							<excludeScope>test</excludeScope>
 						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>com.jbacon.passwordstorage.swing.MainWindow</mainClass>
-						</manifest>
-					</archive>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-my-jar-with-dependencies</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
 					</execution>
 				</executions>
 			</plugin>
