@@ -2,7 +2,7 @@ package com.jbacon.passwordstorage.tools;
 
 import static com.jbacon.passwordstorage.tools.StringUtils.BLANK;
 import static com.jbacon.passwordstorage.tools.StringUtils.SPACE;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import org.junit.Test;
