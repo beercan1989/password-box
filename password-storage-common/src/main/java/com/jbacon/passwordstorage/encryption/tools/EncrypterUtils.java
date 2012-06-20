@@ -22,11 +22,23 @@ public class EncrypterUtils {
 	private static final String SECURE_SALT_ALGORITHM = "secureSaltAlgorithm";
 	private static final String TEXT_ENCODING_TYPE = "UTF-8";
 
+	/**
+	 * @param byteToChar
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	public static char[] byteToChar(final byte[] byteToChar) throws UnsupportedEncodingException {
+		return new String(byteToChar).toCharArray();
+	}
+
 	public static String byteToHexString(final byte[] byteToString) {
 		return new String(Hex.encodeHex(byteToString));
 	}
 
 	/**
+	 * @param byteToString
+	 * @return
+	 * @throws UnsupportedEncodingException
 	 * @deprecated Use byteToHexString
 	 */
 	@Deprecated
@@ -34,6 +46,28 @@ public class EncrypterUtils {
 		return new String(byteToString, TEXT_ENCODING_TYPE);
 	}
 
+	/**
+	 * @param charToByte
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	public static byte[] charToByte(final char[] charToByte) throws UnsupportedEncodingException {
+		return new String(charToByte).getBytes(TEXT_ENCODING_TYPE);
+	}
+
+	/**
+	 * @param charToString
+	 * @return
+	 */
+	public static String charToString(final char[] charToString) {
+		return new String(charToString);
+	}
+
+	/**
+	 * @param encryptionType
+	 * @return
+	 * @throws AbstractEncrypterException
+	 */
 	public static byte[] generateAesEncryptionKey(final EncryptionType encryptionType) throws AbstractEncrypterException {
 		try {
 			Integer keySize = encryptionType.getSpecification().get(KEY_SIZE);
@@ -48,6 +82,11 @@ public class EncrypterUtils {
 		}
 	}
 
+	/**
+	 * @param encryptionType
+	 * @return
+	 * @throws AbstractEncrypterException
+	 */
 	public static byte[] generateSalt(final EncryptionType encryptionType) throws AbstractEncrypterException {
 		try {
 			Integer saltSize = encryptionType.getSpecification().get(SALT_SIZE);
@@ -57,6 +96,12 @@ public class EncrypterUtils {
 		}
 	}
 
+	/**
+	 * @param encryptionType
+	 * @param numberOfBytes
+	 * @return
+	 * @throws AbstractEncrypterException
+	 */
 	public static byte[] generateSalt(final EncryptionType encryptionType, final Integer numberOfBytes) throws AbstractEncrypterException {
 		try {
 			switch (encryptionType) {
@@ -79,11 +124,19 @@ public class EncrypterUtils {
 		}
 	}
 
+	/**
+	 * @param hexToByte
+	 * @return
+	 * @throws DecoderException
+	 */
 	public static byte[] hexStringToByte(final String hexToByte) throws DecoderException {
 		return Hex.decodeHex(hexToByte.toCharArray());
 	}
 
 	/**
+	 * @param stringToByte
+	 * @return
+	 * @throws UnsupportedEncodingException
 	 * @deprecated Use hexStringToByte
 	 */
 	@Deprecated
@@ -91,6 +144,10 @@ public class EncrypterUtils {
 		return stringToByte.getBytes(TEXT_ENCODING_TYPE);
 	}
 
+	/**
+	 * @param stringToChar
+	 * @return
+	 */
 	public static char[] stringToChar(final String stringToChar) {
 		return stringToChar.toCharArray();
 	}

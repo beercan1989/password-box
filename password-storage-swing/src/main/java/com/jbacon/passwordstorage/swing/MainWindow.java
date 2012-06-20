@@ -732,7 +732,7 @@ public class MainWindow {
 			errorMessage("You need to create or load a profile first.", "No Profile Loaded", null);
 			return;
 		}
-		final NewPasswordPanel newPassword = new NewPasswordPanel(ACTIVE_PROFILE);
+		final NewPasswordPanel newPassword = new NewPasswordPanel(ACTIVE_PROFILE, CURRENT_PASSWORD);
 		if (showDefaultInputWindow(newPassword, "New Profile") == JOptionPane.OK_OPTION) {
 
 		}
