@@ -24,6 +24,8 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 
 import org.apache.commons.codec.DecoderException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.jbacon.passwordstorage.encryption.EncrypterAES;
 import com.jbacon.passwordstorage.encryption.EncrypterPBE;
@@ -39,8 +41,45 @@ public class NewPasswordPanel extends JPanel {
 	private static final long serialVersionUID = -501345374303874233L;
 	private static final char PASSWORD_MASK = '*';
 
+	private static Log LOG = LogFactory.getLog(NewPasswordPanel.class);
+
 	public static boolean isValid(final NewPasswordPanel newPassword) {
-		return false;
+		try {
+			final String profileName = newPassword.getProfileName();
+			final String encryptedPassword = newPassword.getEncryptedPassword();
+			final String encryptedPasswordName = newPassword.getEncryptedPasswordName();
+			final String encryptedPasswordNotes = newPassword.getEncryptedPasswordNotes();
+
+			if (LOG.isDebugEnabled()) {
+				final StringBuilder logEntry = new StringBuilder();
+				logEntry.append("Validating NewPasswordPanel [aka StoredPassword].");
+				logEntry.append(StringUtils.NEW_LINE);
+				logEntry.append(StringUtils.SINGLE_TAB);
+				logEntry.append("NewPasswordPanel Entered Values [Encrypted Where Necessary]");
+				logEntry.append(StringUtils.NEW_LINE);
+				logEntry.append(StringUtils.DOUBLE_TAB);
+				logEntry.append("Profile Name: " + profileName);
+				logEntry.append(StringUtils.NEW_LINE);
+				logEntry.append(StringUtils.DOUBLE_TAB);
+				logEntry.append("Encrypted Password Name: " + encryptedPasswordName);
+				logEntry.append(StringUtils.NEW_LINE);
+				logEntry.append(StringUtils.DOUBLE_TAB);
+				logEntry.append("Encrypted Password: " + encryptedPassword);
+				logEntry.append(StringUtils.NEW_LINE);
+				logEntry.append(StringUtils.DOUBLE_TAB);
+				logEntry.append("Encrypted Password Notes: " + encryptedPasswordNotes);
+				LOG.debug(logEntry.toString());
+			}
+
+			return newPassword.enteredPasswordIsValid() && newPassword.enteredPasswordNameIsValid();
+
+		} catch (UnsupportedEncodingException e) {
+			return false;
+		} catch (DecoderException e) {
+			return false;
+		} catch (AbstractEncrypterException e) {
+			return false;
+		}
 	}
 
 	private final MasterPassword profile;
@@ -189,6 +228,22 @@ public class NewPasswordPanel extends JPanel {
 		gbc_passwordNameJTextField.gridx = 1;
 		gbc_passwordNameJTextField.gridy = 2;
 		add(passwordNameJTextField, gbc_passwordNameJTextField);
+		passwordNameJTextField.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(final KeyEvent e) {
+				updatePasswordFieldValidation();
+			}
+
+			@Override
+			public void keyReleased(final KeyEvent e) {
+				updatePasswordFieldValidation();
+			}
+
+			@Override
+			public void keyTyped(final KeyEvent e) {
+				updatePasswordFieldValidation();
+			}
+		});
 
 		passwordJLabel = new JLabel("Password");
 		final GridBagConstraints gbc_passwordJLabel = new GridBagConstraints();
@@ -226,6 +281,8 @@ public class NewPasswordPanel extends JPanel {
 		gbc_passwordNotesJTextArea.gridx = 1;
 		gbc_passwordNotesJTextArea.gridy = 5;
 		add(passwordNotesJTextArea, gbc_passwordNotesJTextArea);
+
+		updatePasswordFieldValidation();
 	}
 
 	public StoredPassword buildPassword() throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
@@ -261,28 +318,28 @@ public class NewPasswordPanel extends JPanel {
 		return true;
 	}
 
-	private String getEncryptedPassword() throws DecoderException, AbstractEncrypterException, UnsupportedEncodingException {
+	private String getEncrypted(final byte[] toEncrypt) throws DecoderException, AbstractEncrypterException, UnsupportedEncodingException {
 		final EncrypterPBE decrypter = (EncrypterPBE) profile.getMasterPasswordEncryptionType().getEncrypter();
 		final byte[] salt = EncrypterUtils.hexStringToByte(profile.getSalt());
 		final byte[] cipherText = EncrypterUtils.hexStringToByte(profile.getEncryptedSecretKey());
 		final char[] passPhrase = EncrypterUtils.stringToChar(currentPassword);
-
 		final byte[] aesKey = decrypter.doCiper(EncryptionMode.DECRYPT_MODE, salt, cipherText, passPhrase);
-
 		final EncrypterAES encrypter = (EncrypterAES) profile.getStoredPasswordEncryptionType().getEncrypter();
-		byte[] encryptedPassword = encrypter.doCiper(EncryptionMode.ENCRYPT_MODE, EncrypterUtils.charToByte(getPassword()), aesKey);
+		final byte[] encryptedValue = encrypter.doCiper(EncryptionMode.ENCRYPT_MODE, toEncrypt, aesKey);
 
-		return EncrypterUtils.byteToHexString(encryptedPassword);
+		return EncrypterUtils.byteToHexString(encryptedValue);
 	}
 
-	private String getEncryptedPasswordName() {
-		// TODO Complete
-		getPasswordName();
-		return "";
+	private String getEncryptedPassword() throws DecoderException, AbstractEncrypterException, UnsupportedEncodingException {
+		return getEncrypted(EncrypterUtils.charToByte(getPassword()));
 	}
 
-	private String getEncryptedPasswordNotes() {
-		return passwordNotesJTextArea.getText() == null ? StringUtils.BLANK : passwordNotesJTextArea.getText();
+	private String getEncryptedPasswordName() throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+		return getEncrypted(EncrypterUtils.hexStringToByte(getPasswordName()));
+	}
+
+	private String getEncryptedPasswordNotes() throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+		return getEncrypted(EncrypterUtils.hexStringToByte(getPasswordNotes()));
 	}
 
 	private char[] getPassword() {
@@ -291,6 +348,10 @@ public class NewPasswordPanel extends JPanel {
 
 	private String getPasswordName() {
 		return passwordNameJTextField.getText();
+	}
+
+	private String getPasswordNotes() {
+		return passwordNotesJTextArea.getText();
 	}
 
 	private String getProfileName() {

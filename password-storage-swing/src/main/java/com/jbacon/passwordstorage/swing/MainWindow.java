@@ -1,5 +1,6 @@
 package com.jbacon.passwordstorage.swing;
 
+import static com.jbacon.passwordstorage.tools.GenericUtils.areNull;
 import static com.jbacon.passwordstorage.tools.GenericUtils.isNotNull;
 
 import java.awt.BorderLayout;
@@ -15,6 +16,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import javax.swing.AbstractButton;
@@ -276,9 +278,8 @@ public class MainWindow {
 			public void actionPerformed(final ActionEvent e) {
 				try {
 					newProfile();
-				} catch (final AbstractEncrypterException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+				} catch (final AbstractEncrypterException t) {
+					errorMessage("An error occured when the creation of your new profile.", "Profile Creation Error", t);
 				}
 			}
 		});
@@ -309,7 +310,15 @@ public class MainWindow {
 		mntmNewPassword.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				newPassword();
+				try {
+					newPassword();
+				} catch (UnsupportedEncodingException t) {
+					errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
+				} catch (DecoderException t) {
+					errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
+				} catch (AbstractEncrypterException t) {
+					errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
+				}
 			}
 		});
 		mnFile.add(mntmNewPassword);
@@ -455,8 +464,8 @@ public class MainWindow {
 			public void actionPerformed(final ActionEvent e) {
 				try {
 					newProfile();
-				} catch (final AbstractEncrypterException error) {
-					errorMessage("An error has been encountered when performing an encryption/decryption attempt", "Encryption Problem", error);
+				} catch (final AbstractEncrypterException t) {
+					errorMessage("An error occured when the creation of your new profile.", "Profile Creation Error", t);
 				}
 			}
 		});
@@ -508,7 +517,15 @@ public class MainWindow {
 		newPasswordJBbutton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				newPassword();
+				try {
+					newPassword();
+				} catch (UnsupportedEncodingException t) {
+					errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
+				} catch (DecoderException t) {
+					errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
+				} catch (AbstractEncrypterException t) {
+					errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
+				}
 			}
 		});
 		final GridBagConstraints gbc_newPasswordJBbutton = new GridBagConstraints();
@@ -681,6 +698,10 @@ public class MainWindow {
 		return false;
 	}
 
+	private boolean isValid(final NewPasswordPanel newPassword) {
+		return NewPasswordPanel.isValid(newPassword);
+	}
+
 	private boolean isValid(final NewProfilePanel newProfile) {
 		return NewProfilePanel.isValid(newProfile);
 	}
@@ -726,7 +747,7 @@ public class MainWindow {
 		logDebugMessage("Loading a Profile - " + ACTIVE_PROFILE);
 	}
 
-	private void newPassword() {
+	private void newPassword() throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
 		logDebugMessage("Creating a new Password");
 		if (ACTIVE_PROFILE.equals(DEFAULT_ACTIVE_PROFILE)) {
 			errorMessage("You need to create or load a profile first.", "No Profile Loaded", null);
@@ -734,7 +755,12 @@ public class MainWindow {
 		}
 		final NewPasswordPanel newPassword = new NewPasswordPanel(ACTIVE_PROFILE, CURRENT_PASSWORD);
 		if (showDefaultInputWindow(newPassword, "New Profile") == JOptionPane.OK_OPTION) {
+			if (!isValid(newPassword)) {
+				errorMessage("Failed to create a new profile, as you did not fill in all the fields.", "Failed To Create New Profile", null);
+				return;
+			}
 
+			final StoredPassword storedPassword = newPassword.buildPassword();
 		}
 	}
 
@@ -850,6 +876,22 @@ public class MainWindow {
 		if (storedPasswords != null) {
 			storedPasswordsModel.addAll(storedPasswords);
 		}
+	}
+
+	private boolean validateNewPassword(final StoredPassword password) {
+		final String profileName = password.getProfileName();
+		final String encryptedPassword = password.getEncryptedPassword();
+		final String encryptedPasswordName = password.getEncryptedPasswordName();
+		final String encryptedPasswordNotes = password.getEncryptedPasswordNotes();
+
+		if (areNull(profileName, encryptedPassword, encryptedPasswordName, encryptedPasswordNotes)) {
+			return false;
+		}
+
+		// TODO - Complete validating a new StoredPassword.
+		asda
+
+		return true;
 	}
 
 	private boolean validateNewProfile(final MasterPassword profile) {

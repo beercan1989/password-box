@@ -48,6 +48,7 @@ public class NewProfilePanel extends JPanel {
 
 	public static boolean isValid(final NewProfilePanel newProfile) {
 		try {
+			LOG.debug("Validating NewProfilePanel [aka MasterPassword].");
 			LOG.debug("ProfileEncryptionType: " + newProfile.getProfileEncryptionType());
 			LOG.debug("PasswordEncryptionType: " + newProfile.getPasswordEncryptionType());
 			LOG.debug("Salt: " + EncrypterUtils.byteToHexString(newProfile.getSalt()));
@@ -58,9 +59,9 @@ public class NewProfilePanel extends JPanel {
 			final boolean saltIsNotNull = GenericUtils.isNotNull(newProfile.getSalt());
 			final boolean areNotEmpty = StringUtils.areNotEmpty(newProfile.getEncryptedSecretKey(), newProfile.getProfileName());
 
-			LOG.debug(encryptionTypesValid);
-			LOG.debug(saltIsNotNull);
-			LOG.debug(areNotEmpty);
+			LOG.debug("Encryption Type is valid: " + encryptionTypesValid);
+			LOG.debug("Salt is not null: " + saltIsNotNull);
+			LOG.debug("Secret Key & Profile Name are not empty: " + areNotEmpty);
 
 			return encryptionTypesValid && saltIsNotNull && areNotEmpty;
 		} catch (final AbstractEncrypterException e) {

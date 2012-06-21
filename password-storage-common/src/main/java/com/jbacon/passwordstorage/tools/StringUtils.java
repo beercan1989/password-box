@@ -8,6 +8,9 @@ public class StringUtils {
 	public static final String UNDER_SCORE = "_";
 	public static final String COMMA = ",";
 	public static final String SEMI_COLON = ";";
+	public static final String NEW_LINE = "\n";
+	public static final String SINGLE_TAB = "\t";
+	public static final String DOUBLE_TAB = "\t\t";
 
 	public static boolean areEmpty(final String... strings) {
 		for (String string : strings) {
