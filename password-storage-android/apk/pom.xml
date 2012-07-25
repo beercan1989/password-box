@@ -1,0 +1,70 @@
+<project xsi:schemaLocation="
+  http://maven.apache.org/POM/4.0.0 
+  http://maven.apache.org/xsd/maven-4.0.0.xsd" 
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.jbacon.passwordstorage</groupId>
+    <artifactId>passwordstorage.android</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>android.ui</artifactId>
+  <packaging>apk</packaging>
+  <description></description>
+  <dependencies>
+    <dependency>
+      <groupId>com.mycompany</groupId>
+      <artifactId>android.util</artifactId>
+      <version>1.0.1-SNAPSHOT</version>
+      <type>apklib</type>
+    </dependency>
+    <!-- this project contains a copy of 
+             the sdk licensing code -->
+    <dependency>
+      <groupId>com.mycompany</groupId>
+      <artifactId>android.licensing</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <type>apklib</type>
+    </dependency>
+    <dependency>
+      <groupId>com.google.android</groupId>
+      <artifactId>android</artifactId>
+      <version>2.2.1</version>
+      <scope>provided</scope>
+    </dependency>
+        <!-- made available to android 
+             by "maven android sdk deployer" -->
+    <dependency>
+      <groupId>android.support</groupId>
+      <artifactId>compatibility-v13</artifactId>
+      <version>r6</version>
+    </dependency>
+    <dependency>
+      <groupId>oauth.signpost</groupId>
+      <artifactId>signpost-core</artifactId>
+      <version>1.2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>oauth.signpost</groupId>
+      <artifactId>signpost-commonshttp4</artifactId>
+      <version>1.2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.twitter4j</groupId>
+      <artifactId>twitter4j-core</artifactId>
+      <version>2.1.0</version>
+    </dependency>
+    <!-- prevent commons-logging from being included by 
+         the Google HTTP client dependencies, which creates 
+         a truck load of warnings and eventually kills eclipse -->
+    <dependency>
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+        <version>1.1.1</version>
+        <scope>provided</scope>
+    </dependency>
+  </dependencies>
+</project>
