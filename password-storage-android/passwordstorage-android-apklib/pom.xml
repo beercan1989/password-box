@@ -8,11 +8,10 @@
   <parent>
     <groupId>com.jbacon.passwordstorage</groupId>
     <artifactId>passwordstorage.android</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
   </parent>
   <artifactId>passwordstorage.android.apklib</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
-  <name>Android Utils</name>
+  <name>Password Storage - Mobile (Android) - APK-LIB</name>
   <packaging>apklib</packaging>
   <description></description>
   <dependencies>

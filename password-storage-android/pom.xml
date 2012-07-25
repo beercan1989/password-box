@@ -15,14 +15,11 @@
 	<properties>
 		<common.version>${project.version}</common.version>
 	</properties>
-
-	<dependencies>
-		<dependency>
-			<groupId>com.jbacon.passwordstorage</groupId>
-			<artifactId>passwordstorage.common</artifactId>
-			<version>${common.version}</version>
-		</dependency>
-	</dependencies>
+        
+        <modules>
+                <module>passwordstorage-android-apklib</module>
+                <module>passwordstorage-android-apk</module>
+        </modules>
 
 	<build>
 		<sourceDirectory>src/java/main</sourceDirectory>

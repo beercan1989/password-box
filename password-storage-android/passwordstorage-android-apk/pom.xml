@@ -9,7 +9,8 @@
     <artifactId>passwordstorage.android</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>android.ui</artifactId>
+  <artifactId>passwordstorage.android.apk</artifactId>
+  <name>Password Storage - Mobile (Android) - APK</name>
   <packaging>apk</packaging>
   <description></description>
   <dependencies>
