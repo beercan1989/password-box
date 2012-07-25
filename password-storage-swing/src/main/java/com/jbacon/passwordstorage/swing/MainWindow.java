@@ -756,11 +756,25 @@ public class MainWindow {
 		final NewPasswordPanel newPassword = new NewPasswordPanel(ACTIVE_PROFILE, CURRENT_PASSWORD);
 		if (showDefaultInputWindow(newPassword, "New Profile") == JOptionPane.OK_OPTION) {
 			if (!isValid(newPassword)) {
-				errorMessage("Failed to create a new profile, as you did not fill in all the fields.", "Failed To Create New Profile", null);
+				errorMessage("Failed to create a new password, as you did not fill in all the fields.", "Failed To Create New Password", null);
 				return;
 			}
 
 			final StoredPassword storedPassword = newPassword.buildPassword();
+
+			if (!validateNewPassword(storedPassword)) {
+				errorMessage("Failed to create a new password, as the new password is not valid, either fields were empty or none existant.",
+						"Failed To Create New Password", null);
+				return;
+			}
+
+			if (unsuccessfulImport(storedPasswordDao.instertStoredPassword(storedPassword))) {
+				errorMessage("Failed to create a new password, inserting into the database failed.", "Failed To Create New Password", null);
+				return;
+			}
+
+			updateStoredPasswords(false);
+			logDebugMessage("Created storedPassword for profile " + storedPassword.getProfileName());
 		}
 	}
 
@@ -885,11 +899,27 @@ public class MainWindow {
 		final String encryptedPasswordNotes = password.getEncryptedPasswordNotes();
 
 		if (areNull(profileName, encryptedPassword, encryptedPasswordName, encryptedPasswordNotes)) {
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Failed to validate password, as a value was null. profileName: [" + profileName + "], encryptedPassword: [" + encryptedPassword
+						+ "], encryptedPasswordName: [" + encryptedPasswordName + "], encryptedPasswordNotes: [" + encryptedPasswordNotes + "]");
+			}
 			return false;
 		}
 
-		// TODO - Complete validating a new StoredPassword.
-		asda
+		// Profile Name matches one that already exists.
+		final List<String> currentProfileNames = masterPasswordDao.getMasterPasswordNames();
+		if (!currentProfileNames.contains(profileName)) {
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Failed to validate password as the profile name did not appear in the database. profileName: [" + profileName + "]");
+			}
+			return false;
+		}
+
+		// Password & Name & Notes are not the same
+		if (encryptedPassword.equals(encryptedPasswordName) || encryptedPassword.equals(encryptedPasswordNotes)
+				|| encryptedPasswordName.equals(encryptedPasswordNotes)) {
+			return false;
+		}
 
 		return true;
 	}

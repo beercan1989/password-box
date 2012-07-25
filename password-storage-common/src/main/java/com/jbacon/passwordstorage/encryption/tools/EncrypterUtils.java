@@ -39,9 +39,7 @@ public class EncrypterUtils {
 	 * @param byteToString
 	 * @return
 	 * @throws UnsupportedEncodingException
-	 * @deprecated Use byteToHexString
 	 */
-	@Deprecated
 	public static String byteToString(final byte[] byteToString) throws UnsupportedEncodingException {
 		return new String(byteToString, TEXT_ENCODING_TYPE);
 	}
@@ -137,9 +135,7 @@ public class EncrypterUtils {
 	 * @param stringToByte
 	 * @return
 	 * @throws UnsupportedEncodingException
-	 * @deprecated Use hexStringToByte
 	 */
-	@Deprecated
 	public static byte[] stringToByte(final String stringToByte) throws UnsupportedEncodingException {
 		return stringToByte.getBytes(TEXT_ENCODING_TYPE);
 	}

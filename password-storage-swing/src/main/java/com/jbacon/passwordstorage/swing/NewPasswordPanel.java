@@ -74,10 +74,13 @@ public class NewPasswordPanel extends JPanel {
 			return newPassword.enteredPasswordIsValid() && newPassword.enteredPasswordNameIsValid();
 
 		} catch (UnsupportedEncodingException e) {
+			LOG.debug(StringUtils.BLANK, e);
 			return false;
 		} catch (DecoderException e) {
+			LOG.debug(StringUtils.BLANK, e);
 			return false;
 		} catch (AbstractEncrypterException e) {
+			LOG.debug(StringUtils.BLANK, e);
 			return false;
 		}
 	}
@@ -335,11 +338,11 @@ public class NewPasswordPanel extends JPanel {
 	}
 
 	private String getEncryptedPasswordName() throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
-		return getEncrypted(EncrypterUtils.hexStringToByte(getPasswordName()));
+		return getEncrypted(EncrypterUtils.stringToByte(getPasswordName()));
 	}
 
 	private String getEncryptedPasswordNotes() throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
-		return getEncrypted(EncrypterUtils.hexStringToByte(getPasswordNotes()));
+		return getEncrypted(EncrypterUtils.stringToByte(getPasswordNotes()));
 	}
 
 	private char[] getPassword() {
