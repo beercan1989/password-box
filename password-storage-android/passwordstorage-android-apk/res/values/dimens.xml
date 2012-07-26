@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="default_border_left">1mm</dimen>
+    <dimen name="default_border_right">1mm</dimen>
+    <dimen name="default_border_top">1mm</dimen>
+    <dimen name="default_border_bottom">1mm</dimen>
+</resources>

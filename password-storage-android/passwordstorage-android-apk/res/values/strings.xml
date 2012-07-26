@@ -1,0 +1,10 @@
+<resources>
+
+    <string name="app_name">Test Application</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">Technophobia Ltd</string>
+    <string name="seekBarDisplayInitalValue">Seek Bar Value: Inital</string>
+    <string name="menu_close">Exit</string>
+
+</resources>

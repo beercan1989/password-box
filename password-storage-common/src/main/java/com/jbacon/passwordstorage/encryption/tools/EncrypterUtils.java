@@ -31,6 +31,10 @@ public class EncrypterUtils {
 		return new String(byteToChar).toCharArray();
 	}
 
+	/**
+	 * @param byteToString
+	 * @return
+	 */
 	public static String byteToHexString(final byte[] byteToString) {
 		return new String(Hex.encodeHex(byteToString));
 	}
