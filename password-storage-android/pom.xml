@@ -12,18 +12,32 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<properties>
-		<common.version>${project.version}</common.version>
-	</properties>
-
 	<modules>
 <!-- 		<module>passwordstorage-android-apklib</module> -->
 		<module>passwordstorage-android-apk</module>
 	</modules>
+	
+	<properties>
+	    <android.version>4.0.1.2</android.version>
+	</properties>
 
+	<dependencyManagement>
+	    <dependencies>
+	        <dependency>
+	            <groupId>com.google.android</groupId>
+	            <artifactId>android</artifactId>
+	            <version>${android.version}</version>
+	            <scope>provided</scope>
+	        </dependency>
+	    </dependencies>
+	</dependencyManagement>
+	
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
+		<directory>bin</directory>
+
+		<finalName>${project.artifactId}</finalName>
 		
 		<pluginManagement>
             <plugins>
@@ -32,32 +46,25 @@
                     <artifactId>android-maven-plugin</artifactId>
                     <version>3.3.0</version>
                     <extensions>true</extensions>
+                    <configuration>
+						<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
+						<assetsDirectory>${project.basedir}/assets</assetsDirectory>
+						<resourceDirectory>${project.basedir}/res</resourceDirectory>
+						<nativeLibrariesDirectory>${project.basedir}/src/main/native</nativeLibrariesDirectory>
+						<sdk>
+							<platform>16</platform>
+						</sdk>
+						<proguard>
+							<skip>true</skip>
+						</proguard>
+						<sign>
+							<debug>false</debug>
+						</sign>
+						<deleteConflictingFiles>true</deleteConflictingFiles>
+						<undeployBeforeDeploy>true</undeployBeforeDeploy>
+					</configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
-		<plugins>
-			<plugin>
-				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
-				<artifactId>android-maven-plugin</artifactId>
-				<configuration>
-					<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
-					<assetsDirectory>${project.basedir}/assets</assetsDirectory>
-					<resourceDirectory>${project.basedir}/res</resourceDirectory>
-					<nativeLibrariesDirectory>${project.basedir}/src/main/native</nativeLibrariesDirectory>
-					<sdk>
-						<platform>16</platform>
-					</sdk>
-					<proguard>
-						<skip>false</skip>
-					</proguard>
-					<sign>
-						<debug>false</debug>
-					</sign>
-					<deleteConflictingFiles>true</deleteConflictingFiles>
-					<undeployBeforeDeploy>true</undeployBeforeDeploy>
-				</configuration>
-				<extensions>true</extensions>
-			</plugin>
-		</plugins>
 	</build>
 </project>
