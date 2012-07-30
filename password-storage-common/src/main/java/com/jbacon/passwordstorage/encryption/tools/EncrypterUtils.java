@@ -8,6 +8,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 
 import com.jbacon.passwordstorage.encryption.EncryptionType;
@@ -21,6 +22,22 @@ public class EncrypterUtils {
 	private static final String KEY_SIZE = "keysize";
 	private static final String SECURE_SALT_ALGORITHM = "secureSaltAlgorithm";
 	private static final String TEXT_ENCODING_TYPE = "UTF-8";
+
+	/**
+	 * @param base64ToByte
+	 * @return
+	 */
+	public static byte[] base64ToSring(final String base64ToByte) {
+		return Base64.decodeBase64(base64ToByte);
+	}
+
+	/**
+	 * @param byteToString
+	 * @return
+	 */
+	public static String byteToBase64(final byte[] byteToString) {
+		return Base64.encodeBase64String(byteToString);
+	}
 
 	/**
 	 * @param byteToChar

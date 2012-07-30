@@ -164,6 +164,7 @@ public class MainWindow {
 	private JSeparator deleteDatabaseJSeparator;
 	private JPanel activeProfileJPanel;
 	private JLabel activeProfileJLabel;
+	private JButton closeProfileJButton;
 
 	public MainWindow() {
 		maintenanceDao = setupMaintenanceDao();
@@ -453,9 +454,9 @@ public class MainWindow {
 		westJPanel.add(availableProfilesNorthButtonJPanel, BorderLayout.NORTH);
 		final GridBagLayout gbl_availableProfilesNorthButtonJPanel = new GridBagLayout();
 		gbl_availableProfilesNorthButtonJPanel.columnWidths = new int[] { 0, 0 };
-		gbl_availableProfilesNorthButtonJPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		gbl_availableProfilesNorthButtonJPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 		gbl_availableProfilesNorthButtonJPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-		gbl_availableProfilesNorthButtonJPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gbl_availableProfilesNorthButtonJPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		availableProfilesNorthButtonJPanel.setLayout(gbl_availableProfilesNorthButtonJPanel);
 
 		newProfileJButton = new JButton("New Profile");
@@ -497,11 +498,19 @@ public class MainWindow {
 				deleteProfile();
 			}
 		});
+
+		closeProfileJButton = new JButton("Close Profile");
+		GridBagConstraints gbc_closeProfileJButton = new GridBagConstraints();
+		gbc_closeProfileJButton.fill = GridBagConstraints.HORIZONTAL;
+		gbc_closeProfileJButton.insets = new Insets(0, 0, 5, 0);
+		gbc_closeProfileJButton.gridx = 0;
+		gbc_closeProfileJButton.gridy = 2;
+		availableProfilesNorthButtonJPanel.add(closeProfileJButton, gbc_closeProfileJButton);
 		final GridBagConstraints gbc_deleteProfileJButton = new GridBagConstraints();
 		gbc_deleteProfileJButton.fill = GridBagConstraints.HORIZONTAL;
 		gbc_deleteProfileJButton.insets = new Insets(0, 0, 5, 0);
 		gbc_deleteProfileJButton.gridx = 0;
-		gbc_deleteProfileJButton.gridy = 2;
+		gbc_deleteProfileJButton.gridy = 3;
 		availableProfilesNorthButtonJPanel.add(deleteProfileJButton, gbc_deleteProfileJButton);
 
 		availableProfilesButtonSeparator = new JSeparator();
@@ -510,7 +519,7 @@ public class MainWindow {
 		gbc_availableProfilesButtonSeparator.fill = GridBagConstraints.BOTH;
 		gbc_availableProfilesButtonSeparator.insets = new Insets(0, 0, 5, 0);
 		gbc_availableProfilesButtonSeparator.gridx = 0;
-		gbc_availableProfilesButtonSeparator.gridy = 3;
+		gbc_availableProfilesButtonSeparator.gridy = 4;
 		availableProfilesNorthButtonJPanel.add(availableProfilesButtonSeparator, gbc_availableProfilesButtonSeparator);
 
 		newPasswordJBbutton = new JButton("New Password");
@@ -532,7 +541,7 @@ public class MainWindow {
 		gbc_newPasswordJBbutton.fill = GridBagConstraints.HORIZONTAL;
 		gbc_newPasswordJBbutton.insets = new Insets(0, 0, 5, 0);
 		gbc_newPasswordJBbutton.gridx = 0;
-		gbc_newPasswordJBbutton.gridy = 4;
+		gbc_newPasswordJBbutton.gridy = 5;
 		availableProfilesNorthButtonJPanel.add(newPasswordJBbutton, gbc_newPasswordJBbutton);
 
 		viewPasswordJButton = new JButton("View Password");
@@ -546,7 +555,7 @@ public class MainWindow {
 		gbc_openPasswordJButton.fill = GridBagConstraints.HORIZONTAL;
 		gbc_openPasswordJButton.insets = new Insets(0, 0, 5, 0);
 		gbc_openPasswordJButton.gridx = 0;
-		gbc_openPasswordJButton.gridy = 5;
+		gbc_openPasswordJButton.gridy = 6;
 		availableProfilesNorthButtonJPanel.add(viewPasswordJButton, gbc_openPasswordJButton);
 
 		editPasswordJButton = new JButton("Edit Password");
@@ -560,7 +569,7 @@ public class MainWindow {
 		gbc_editPasswordJButton.fill = GridBagConstraints.HORIZONTAL;
 		gbc_editPasswordJButton.insets = new Insets(0, 0, 5, 0);
 		gbc_editPasswordJButton.gridx = 0;
-		gbc_editPasswordJButton.gridy = 6;
+		gbc_editPasswordJButton.gridy = 7;
 		availableProfilesNorthButtonJPanel.add(editPasswordJButton, gbc_editPasswordJButton);
 
 		deletePasswordJButton = new JButton("Delete Password");
@@ -574,7 +583,7 @@ public class MainWindow {
 		gbc_deletePasswordJButton.insets = new Insets(0, 0, 5, 0);
 		gbc_deletePasswordJButton.fill = GridBagConstraints.HORIZONTAL;
 		gbc_deletePasswordJButton.gridx = 0;
-		gbc_deletePasswordJButton.gridy = 7;
+		gbc_deletePasswordJButton.gridy = 8;
 		availableProfilesNorthButtonJPanel.add(deletePasswordJButton, gbc_deletePasswordJButton);
 
 		deleteDatabaseJSeparator = new JSeparator();
@@ -583,7 +592,7 @@ public class MainWindow {
 		gbc_deleteDatabaseJSeparator.fill = GridBagConstraints.BOTH;
 		gbc_deleteDatabaseJSeparator.insets = new Insets(0, 0, 5, 0);
 		gbc_deleteDatabaseJSeparator.gridx = 0;
-		gbc_deleteDatabaseJSeparator.gridy = 8;
+		gbc_deleteDatabaseJSeparator.gridy = 9;
 		availableProfilesNorthButtonJPanel.add(deleteDatabaseJSeparator, gbc_deleteDatabaseJSeparator);
 
 		deleteDatabaseJButton = new JButton("Delete Database");
@@ -594,9 +603,10 @@ public class MainWindow {
 			}
 		});
 		final GridBagConstraints gbc_deleteDatabaseJButton = new GridBagConstraints();
+		gbc_deleteDatabaseJButton.insets = new Insets(0, 0, 5, 0);
 		gbc_deleteDatabaseJButton.fill = GridBagConstraints.HORIZONTAL;
 		gbc_deleteDatabaseJButton.gridx = 0;
-		gbc_deleteDatabaseJButton.gridy = 9;
+		gbc_deleteDatabaseJButton.gridy = 10;
 		availableProfilesNorthButtonJPanel.add(deleteDatabaseJButton, gbc_deleteDatabaseJButton);
 
 		availableProfilesModel = new MasterPasswordListModel();
