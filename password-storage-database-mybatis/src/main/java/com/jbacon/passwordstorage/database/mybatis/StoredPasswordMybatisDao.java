@@ -3,11 +3,11 @@ package com.jbacon.passwordstorage.database.mybatis;
 import java.io.IOException;
 import java.util.List;
 
-import com.jbacon.passwordstorage.database.dao.StoredPasswordDao;
+import com.jbacon.passwordstorage.database.dao.StoredPasswordsDao;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
 
-public final class StoredPasswordMybatisDao extends MybatisDao implements StoredPasswordDao {
+public final class StoredPasswordMybatisDao extends MybatisDao implements StoredPasswordsDao {
 
 	public StoredPasswordMybatisDao() throws IOException {
 		super();

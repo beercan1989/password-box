@@ -45,8 +45,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.jbacon.passwordstorage.database.dao.MaintenanceDao;
-import com.jbacon.passwordstorage.database.dao.MasterPasswordDao;
-import com.jbacon.passwordstorage.database.dao.StoredPasswordDao;
+import com.jbacon.passwordstorage.database.dao.MasterPasswordsDao;
+import com.jbacon.passwordstorage.database.dao.StoredPasswordsDao;
 import com.jbacon.passwordstorage.database.mybatis.MaintenanceMybatisDao;
 import com.jbacon.passwordstorage.database.mybatis.MasterPasswordMybatisDao;
 import com.jbacon.passwordstorage.database.mybatis.StoredPasswordMybatisDao;
@@ -102,8 +102,8 @@ public class MainWindow {
 	}
 
 	private final MaintenanceDao maintenanceDao;
-	private final MasterPasswordDao masterPasswordDao;
-	private final StoredPasswordDao storedPasswordDao;
+	private final MasterPasswordsDao masterPasswordDao;
+	private final StoredPasswordsDao storedPasswordDao;
 
 	private static final MasterPassword DEFAULT_ACTIVE_PROFILE = new MasterPassword();
 	private static final String DEFAULT_CURRENT_PASSWORD = "### --- Default Current Password --- ###";
@@ -196,6 +196,17 @@ public class MainWindow {
 		for (final Component component : components) {
 			component.setVisible(isVisible);
 		}
+	}
+
+	private void closeProfile() {
+		logDebugMessage("closeProfile");
+
+		availableProfilesJList.clearSelection();
+
+		ACTIVE_PROFILE = DEFAULT_ACTIVE_PROFILE;
+		CURRENT_PASSWORD = DEFAULT_CURRENT_PASSWORD;
+
+		updateStoredPasswords(false);
 	}
 
 	protected void deleteDatabase() {
@@ -500,6 +511,12 @@ public class MainWindow {
 		});
 
 		closeProfileJButton = new JButton("Close Profile");
+		closeProfileJButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				closeProfile();
+			}
+		});
 		GridBagConstraints gbc_closeProfileJButton = new GridBagConstraints();
 		gbc_closeProfileJButton.fill = GridBagConstraints.HORIZONTAL;
 		gbc_closeProfileJButton.insets = new Insets(0, 0, 5, 0);

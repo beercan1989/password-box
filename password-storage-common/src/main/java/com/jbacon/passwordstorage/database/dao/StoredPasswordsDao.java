@@ -10,7 +10,7 @@ import com.jbacon.passwordstorage.password.StoredPassword;
  * 
  * @author James Bacon
  */
-public interface StoredPasswordDao extends GenericDao {
+public interface StoredPasswordsDao extends GenericDao {
 
 	/**
 	 * Deletes a StoredPassword from the database.

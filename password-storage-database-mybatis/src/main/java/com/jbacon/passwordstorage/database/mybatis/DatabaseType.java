@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import com.jbacon.passwordstorage.database.Database;
 import com.jbacon.passwordstorage.database.dao.MaintenanceDao;
-import com.jbacon.passwordstorage.database.dao.MasterPasswordDao;
-import com.jbacon.passwordstorage.database.dao.StoredPasswordDao;
+import com.jbacon.passwordstorage.database.dao.MasterPasswordsDao;
+import com.jbacon.passwordstorage.database.dao.StoredPasswordsDao;
 import com.jbacon.passwordstorage.database.errors.UnsupportedDatabaseException;
 
 public enum DatabaseType implements Database {
@@ -21,22 +21,22 @@ public enum DatabaseType implements Database {
 		}
 
 		@Override
-		public MasterPasswordDao createMasterPasswordDao() throws IOException {
+		public MasterPasswordsDao createMasterPasswordDao() throws IOException {
 			return new MasterPasswordMybatisDao();
 		}
 
 		@Override
-		public MasterPasswordDao createMasterPasswordDao(final String configurationFile) throws UnsupportedDatabaseException, IOException {
+		public MasterPasswordsDao createMasterPasswordDao(final String configurationFile) throws UnsupportedDatabaseException, IOException {
 			return new MasterPasswordMybatisDao(configurationFile);
 		}
 
 		@Override
-		public StoredPasswordDao createStoredPasswordDao() throws IOException {
+		public StoredPasswordsDao createStoredPasswordDao() throws IOException {
 			return new StoredPasswordMybatisDao();
 		}
 
 		@Override
-		public StoredPasswordDao createStoredPasswordDao(final String configurationFile) throws UnsupportedDatabaseException, IOException {
+		public StoredPasswordsDao createStoredPasswordDao(final String configurationFile) throws UnsupportedDatabaseException, IOException {
 			return new StoredPasswordMybatisDao(configurationFile);
 		}
 	};
@@ -45,11 +45,11 @@ public enum DatabaseType implements Database {
 		throw new UnsupportedDatabaseException("Database type has not been implemented yet.");
 	}
 
-	public MasterPasswordDao createMasterPasswordDao(final String configurationFilePath) throws UnsupportedDatabaseException, IOException {
+	public MasterPasswordsDao createMasterPasswordDao(final String configurationFilePath) throws UnsupportedDatabaseException, IOException {
 		throw new UnsupportedDatabaseException("Database type has not been implemented yet.");
 	}
 
-	public StoredPasswordDao createStoredPasswordDao(final String configurationFilePath) throws UnsupportedDatabaseException, IOException {
+	public StoredPasswordsDao createStoredPasswordDao(final String configurationFilePath) throws UnsupportedDatabaseException, IOException {
 		throw new UnsupportedDatabaseException("Database type has not been implemented yet.");
 	}
 

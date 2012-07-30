@@ -15,6 +15,13 @@ public interface MaintenanceDao extends GenericDao {
 	public int createMasterPasswordTable();
 
 	/**
+	 * Creates the Settings table in the database.
+	 * 
+	 * @return the result of the SQL query.
+	 */
+	public int createSettingsTable();
+
+	/**
 	 * Creates the StoredPasswords table in the database.
 	 * 
 	 * @return the result of the SQL query.
@@ -27,6 +34,13 @@ public interface MaintenanceDao extends GenericDao {
 	 * @return the result of the SQL query.
 	 */
 	public int dropMasterPasswordTable();
+
+	/**
+	 * Deletes the Settings table in the database.
+	 * 
+	 * @return the result of the SQL query.
+	 */
+	public int dropSettingsTable();
 
 	/**
 	 * Deletes the StoredPasswords table in the database.

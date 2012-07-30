@@ -20,6 +20,11 @@ public final class MaintenanceMybatisDao extends MybatisDao implements Maintenan
 	}
 
 	@Override
+	public int createSettingsTable() {
+		return databaseConnection.update("createSettingsTable");
+	}
+
+	@Override
 	public int createStoredPasswordTable() {
 		return databaseConnection.update("createStoredPasswordTable");
 	}
@@ -30,8 +35,13 @@ public final class MaintenanceMybatisDao extends MybatisDao implements Maintenan
 	}
 
 	@Override
+	public int dropSettingsTable() {
+		// return databaseConnection.update("dropSettingsTable");
+	}
+
+	@Override
 	public int dropStoredPasswordTable() {
-		return databaseConnection.update("dropStoredPasswordTable");
+		// return databaseConnection.update("dropStoredPasswordTable");
 	}
 
 }

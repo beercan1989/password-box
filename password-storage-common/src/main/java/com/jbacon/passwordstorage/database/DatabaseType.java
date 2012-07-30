@@ -3,8 +3,8 @@ package com.jbacon.passwordstorage.database;
 import java.io.IOException;
 
 import com.jbacon.passwordstorage.database.dao.MaintenanceDao;
-import com.jbacon.passwordstorage.database.dao.MasterPasswordDao;
-import com.jbacon.passwordstorage.database.dao.StoredPasswordDao;
+import com.jbacon.passwordstorage.database.dao.MasterPasswordsDao;
+import com.jbacon.passwordstorage.database.dao.StoredPasswordsDao;
 import com.jbacon.passwordstorage.database.errors.UnsupportedDatabaseException;
 
 public enum DatabaseType implements Database {
@@ -18,12 +18,12 @@ public enum DatabaseType implements Database {
 	}
 
 	@Override
-	public MasterPasswordDao createMasterPasswordDao() throws UnsupportedDatabaseException, IOException {
+	public MasterPasswordsDao createMasterPasswordDao() throws UnsupportedDatabaseException, IOException {
 		throw new UnsupportedDatabaseException("Database type has not been implemented yet.");
 	}
 
 	@Override
-	public StoredPasswordDao createStoredPasswordDao() throws UnsupportedDatabaseException, IOException {
+	public StoredPasswordsDao createStoredPasswordDao() throws UnsupportedDatabaseException, IOException {
 		throw new UnsupportedDatabaseException("Database type has not been implemented yet.");
 	}
 }

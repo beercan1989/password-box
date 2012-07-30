@@ -3,10 +3,10 @@ package com.jbacon.passwordstorage.database.mybatis;
 import java.io.IOException;
 import java.util.List;
 
-import com.jbacon.passwordstorage.database.dao.MasterPasswordDao;
+import com.jbacon.passwordstorage.database.dao.MasterPasswordsDao;
 import com.jbacon.passwordstorage.password.MasterPassword;
 
-public final class MasterPasswordMybatisDao extends MybatisDao implements MasterPasswordDao {
+public final class MasterPasswordMybatisDao extends MybatisDao implements MasterPasswordsDao {
 
 	public MasterPasswordMybatisDao() throws IOException {
 		super();
