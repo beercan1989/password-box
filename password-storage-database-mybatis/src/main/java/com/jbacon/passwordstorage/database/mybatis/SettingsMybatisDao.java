@@ -2,6 +2,7 @@ package com.jbacon.passwordstorage.database.mybatis;
 
 import java.io.IOException;
 import java.util.EnumMap;
+import java.util.List;
 
 import com.jbacon.passwordstorage.database.dao.SettingsDao;
 import com.jbacon.passwordstorage.settings.Setting;
@@ -18,32 +19,41 @@ public final class SettingsMybatisDao extends MybatisDao implements SettingsDao 
 
 	@Override
 	public int deleteSetting(final Setting setting) {
-		// TODO Auto-generated method stub
-		return databaseConnection.delete("deleteSetting", setting.name());
+		String settingName = setting.name();
+		return databaseConnection.delete("deleteSetting", settingName);
 	}
 
 	@Override
 	public String getSetting(final Setting setting) {
-		// TODO Auto-generated method stub
-		return databaseConnection.selectOne("getSetting", setting.name()).toString();
+		String settingName = setting.name();
+		return databaseConnection.selectOne("getSetting", settingName).toString();
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public EnumMap<Setting, String> getSettings() {
-		// TODO Auto-generated method stub
-		return null;
+		List<SettingsPair> allSettings = (List<SettingsPair>) databaseConnection.selectList("getSettings");
+		EnumMap<Setting, String> allSettingsMap = new EnumMap<Setting, String>(Setting.class);
+
+		for (SettingsPair settingsPair : allSettings) {
+			allSettingsMap.put(settingsPair.getSettingName(), settingsPair.getSettingValue());
+		}
+
+		return allSettingsMap;
 	}
 
 	@Override
 	public int insertSetting(final Setting setting, final String value) {
 		// TODO Auto-generated method stub
-		return databaseConnection.insert("insertSetting", new String[] { setting.name(), value });
+		String settingName = setting.name();
+		return databaseConnection.insert("insertSetting", new String[] { settingName, value });
 	}
 
 	@Override
 	public int updateSetting(final Setting setting, final String value) {
 		// TODO Auto-generated method stub
-		return databaseConnection.update("insertSetting", new String[] { setting.name(), value });
+		String settingName = setting.name();
+		return databaseConnection.update("updateSetting", new String[] { settingName, value });
 	}
 
 }

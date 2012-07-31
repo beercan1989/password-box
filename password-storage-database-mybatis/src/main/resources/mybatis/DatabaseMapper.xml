@@ -67,6 +67,28 @@
 	</update>
 	
 	
+	<!-- Settings Mappings -->
+	<delete id="deleteSetting" parameterType="java.lang.String">
+	    DELETE FROM Settings WHERE settingName = #{settingName};
+	</delete>
+	
+	<select id="getSetting" parameterType="java.lang.String">
+	    SELECT settingValue FROM Settings WHERE settingName = #{settingName};
+	</select>
+	
+	<select id="getSettings" resultMap="Settings">
+	    SELECT settingName, settingValue FROM Settings;
+	</select>
+	
+	<insert id="insertSetting">
+	    
+	</insert>
+	
+	<update id="updateSetting">
+	    
+	</update>
+	
+	
 	<!-- Database Configuration Mappings -->
 	<!-- Create DB tables. -->
 	<update id="createStoredPasswordTable">
@@ -75,6 +97,10 @@
 	<update id="createMasterPasswordTable">
 		CREATE TABLE IF NOT EXISTS MasterPasswords (id INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE ON CONFLICT FAIL, profileName TEXT NOT NULL UNIQUE ON CONFLICT FAIL, secretKey TEXT NOT NULL, salt TEXT NOT NULL, createdAt TEXT NOT NULL, updatedAt TEXT NOT NULL, masterET TEXT NOT NULL, storedET TEXT NOT NULL);
 	</update>
+	<update id="createSettingsTable">
+	    CREATE TABLE IS NOT EXISTS Settings (id INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE ON CONFLICT FAIL, settingName TEXT NOT NULL UNIQUE ON CONFLICT FAIL, settingValue TEXT NOT NULL, createdAt TEXT NOT NULL, updatedAt TEXT NOT NULL);
+	</update>
+	
 	
 	<!-- Drop DB tables. -->
 	<update id="dropStoredPasswordTable">
@@ -82,6 +108,9 @@
 	</update>
 	<update id="dropMasterPasswordTable">
 		DROP TABLE IF EXISTS MasterPasswords;
+	</update>
+	<update id="dropSettingsTable">
+		DROP TABLE IF EXISTS Settings;
 	</update>
 	
 	
@@ -104,6 +133,11 @@
 		<result column="passwordName" 	property="encryptedPasswordName" />
 		<result column="password" 		property="encryptedPassword" />
 		<result column="passwordNotes" 	property="encryptedPasswordNotes" />
+	</resultMap>
+	
+	<resultMap id="Settings" type="com.jbacon.passwordstorage.database.mybatis.SettingsPair">
+	    <result column="settingName" 	property="settingName" javaType="com.jbacon.passwordstorage.settings.Setting" jdbcType="TEXT"/>
+	    <result column="settingValue" 	property="settingValue" />
 	</resultMap>
 
 </mapper>
