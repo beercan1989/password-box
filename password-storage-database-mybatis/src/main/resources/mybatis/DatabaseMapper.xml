@@ -80,12 +80,12 @@
 	    SELECT settingName, settingValue FROM Settings;
 	</select>
 	
-	<insert id="insertSetting">
-	    
+	<insert id="insertSetting" parameterType="com.jbacon.passwordstorage.database.mybatis.SettingsPair">
+	    INSERT OR FAIL INTO StoredPasswords (settingName, settingValue, createdAt, updatedAt) VALUES (#{settingName}, #{settingValue}, #{currentDate}, #{currentDate});
 	</insert>
 	
-	<update id="updateSetting">
-	    
+	<update id="updateSetting" parameterType="com.jbacon.passwordstorage.database.mybatis.SettingsPair">
+	    UPDATE OR FAIL StoredPasswords SET settingValue = #{settingValue}, updatedAt = #{currentDate} WHERE settingName = #{settingName};
 	</update>
 	
 	
@@ -136,7 +136,7 @@
 	</resultMap>
 	
 	<resultMap id="Settings" type="com.jbacon.passwordstorage.database.mybatis.SettingsPair">
-	    <result column="settingName" 	property="settingName" javaType="com.jbacon.passwordstorage.settings.Setting" jdbcType="TEXT"/>
+	    <result column="settingName" 	property="settingName" />
 	    <result column="settingValue" 	property="settingValue" />
 	</resultMap>
 
