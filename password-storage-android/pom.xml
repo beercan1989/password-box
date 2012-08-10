@@ -19,6 +19,7 @@
 	
 	<properties>
 	    <android.version>4.0.1.2</android.version>
+	    <android-maven-plugin.version>3.3.0</android-maven-plugin.version>
 	</properties>
 
 	<dependencyManagement>
@@ -44,7 +45,7 @@
                 <plugin>
                     <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                     <artifactId>android-maven-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>${android-maven-plugin.version}</version>
                     <extensions>true</extensions>
                     <configuration>
 						<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
