@@ -30,13 +30,11 @@ public class EncrypterUtilsTest {
 		Security.addProvider(new BouncyCastleProvider());
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void shouldConvertByteArrayToString() throws UnsupportedEncodingException {
 		assertThat(EncrypterUtils.byteToString(BYTEARRAY_HELLOWORLD), is(equalTo(STRING_HELLOWORLD)));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void shouldConvertStringToByteArray() throws UnsupportedEncodingException, DecoderException {
 		assertThat(EncrypterUtils.stringToByte(STRING_HELLOWORLD), is(equalTo(BYTEARRAY_HELLOWORLD)));

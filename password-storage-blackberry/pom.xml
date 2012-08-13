@@ -13,14 +13,107 @@
 	</parent>
 	
 	<properties>
-		<common.version>${project.version}</common.version>
-	</properties>
+	    <common.version>${project.version}</common.version>
+        <jde.home>/home/jbacon/LunchTimeFun/blackberry-development/blackberry-sdk/BlackBerry-JDE-7.1.0</jde.home>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
+    </properties>
+    
+<!-- 	<dependencies> -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.jbacon.passwordstorage</groupId> -->
+<!-- 			<artifactId>passwordstorage.common</artifactId> -->
+<!-- 			<version>${common.version}</version> -->
+<!-- 		</dependency> -->
+<!-- 	</dependencies> -->
 
-	<dependencies>
-		<dependency>
-			<groupId>com.jbacon.passwordstorage</groupId>
-			<artifactId>passwordstorage.common</artifactId>
-			<version>${common.version}</version>
-		</dependency>
-	</dependencies>
+    <build>
+        <defaultGoal>package</defaultGoal>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArguments>
+                        <bootclasspath>${jde.home}\lib\net_rim_api.jar</bootclasspath>
+                    </compilerArguments>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <bootclasspath>${jde.home}\lib\net_rim_api.jar</bootclasspath>
+                </configuration>
+            </plugin>
+<!--             <plugin> -->
+<!--                 <groupId>com.pyx4me</groupId> -->
+<!--                 <artifactId>j2me-maven-plugin</artifactId> -->
+<!--                 <executions> -->
+<!--                     <execution> -->
+<!--                         <goals> -->
+<!--                             <goal>package</goal> -->
+<!--                         </goals> -->
+<!--                     </execution> -->
+<!--                 </executions> -->
+<!--                 <configuration> -->
+<!--                     <appendClassifier>false</appendClassifier> -->
+<!--                     <useWtkLibs>false</useWtkLibs> -->
+<!--                     <proguardVersion>4.6</proguardVersion> -->
+<!--                     <proguard>true</proguard> -->
+<!--                     <obfuscate>true</obfuscate> -->
+<!--                     <proguardPreverify>true</proguardPreverify> -->
+<!--                     <attach>false</attach> -->
+<!--                     <libs> -->
+<!--                         <lib>${jde.home}\lib\net_rim_api.jar</lib> -->
+<!--                     </libs> -->
+<!--                     <proguardOptions> -->
+<!--                         <options> -->
+<!--                             <option>-dontusemixedcaseclassnames</option> -->
+<!--                             <option>-overloadaggressively</option> -->
+<!--                             <option>-keep public class ** extends net.rim.device.api.ui.UiApplication {public *;}</option> -->
+<!--                             <option>-keep public class ** extends net.rim.device.api.system.Application {public *;}</option> -->
+<!--                             <option>-keep public class ** implements net.rim.device.api.util.Persistable</option> -->
+<!--                         </options> -->
+<!--                     </proguardOptions> -->
+<!--                 </configuration> -->
+<!--                 <dependencies> -->
+<!--                     <dependency> -->
+<!--                         <groupId>net.sf.proguard</groupId> -->
+<!--                         <artifactId>proguard</artifactId> -->
+<!--                         <version>4.6</version> -->
+<!--                         <scope>runtime</scope> -->
+<!--                     </dependency> -->
+<!--                 </dependencies> -->
+<!--             </plugin> -->
+            <plugin>
+                <groupId>com.fancyfon.maven</groupId>
+                <artifactId>blackberry-maven-plugin</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>package</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jdehome>${jde.home}</jdehome>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
+    <pluginRepositories>
+        <pluginRepository>
+            <id>blackberry-maven-plugin</id>
+            <name>blackberry-maven-plugin</name>
+            <url>http://blackberry-maven-plugin.googlecode.com/svn/repository</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 </project>

@@ -58,25 +58,14 @@
             android:id="@+id/tableRow4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
-
-            <TimePicker
-                android:id="@+id/timePicker1"
+            
+            <Button
+                android:id="@+id/Button02"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" />
-        </TableRow>
-
-        <TableRow
-            android:id="@+id/tableRow5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/default_border_top" >
-
-            <DatePicker
-                android:id="@+id/datePicker1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:layout_gravity="center_horizontal"
+                android:text="Flip" >
+            </Button>
         </TableRow>
     </TableLayout>
 
