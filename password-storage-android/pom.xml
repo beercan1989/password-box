@@ -34,9 +34,8 @@
 	</dependencyManagement>
 	
 	<build>
-		<sourceDirectory>src/main/java</sourceDirectory>
-		<testSourceDirectory>src/test/java</testSourceDirectory>
-		<directory>bin</directory>
+<!-- 		<sourceDirectory>src/main/java</sourceDirectory> -->
+<!-- 		<testSourceDirectory>src/test/java</testSourceDirectory> -->
 
 		<finalName>${project.artifactId}</finalName>
 		
@@ -49,17 +48,17 @@
                     <extensions>true</extensions>
                     <configuration>
 						<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
-						<assetsDirectory>${project.basedir}/assets</assetsDirectory>
-						<resourceDirectory>${project.basedir}/res</resourceDirectory>
-						<nativeLibrariesDirectory>${project.basedir}/src/main/native</nativeLibrariesDirectory>
+<!-- 						<assetsDirectory>${project.basedir}/assets</assetsDirectory> -->
+<!-- 						<resourceDirectory>${project.basedir}/res</resourceDirectory> -->
+<!-- 						<nativeLibrariesDirectory>${project.basedir}/src/main/native</nativeLibrariesDirectory> -->
 						<sdk>
 							<platform>16</platform>
 						</sdk>
 						<proguard>
-							<skip>true</skip>
+							<skip>false</skip>
 						</proguard>
 						<sign>
-							<debug>false</debug>
+							<debug>true</debug>
 						</sign>
 						<deleteConflictingFiles>true</deleteConflictingFiles>
 						<undeployBeforeDeploy>true</undeployBeforeDeploy>
