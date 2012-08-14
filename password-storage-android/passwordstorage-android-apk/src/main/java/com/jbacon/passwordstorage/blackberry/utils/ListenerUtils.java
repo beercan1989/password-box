@@ -3,8 +3,8 @@ package com.jbacon.passwordstorage.blackberry.utils;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-public final class ListenerUtil {
-    private ListenerUtil() {
+public final class ListenerUtils {
+    private ListenerUtils() {
     }
 
     /**

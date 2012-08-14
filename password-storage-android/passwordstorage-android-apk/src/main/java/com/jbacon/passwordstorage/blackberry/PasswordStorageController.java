@@ -15,7 +15,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
-import com.jbacon.passwordstorage.blackberry.utils.ListenerUtil;
+import com.jbacon.passwordstorage.blackberry.utils.AnimationUtils;
+import com.jbacon.passwordstorage.blackberry.utils.ListenerUtils;
 import com.jbacon.passwordstorage.encryption.EncrypterAES;
 import com.jbacon.passwordstorage.encryption.EncrypterPBE;
 import com.jbacon.passwordstorage.encryption.EncryptionMode;
@@ -28,12 +29,12 @@ import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
  * @author JBacon
  */
 public class PasswordStorageController extends Activity {
-    private static final String ENCRYPTED_PBE_KEY  = "c0ee59b064b00040737ec66e9e6399169d843cc3f35b54b07be67e9f7229845670a4ff9af03181c098406831f3612e34";
-    private static final String SALT               = "fe89f76a525362c5399279418660fd91b4aef558a1a344d5a9829e1419604c92";
+    private static final String ENCRYPTED_PBE_KEY = "c0ee59b064b00040737ec66e9e6399169d843cc3f35b54b07be67e9f7229845670a4ff9af03181c098406831f3612e34";
+    private static final String SALT = "fe89f76a525362c5399279418660fd91b4aef558a1a344d5a9829e1419604c92";
     private static final String ENCRYPTED_PASSWORD = "bc5fdf0bb73a3309829322c69f6c5468";
-    private SeekBar             seekBar;
-    private TextView            seekBarLabel;
-    private ViewFlipper         flipper;
+    private SeekBar seekBar;
+    private TextView seekBarLabel;
+    private ViewFlipper flipper;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -42,7 +43,7 @@ public class PasswordStorageController extends Activity {
         seekBar = (SeekBar) findViewById(R.id.seekBar);
         seekBarLabel = (TextView) findViewById(R.id.seekBarDisplay);
 
-        seekBar.setOnSeekBarChangeListener(ListenerUtil.SeekBarListener(seekBarLabel));
+        seekBar.setOnSeekBarChangeListener(ListenerUtils.SeekBarListener(seekBarLabel));
         flipper = (ViewFlipper) findViewById(R.id.flipper);
         final Button button1 = (Button) findViewById(R.id.Button01);
         final Button button2 = (Button) findViewById(R.id.Button02);

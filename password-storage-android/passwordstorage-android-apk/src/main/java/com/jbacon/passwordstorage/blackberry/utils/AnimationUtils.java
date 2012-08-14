@@ -1,4 +1,4 @@
-package com.jbacon.passwordstorage.blackberry;
+package com.jbacon.passwordstorage.blackberry.utils;
 
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
