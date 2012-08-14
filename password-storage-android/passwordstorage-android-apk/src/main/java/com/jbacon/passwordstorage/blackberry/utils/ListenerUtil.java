@@ -1,10 +1,10 @@
-package com.jbacon.passwordstorage.blackberry;
+package com.jbacon.passwordstorage.blackberry.utils;
 
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-public final class ActionUtils {
-    private ActionUtils() {
+public final class ListenerUtil {
+    private ListenerUtil() {
     }
 
     /**

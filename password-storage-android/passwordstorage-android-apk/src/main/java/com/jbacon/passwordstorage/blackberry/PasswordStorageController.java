@@ -15,6 +15,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
+import com.jbacon.passwordstorage.blackberry.utils.ListenerUtil;
 import com.jbacon.passwordstorage.encryption.EncrypterAES;
 import com.jbacon.passwordstorage.encryption.EncrypterPBE;
 import com.jbacon.passwordstorage.encryption.EncryptionMode;
@@ -27,12 +28,12 @@ import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
  * @author JBacon
  */
 public class PasswordStorageController extends Activity {
-    private static final String ENCRYPTED_PBE_KEY = "c0ee59b064b00040737ec66e9e6399169d843cc3f35b54b07be67e9f7229845670a4ff9af03181c098406831f3612e34";
-    private static final String SALT = "fe89f76a525362c5399279418660fd91b4aef558a1a344d5a9829e1419604c92";
+    private static final String ENCRYPTED_PBE_KEY  = "c0ee59b064b00040737ec66e9e6399169d843cc3f35b54b07be67e9f7229845670a4ff9af03181c098406831f3612e34";
+    private static final String SALT               = "fe89f76a525362c5399279418660fd91b4aef558a1a344d5a9829e1419604c92";
     private static final String ENCRYPTED_PASSWORD = "bc5fdf0bb73a3309829322c69f6c5468";
-    private SeekBar seekBar;
-    private TextView seekBarLabel;
-    private ViewFlipper flipper;
+    private SeekBar             seekBar;
+    private TextView            seekBarLabel;
+    private ViewFlipper         flipper;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -40,8 +41,8 @@ public class PasswordStorageController extends Activity {
         setContentView(R.layout.view_flipper);
         seekBar = (SeekBar) findViewById(R.id.seekBar);
         seekBarLabel = (TextView) findViewById(R.id.seekBarDisplay);
-        seekBar.setOnSeekBarChangeListener(ActionUtils.SeekBarListener(seekBarLabel));
 
+        seekBar.setOnSeekBarChangeListener(ListenerUtil.SeekBarListener(seekBarLabel));
         flipper = (ViewFlipper) findViewById(R.id.flipper);
         final Button button1 = (Button) findViewById(R.id.Button01);
         final Button button2 = (Button) findViewById(R.id.Button02);
@@ -80,7 +81,8 @@ public class PasswordStorageController extends Activity {
                     final byte[] encryptedPassword = EncrypterUtils.hexStringToByte(ENCRYPTED_PASSWORD);
 
                     final EncrypterPBE encrypterPBE = (EncrypterPBE) EncryptionType.PBE_WITH_SHA1_AND_256_AES_CBC_BC.getEncrypter();
-                    final byte[] aesKey = encrypterPBE.doCiper(EncryptionMode.DECRYPT_MODE, salt, encryptedKey, EncrypterUtils.stringToChar("password"));
+                    final byte[] aesKey = encrypterPBE.doCiper(EncryptionMode.DECRYPT_MODE, salt, encryptedKey,
+                            EncrypterUtils.stringToChar("password"));
 
                     final EncrypterAES encrypterAES = (EncrypterAES) EncryptionType.AES_256.getEncrypter();
                     final byte[] password = encrypterAES.doCiper(EncryptionMode.DECRYPT_MODE, encryptedPassword, aesKey);
@@ -109,11 +111,11 @@ public class PasswordStorageController extends Activity {
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
-        case R.id.menu_close:
-            finish();
-            return true;
-        default:
-            return false;
+            case R.id.menu_close:
+                finish();
+                return true;
+            default:
+                return false;
         }
     }
 }
