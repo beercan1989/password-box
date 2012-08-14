@@ -17,13 +17,13 @@ import android.widget.ViewFlipper;
 
 import com.jbacon.passwordstorage.blackberry.utils.AnimationUtils;
 import com.jbacon.passwordstorage.blackberry.utils.ListenerUtils;
-import com.jbacon.passwordstorage.encryption.EncrypterAES;
-import com.jbacon.passwordstorage.encryption.EncrypterPBE;
-import com.jbacon.passwordstorage.encryption.EncryptionMode;
-import com.jbacon.passwordstorage.encryption.EncryptionType;
-import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
-import com.jbacon.passwordstorage.encryption.errors.NoSuchEncryptionException;
-import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
+import com.jbacon.passwordstorage.imported.encryption.EncrypterAES;
+import com.jbacon.passwordstorage.imported.encryption.EncrypterPBE;
+import com.jbacon.passwordstorage.imported.encryption.EncryptionMode;
+import com.jbacon.passwordstorage.imported.encryption.EncryptionType;
+import com.jbacon.passwordstorage.imported.encryption.errors.AbstractEncrypterException;
+import com.jbacon.passwordstorage.imported.encryption.errors.NoSuchEncryptionException;
+import com.jbacon.passwordstorage.imported.encryption.tools.EncrypterUtils;
 
 /**
  * @author JBacon
