@@ -39,6 +39,3 @@
 }
 
 -dontwarn android.support.**
--dontwarn org.bouncycastle.util.IPTest
--dontwarn org.bouncycastle.util.AllTests
--dontwarn org.bouncycastle.util.io.pem.AllTests

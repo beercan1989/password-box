@@ -19,7 +19,7 @@
 	
 	<properties>
 	    <android.version>4.0.1.2</android.version>
-	    <android.support.version>plugin</android.support.version> <!-- r7 -->
+	    <android.support.version>r10</android.support.version>
 	    <android-maven-plugin.version>3.3.0</android-maven-plugin.version>
 	</properties>
 
