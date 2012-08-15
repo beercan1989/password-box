@@ -8,7 +8,6 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 
 import com.jbacon.passwordstorage.imported.encryption.EncryptionType;
@@ -23,21 +22,21 @@ public class EncrypterUtils {
     private static final String SECURE_SALT_ALGORITHM = "secureSaltAlgorithm";
     private static final String TEXT_ENCODING_TYPE = "UTF-8";
 
-    /**
-     * @param base64ToByte
-     * @return
-     */
-    public static byte[] base64ToSring(final String base64ToByte) {
-        return Base64.decodeBase64(base64ToByte);
-    }
+    // /**
+    // * @param base64ToByte
+    // * @return
+    // */
+    // public static byte[] base64ToSring(final String base64ToByte) {
+    // return Base64.decodeBase64(base64ToByte);
+    // }
 
-    /**
-     * @param byteToString
-     * @return
-     */
-    public static String byteToBase64(final byte[] byteToString) {
-        return Base64.encodeBase64String(byteToString);
-    }
+    // /**
+    // * @param byteToString
+    // * @return
+    // */
+    // public static String byteToBase64(final byte[] byteToString) {
+    // return Base64.encodeBase64String(byteToString);
+    // }
 
     /**
      * @param byteToChar
@@ -124,17 +123,17 @@ public class EncrypterUtils {
     public static byte[] generateSalt(final EncryptionType encryptionType, final Integer numberOfBytes) throws AbstractEncrypterException {
         try {
             switch (encryptionType) {
-                case PBE_WITH_MD5_AND_DES:
-                case PBE_WITH_SHA_AND_TWOFISH_CBC:
-                case PBE_WITH_SHA1_AND_256_AES_CBC_BC:
-                case PBE_WITH_SHA_AND_3_KEY_TRIPPLE_DES_CBC:
-                    final byte[] salt = new byte[numberOfBytes];
-                    final String secureSaltAlgorithm = encryptionType.getSpecification().get(SECURE_SALT_ALGORITHM);
-                    final SecureRandom saltGen = SecureRandom.getInstance(secureSaltAlgorithm);
-                    saltGen.nextBytes(salt);
-                    return salt;
-                default:
-                    throw new InvalidEncryptionTypeForSaltGeneration("No such supported passwordbased encryption.");
+            case PBE_WITH_MD5_AND_DES:
+            case PBE_WITH_SHA_AND_TWOFISH_CBC:
+            case PBE_WITH_SHA1_AND_256_AES_CBC_BC:
+            case PBE_WITH_SHA_AND_3_KEY_TRIPPLE_DES_CBC:
+                final byte[] salt = new byte[numberOfBytes];
+                final String secureSaltAlgorithm = encryptionType.getSpecification().get(SECURE_SALT_ALGORITHM);
+                final SecureRandom saltGen = SecureRandom.getInstance(secureSaltAlgorithm);
+                saltGen.nextBytes(salt);
+                return salt;
+            default:
+                throw new InvalidEncryptionTypeForSaltGeneration("No such supported passwordbased encryption.");
             }
         } catch (final NoSuchAlgorithmException e) {
             throw new AbstractEncrypterException(e);
