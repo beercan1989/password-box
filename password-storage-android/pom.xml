@@ -55,7 +55,7 @@
 							<platform>16</platform>
 						</sdk>
 						<proguard>
-							<skip>true</skip>
+							<skip>false</skip>
 						</proguard>
 						<sign>
 							<debug>true</debug>
