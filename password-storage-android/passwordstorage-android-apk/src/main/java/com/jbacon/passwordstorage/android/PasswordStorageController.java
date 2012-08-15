@@ -1,4 +1,4 @@
-package com.jbacon.passwordstorage.blackberry;
+package com.jbacon.passwordstorage.android;
 
 import java.io.UnsupportedEncodingException;
 
@@ -15,8 +15,9 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
-import com.jbacon.passwordstorage.blackberry.utils.AnimationUtils;
-import com.jbacon.passwordstorage.blackberry.utils.ListenerUtils;
+import com.jbacon.passwordstorage.android.R;
+import com.jbacon.passwordstorage.android.utils.AnimationUtils;
+import com.jbacon.passwordstorage.android.utils.ListenerUtils;
 import com.jbacon.passwordstorage.imported.encryption.EncrypterAES;
 import com.jbacon.passwordstorage.imported.encryption.EncrypterPBE;
 import com.jbacon.passwordstorage.imported.encryption.EncryptionMode;

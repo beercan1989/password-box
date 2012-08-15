@@ -14,20 +14,24 @@ public class StringUtils {
 
     public static boolean areEmpty(final String... strings) {
         for (final String string : strings) {
-            if (isNotEmpty(string)) { return false; }
+            if (isNotEmpty(string)) {
+                return false;
+            }
         }
         return true;
     }
 
     public static boolean areNotEmpty(final String... strings) {
         for (final String string : strings) {
-            if (isEmpty(string)) { return false; }
+            if (isEmpty(string)) {
+                return false;
+            }
         }
         return true;
     }
 
     public static boolean isEmpty(final String string) {
-        return (isNotNull(string)) ? string.trim().isEmpty() : true;
+        return (isNotNull(string)) ? string.trim().length() == 0 : true;
     }
 
     public static boolean isNotEmpty(final String string) {

@@ -19,6 +19,7 @@
 	
 	<properties>
 	    <android.version>4.0.1.2</android.version>
+	    <android.support.version>plugin</android.support.version> <!-- r7 -->
 	    <android-maven-plugin.version>3.3.0</android-maven-plugin.version>
 	</properties>
 
@@ -30,6 +31,11 @@
 	            <version>${android.version}</version>
 	            <scope>provided</scope>
 	        </dependency>
+	        <dependency>
+			    <groupId>com.google.android</groupId>
+			    <artifactId>support-v4</artifactId>
+			    <version>${android.support.version}</version>
+			</dependency>
 	    </dependencies>
 	</dependencyManagement>
 	
@@ -60,8 +66,8 @@
 						<sign>
 							<debug>true</debug>
 						</sign>
-<!-- 						<deleteConflictingFiles>true</deleteConflictingFiles> -->
-<!-- 						<undeployBeforeDeploy>true</undeployBeforeDeploy> -->
+						<deleteConflictingFiles>true</deleteConflictingFiles>
+						<undeployBeforeDeploy>true</undeployBeforeDeploy>
 					</configuration>
                 </plugin>
             </plugins>

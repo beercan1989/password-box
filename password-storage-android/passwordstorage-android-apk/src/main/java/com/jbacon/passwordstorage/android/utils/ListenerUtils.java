@@ -1,4 +1,4 @@
-package com.jbacon.passwordstorage.blackberry.utils;
+package com.jbacon.passwordstorage.android.utils;
 
 import android.widget.SeekBar;
 import android.widget.TextView;
