@@ -15,16 +15,15 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
-import com.jbacon.passwordstorage.android.R;
 import com.jbacon.passwordstorage.android.utils.AnimationUtils;
 import com.jbacon.passwordstorage.android.utils.ListenerUtils;
-import com.jbacon.passwordstorage.imported.encryption.EncrypterAES;
-import com.jbacon.passwordstorage.imported.encryption.EncrypterPBE;
-import com.jbacon.passwordstorage.imported.encryption.EncryptionMode;
-import com.jbacon.passwordstorage.imported.encryption.EncryptionType;
-import com.jbacon.passwordstorage.imported.encryption.errors.AbstractEncrypterException;
-import com.jbacon.passwordstorage.imported.encryption.errors.NoSuchEncryptionException;
-import com.jbacon.passwordstorage.imported.encryption.tools.EncrypterUtils;
+import com.jbacon.passwordstorage.encryption.EncrypterAES;
+import com.jbacon.passwordstorage.encryption.EncrypterPBE;
+import com.jbacon.passwordstorage.encryption.EncryptionMode;
+import com.jbacon.passwordstorage.encryption.EncryptionType;
+import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
+import com.jbacon.passwordstorage.encryption.errors.NoSuchEncryptionException;
+import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 
 /**
  * @author JBacon
@@ -84,8 +83,7 @@ public class PasswordStorageController extends Activity {
                     final byte[] encryptedPassword = EncrypterUtils.hexStringToByte(ENCRYPTED_PASSWORD);
 
                     final EncrypterPBE encrypterPBE = (EncrypterPBE) EncryptionType.PBE_WITH_SHA1_AND_256_AES_CBC_BC.getEncrypter();
-                    final byte[] aesKey = encrypterPBE.doCiper(EncryptionMode.DECRYPT_MODE, salt, encryptedKey,
-                            EncrypterUtils.stringToChar(PBE_PASSWORD));
+                    final byte[] aesKey = encrypterPBE.doCiper(EncryptionMode.DECRYPT_MODE, salt, encryptedKey, EncrypterUtils.stringToChar(PBE_PASSWORD));
 
                     final EncrypterAES encrypterAES = (EncrypterAES) EncryptionType.AES_256.getEncrypter();
                     final byte[] password = encrypterAES.doCiper(EncryptionMode.DECRYPT_MODE, encryptedPassword, aesKey);
@@ -114,11 +112,11 @@ public class PasswordStorageController extends Activity {
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_close:
-                finish();
-                return true;
-            default:
-                return false;
+        case R.id.menu_close:
+            finish();
+            return true;
+        default:
+            return false;
         }
     }
 }
