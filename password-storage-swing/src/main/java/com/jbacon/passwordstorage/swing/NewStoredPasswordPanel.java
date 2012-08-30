@@ -36,14 +36,14 @@ import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
 import com.jbacon.passwordstorage.tools.StringUtils;
 
-public class NewPasswordPanel extends JPanel {
+public class NewStoredPasswordPanel extends JPanel {
 
     private static final long serialVersionUID = -501345374303874233L;
     private static final char PASSWORD_MASK = '*';
 
-    private static Log LOG = LogFactory.getLog(NewPasswordPanel.class);
+    private static Log LOG = LogFactory.getLog(NewStoredPasswordPanel.class);
 
-    public static boolean isValid(final NewPasswordPanel newPassword) {
+    public static boolean isValid(final NewStoredPasswordPanel newPassword) {
         try {
             final String profileName = newPassword.getProfileName();
             final String encryptedPassword = newPassword.getEncryptedPassword();
@@ -52,10 +52,10 @@ public class NewPasswordPanel extends JPanel {
 
             if (LOG.isDebugEnabled()) {
                 final StringBuilder logEntry = new StringBuilder();
-                logEntry.append("Validating NewPasswordPanel [aka StoredPassword].");
+                logEntry.append("Validating NewStoredPasswordPanel [aka StoredPassword].");
                 logEntry.append(StringUtils.NEW_LINE);
                 logEntry.append(StringUtils.SINGLE_TAB);
-                logEntry.append("NewPasswordPanel Entered Values [Encrypted Where Necessary]");
+                logEntry.append("NewStoredPasswordPanel Entered Values [Encrypted Where Necessary]");
                 logEntry.append(StringUtils.NEW_LINE);
                 logEntry.append(StringUtils.DOUBLE_TAB);
                 logEntry.append("Profile Name: " + profileName);
@@ -115,7 +115,7 @@ public class NewPasswordPanel extends JPanel {
      * @param currentPassword
      *            the password of the current MasterPassword profile.
      */
-    public NewPasswordPanel(final MasterPassword profile, final String currentPassword) {
+    public NewStoredPasswordPanel(final MasterPassword profile, final String currentPassword) {
         this.profile = profile;
         this.currentPassword = currentPassword;
 

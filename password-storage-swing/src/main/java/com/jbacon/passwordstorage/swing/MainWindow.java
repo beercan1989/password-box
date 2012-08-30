@@ -2,6 +2,14 @@ package com.jbacon.passwordstorage.swing;
 
 import static com.jbacon.passwordstorage.tools.GenericUtils.areNull;
 import static com.jbacon.passwordstorage.tools.GenericUtils.isNotNull;
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
+import static javax.swing.JOptionPane.OK_CANCEL_OPTION;
+import static javax.swing.JOptionPane.OK_OPTION;
+import static javax.swing.JOptionPane.QUESTION_MESSAGE;
+import static javax.swing.JOptionPane.showConfirmDialog;
+import static javax.swing.JOptionPane.showInputDialog;
+import static javax.swing.JOptionPane.showMessageDialog;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -28,7 +36,6 @@ import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -67,7 +74,7 @@ public class MainWindow {
     private static Log LOG = LogFactory.getLog(MainWindow.class);
 
     public static void errorMessage(final String message, final String title, final Exception e) {
-        JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
+        showMessageDialog(null, message, title, ERROR_MESSAGE);
         LOG.error(message, e);
     }
 
@@ -90,15 +97,15 @@ public class MainWindow {
     }
 
     private static int showDefaultInputWindow(final Object message, final String title) {
-        return JOptionPane.showConfirmDialog(null, message, title, JOptionPane.OK_CANCEL_OPTION);
+        return showConfirmDialog(null, message, title, OK_CANCEL_OPTION);
     }
 
     private static void showMessageWindow(final Object message, final String title) {
-        JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
+        showMessageDialog(null, message, title, INFORMATION_MESSAGE);
     }
 
     private static String showSimpleInputWindow(final String message, final String title) {
-        return JOptionPane.showInputDialog(null, message, title, JOptionPane.PLAIN_MESSAGE);
+        return showInputDialog(null, message, title, QUESTION_MESSAGE);
     }
 
     private final MaintenanceDao maintenanceDao;
@@ -184,19 +191,19 @@ public class MainWindow {
         availableProfilesModel.addAll(savedProfiles);
     }
 
-    private void areEnabled(final boolean isEnabled, final Component... components) {
+    private void setEnabled(final boolean isEnabled, final Component... components) {
         for (final Component component : components) {
             component.setEnabled(isEnabled);
         }
     }
 
-    private void areSelected(final boolean isSelected, final AbstractButton... components) {
+    private void setSelected(final boolean isSelected, final AbstractButton... components) {
         for (final AbstractButton button : components) {
             button.setSelected(isSelected);
         }
     }
 
-    private void areVisible(final boolean isVisible, final Component... components) {
+    private void setVisible(final boolean isVisible, final Component... components) {
         for (final Component component : components) {
             component.setVisible(isVisible);
         }
@@ -394,11 +401,11 @@ public class MainWindow {
             @Override
             public void actionPerformed(final ActionEvent evt) {
                 final boolean isSelected = chckbxmntmToggleSidebar.isSelected();
-                areVisible(isSelected, westJPanel);
-                areEnabled(isSelected, chckbxmntmToggleActionButtons, chckbxmntmToggleAvailableProfiles);
+                setVisible(isSelected, westJPanel);
+                setEnabled(isSelected, chckbxmntmToggleActionButtons, chckbxmntmToggleAvailableProfiles);
                 if (isSelected) {
-                    areSelected(isSelected, chckbxmntmToggleActionButtons, chckbxmntmToggleAvailableProfiles);
-                    areVisible(isSelected, availableProfilesNorthButtonJPanel, availableProfilesJList);
+                    setSelected(isSelected, chckbxmntmToggleActionButtons, chckbxmntmToggleAvailableProfiles);
+                    setVisible(isSelected, availableProfilesNorthButtonJPanel, availableProfilesJList);
                 }
             }
         });
@@ -412,7 +419,7 @@ public class MainWindow {
         chckbxmntmToggleActionButtons.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent evt) {
-                areVisible(chckbxmntmToggleActionButtons.isSelected(), availableProfilesNorthButtonJPanel);
+                setVisible(chckbxmntmToggleActionButtons.isSelected(), availableProfilesNorthButtonJPanel);
             }
         });
         mnView.add(chckbxmntmToggleActionButtons);
@@ -422,7 +429,7 @@ public class MainWindow {
         chckbxmntmToggleAvailableProfiles.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent evt) {
-                areVisible(chckbxmntmToggleAvailableProfiles.isSelected(), availableProfilesJList);
+                setVisible(chckbxmntmToggleAvailableProfiles.isSelected(), availableProfilesJList);
             }
         });
         mnView.add(chckbxmntmToggleAvailableProfiles);
@@ -730,12 +737,12 @@ public class MainWindow {
         return false;
     }
 
-    private boolean isValid(final NewPasswordPanel newPassword) {
-        return NewPasswordPanel.isValid(newPassword);
+    private boolean isValid(final NewStoredPasswordPanel newPassword) {
+        return NewStoredPasswordPanel.isValid(newPassword);
     }
 
-    private boolean isValid(final NewProfilePanel newProfile) {
-        return NewProfilePanel.isValid(newProfile);
+    private boolean isValid(final NewMasterPasswordPanel newProfile) {
+        return NewMasterPasswordPanel.isValid(newProfile);
     }
 
     private void loadProfile() {
@@ -785,8 +792,8 @@ public class MainWindow {
             errorMessage("You need to create or load a profile first.", "No Profile Loaded", null);
             return;
         }
-        final NewPasswordPanel newPassword = new NewPasswordPanel(ACTIVE_PROFILE, CURRENT_PASSWORD);
-        if (showDefaultInputWindow(newPassword, "New Profile") == JOptionPane.OK_OPTION) {
+        final NewStoredPasswordPanel newPassword = new NewStoredPasswordPanel(ACTIVE_PROFILE, CURRENT_PASSWORD);
+        if (showDefaultInputWindow(newPassword, "New Profile") == OK_OPTION) {
             if (!isValid(newPassword)) {
                 errorMessage("Failed to create a new password, as you did not fill in all the fields.", "Failed To Create New Password", null);
                 return;
@@ -811,8 +818,8 @@ public class MainWindow {
 
     private void newProfile() throws AbstractEncrypterException {
         logDebugMessage("Creating a new Profile");
-        final NewProfilePanel newProfile = new NewProfilePanel();
-        if (showDefaultInputWindow(newProfile, "New Profile") == JOptionPane.OK_OPTION) {
+        final NewMasterPasswordPanel newProfile = new NewMasterPasswordPanel();
+        if (showDefaultInputWindow(newProfile, "New Profile") == OK_OPTION) {
 
             if (!isValid(newProfile)) {
                 errorMessage("Failed to create a new profile, as you did not fill in all the fields.", "Failed To Create New Profile", null);
@@ -837,8 +844,9 @@ public class MainWindow {
     }
 
     private String promptUserForProfilePassword() {
+        // return showDefaultInputWindow("Please enter the password for the profile.", "Enter Profile Password");
         final ProfilePasswordEntryPanel passwordEntryPanel = new ProfilePasswordEntryPanel();
-        if (showDefaultInputWindow(passwordEntryPanel, "Enter Profile Password") == JOptionPane.OK_OPTION) {
+        if (showDefaultInputWindow(passwordEntryPanel, "Enter Profile Password") == OK_OPTION) {
             return (passwordEntryPanel.getPassword() == null) ? StringUtils.BLANK : passwordEntryPanel.getPassword();
         }
         return null;

@@ -39,16 +39,16 @@ import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.tools.GenericUtils;
 import com.jbacon.passwordstorage.tools.StringUtils;
 
-public class NewProfilePanel extends JPanel {
+public class NewMasterPasswordPanel extends JPanel {
 
 	private static final char PASSWORD_MASK = '*';
 	private static final long serialVersionUID = 8536565892859901568L;
 
-	private static Log LOG = LogFactory.getLog(NewProfilePanel.class);
+	private static Log LOG = LogFactory.getLog(NewMasterPasswordPanel.class);
 
-	public static boolean isValid(final NewProfilePanel newProfile) {
+	public static boolean isValid(final NewMasterPasswordPanel newProfile) {
 		try {
-			LOG.debug("Validating NewProfilePanel [aka MasterPassword].");
+			LOG.debug("Validating NewMasterPasswordPanel [aka MasterPassword].");
 			LOG.debug("ProfileEncryptionType: " + newProfile.getProfileEncryptionType());
 			LOG.debug("PasswordEncryptionType: " + newProfile.getPasswordEncryptionType());
 			LOG.debug("Salt: " + EncrypterUtils.byteToHexString(newProfile.getSalt()));
@@ -97,7 +97,7 @@ public class NewProfilePanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public NewProfilePanel() {
+	public NewMasterPasswordPanel() {
 		setBorder(new EmptyBorder(10, 10, 10, 10));
 		final GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0 };
