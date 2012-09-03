@@ -10,6 +10,7 @@ import static javax.swing.JOptionPane.QUESTION_MESSAGE;
 import static javax.swing.JOptionPane.showConfirmDialog;
 import static javax.swing.JOptionPane.showInputDialog;
 import static javax.swing.JOptionPane.showMessageDialog;
+import static javax.swing.JOptionPane.showOptionDialog;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -30,12 +31,14 @@ import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -98,6 +101,10 @@ public class MainWindow {
 
     private static int showDefaultInputWindow(final Object message, final String title) {
         return showConfirmDialog(null, message, title, OK_CANCEL_OPTION);
+    }
+
+    private static int showCustomInputWindow(final Object message, final String title) {
+        return showOptionDialog(null, message, title, OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
     }
 
     private static void showMessageWindow(final Object message, final String title) {
@@ -844,11 +851,13 @@ public class MainWindow {
     }
 
     private String promptUserForProfilePassword() {
-        // return showDefaultInputWindow("Please enter the password for the profile.", "Enter Profile Password");
+        // TODO - Implement custom JOptionPane in ProfilePasswordEntryPanel as a JDialog.
         final ProfilePasswordEntryPanel passwordEntryPanel = new ProfilePasswordEntryPanel();
-        if (showDefaultInputWindow(passwordEntryPanel, "Enter Profile Password") == OK_OPTION) {
-            return (passwordEntryPanel.getPassword() == null) ? StringUtils.BLANK : passwordEntryPanel.getPassword();
-        }
+        final JDialog dialog = new JDialog(mainWindowJFrame, "Enter Profile Password", true);
+        dialog.add(passwordEntryPanel);
+        dialog.pack();
+        dialog.setVisible(true);
+
         return null;
     }
 
