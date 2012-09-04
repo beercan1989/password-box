@@ -31,7 +31,6 @@ import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -104,7 +103,7 @@ public class MainWindow {
     }
 
     private static int showCustomInputWindow(final Object message, final String title) {
-        return showOptionDialog(null, message, title, OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+        return showOptionDialog(null, message, title, OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] { "OK", "Cancel" }, "");
     }
 
     private static void showMessageWindow(final Object message, final String title) {
@@ -851,12 +850,12 @@ public class MainWindow {
     }
 
     private String promptUserForProfilePassword() {
-        // TODO - Implement custom JOptionPane in ProfilePasswordEntryPanel as a JDialog.
         final ProfilePasswordEntryPanel passwordEntryPanel = new ProfilePasswordEntryPanel();
-        final JDialog dialog = new JDialog(mainWindowJFrame, "Enter Profile Password", true);
-        dialog.add(passwordEntryPanel);
-        dialog.pack();
-        dialog.setVisible(true);
+        final int result = showCustomInputWindow(passwordEntryPanel, "Enter Profile Password");
+
+        if (result == OK_OPTION || passwordEntryPanel.isClosedByKeyListener()) {
+            return passwordEntryPanel.getPassword();
+        }
 
         return null;
     }

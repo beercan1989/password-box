@@ -1,8 +1,6 @@
 package com.jbacon.passwordstorage.swing;
 
 import java.awt.BorderLayout;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -10,27 +8,25 @@ import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
-public class ProfilePasswordEntryPanel extends JPanel {
+import com.jbacon.passwordstorage.swing.listeners.CloseJOptionPaneKeyListener;
+import com.jbacon.passwordstorage.swing.listeners.RequestFocusListener;
 
-    /*
-     * Eclipse Auto Generated
-     */
+public class ProfilePasswordEntryPanel extends JPanel {
     private static final long serialVersionUID = -6024339522848221876L;
 
     private final JPasswordField passwordField;
     private final JTextArea txtrPleaseEnterThe;
+    private final CloseJOptionPaneKeyListener closeJOptionPaneKeyListener;
 
     public ProfilePasswordEntryPanel() {
+        closeJOptionPaneKeyListener = new CloseJOptionPaneKeyListener();
+
         setBorder(new EmptyBorder(5, 5, 5, 5));
         setLayout(new BorderLayout(0, 0));
 
         passwordField = new JPasswordField();
-        passwordField.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentShown(final ComponentEvent ce) {
-                passwordField.requestFocusInWindow();
-            }
-        });
+        passwordField.addAncestorListener(new RequestFocusListener());
+        passwordField.addKeyListener(closeJOptionPaneKeyListener);
         add(passwordField, BorderLayout.CENTER);
 
         txtrPleaseEnterThe = new JTextArea();
@@ -44,5 +40,9 @@ public class ProfilePasswordEntryPanel extends JPanel {
 
     public String getPassword() {
         return new String(passwordField.getPassword());
+    }
+
+    public boolean isClosedByKeyListener() {
+        return closeJOptionPaneKeyListener.isClosedByKeyListener();
     }
 }
