@@ -73,7 +73,7 @@ import com.jbacon.passwordstorage.tools.StringUtils;
 
 public class MainWindow {
 
-    private static Log LOG = LogFactory.getLog(MainWindow.class);
+    private static final Log LOG = LogFactory.getLog(MainWindow.class);
 
     public static void errorMessage(final String message, final String title, final Exception e) {
         showMessageDialog(null, message, title, ERROR_MESSAGE);
@@ -121,8 +121,8 @@ public class MainWindow {
     private static final MasterPassword DEFAULT_ACTIVE_PROFILE = new MasterPassword();
     private static final String DEFAULT_CURRENT_PASSWORD = "### --- Default Current Password --- ###";
 
-    private static MasterPassword ACTIVE_PROFILE = DEFAULT_ACTIVE_PROFILE;
-    private static String CURRENT_PASSWORD = DEFAULT_CURRENT_PASSWORD;
+    private static MasterPassword activeProfile = DEFAULT_ACTIVE_PROFILE;
+    private static String currentPassword = DEFAULT_CURRENT_PASSWORD;
 
     static {
         DEFAULT_ACTIVE_PROFILE.setProfileName("N/A");
@@ -220,8 +220,8 @@ public class MainWindow {
 
         availableProfilesJList.clearSelection();
 
-        ACTIVE_PROFILE = DEFAULT_ACTIVE_PROFILE;
-        CURRENT_PASSWORD = DEFAULT_CURRENT_PASSWORD;
+        activeProfile = DEFAULT_ACTIVE_PROFILE;
+        currentPassword = DEFAULT_CURRENT_PASSWORD;
 
         updateAvailableProfiles();
         updateStoredPasswords(false);
@@ -665,7 +665,7 @@ public class MainWindow {
                 "Active Profile", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(51, 51, 51)), new EmptyBorder(0, 3, 3, 3))));
         westJPanel.add(activeProfileJPanel, BorderLayout.SOUTH);
 
-        activeProfileJLabel = new JLabel(ACTIVE_PROFILE.getProfileName());
+        activeProfileJLabel = new JLabel(activeProfile.getProfileName());
         activeProfileJLabel.setFont(new Font("Dialog", Font.BOLD, 12));
         activeProfileJPanel.add(activeProfileJLabel);
 
@@ -780,25 +780,25 @@ public class MainWindow {
         }
 
         // set ActiveProfile to the selected MP
-        ACTIVE_PROFILE = masterPassword;
+        activeProfile = masterPassword;
 
         // set CurrentPassword to the entered password
-        CURRENT_PASSWORD = enteredPassword;
+        currentPassword = enteredPassword;
 
         // Load all the StoredPasswords for the selected ActiveProfile
         updateStoredPasswords(true);
-        activeProfileJLabel.setText(ACTIVE_PROFILE.getProfileName());
+        activeProfileJLabel.setText(activeProfile.getProfileName());
 
-        logDebugMessage("Loading a Profile - " + ACTIVE_PROFILE);
+        logDebugMessage("Loading a Profile - " + activeProfile);
     }
 
     private void newPassword() throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
         logDebugMessage("Creating a new Password");
-        if (ACTIVE_PROFILE.equals(DEFAULT_ACTIVE_PROFILE)) {
+        if (activeProfile.equals(DEFAULT_ACTIVE_PROFILE)) {
             errorMessage("You need to create or load a profile first.", "No Profile Loaded", null);
             return;
         }
-        final NewStoredPasswordPanel newPassword = new NewStoredPasswordPanel(ACTIVE_PROFILE, CURRENT_PASSWORD);
+        final NewStoredPasswordPanel newPassword = new NewStoredPasswordPanel(activeProfile, currentPassword);
         if (showDefaultInputWindow(newPassword, "New Profile") == OK_OPTION) {
             if (!isValid(newPassword)) {
                 errorMessage("Failed to create a new password, as you did not fill in all the fields.", "Failed To Create New Password", null);
@@ -903,9 +903,9 @@ public class MainWindow {
 
         if (masterPasswords != null) {
             availableProfilesModel.addAll(masterPasswords);
-            if (!masterPasswords.contains(ACTIVE_PROFILE)) {
-                ACTIVE_PROFILE = DEFAULT_ACTIVE_PROFILE;
-                activeProfileJLabel.setText(ACTIVE_PROFILE.getProfileName());
+            if (!masterPasswords.contains(activeProfile)) {
+                activeProfile = DEFAULT_ACTIVE_PROFILE;
+                activeProfileJLabel.setText(activeProfile.getProfileName());
             }
         }
     }
@@ -991,7 +991,7 @@ public class MainWindow {
             final StoredPassword password = storedPasswordsModel.getRow(selectedRow);
             if (password != null) {
                 try {
-                    viewPassword(password, ACTIVE_PROFILE, CURRENT_PASSWORD, true);
+                    viewPassword(password, activeProfile, currentPassword, true);
                 } catch (final UnsupportedEncodingException e) {
                     errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
                     viewPasswordEncrypted(password);
@@ -1012,7 +1012,7 @@ public class MainWindow {
 
     private static void viewPasswordEncrypted(final StoredPassword password) {
         try {
-            viewPassword(password, ACTIVE_PROFILE, CURRENT_PASSWORD, false);
+            viewPassword(password, activeProfile, currentPassword, false);
         } catch (final UnsupportedEncodingException e) {
             errorMessage("An error occured when trying to view your password.", "Password Error", e);
         } catch (final DecoderException e) {
@@ -1024,7 +1024,7 @@ public class MainWindow {
 
     private static void viewPassword(final StoredPassword password, final MasterPassword activeProfile, final String currentPassword, final boolean doDecrypt)
             throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
-        final ViewStoredPasswordPanel viewStoredPassword = new ViewStoredPasswordPanel(password, ACTIVE_PROFILE, CURRENT_PASSWORD, doDecrypt);
+        final ViewStoredPasswordPanel viewStoredPassword = new ViewStoredPasswordPanel(password, activeProfile, currentPassword, doDecrypt);
         showMessageWindow(viewStoredPassword, "View Stored Password");
     }
 }

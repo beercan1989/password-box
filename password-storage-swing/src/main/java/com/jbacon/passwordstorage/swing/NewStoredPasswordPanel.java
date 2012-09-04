@@ -41,7 +41,7 @@ public class NewStoredPasswordPanel extends JPanel {
     private static final long serialVersionUID = -501345374303874233L;
     private static final char PASSWORD_MASK = '*';
 
-    private static Log LOG = LogFactory.getLog(NewStoredPasswordPanel.class);
+    private static final Log LOG = LogFactory.getLog(NewStoredPasswordPanel.class);
 
     public static boolean isValid(final NewStoredPasswordPanel newPassword) {
         try {
