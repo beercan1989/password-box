@@ -29,7 +29,7 @@ public class PasswordStorageController extends Activity {
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_flipper);
+        setContentView(R.layout.main_view);
         seekBar = (SeekBar) findViewById(R.id.seekBar);
         seekBarLabel = (TextView) findViewById(R.id.seekBarDisplay);
 

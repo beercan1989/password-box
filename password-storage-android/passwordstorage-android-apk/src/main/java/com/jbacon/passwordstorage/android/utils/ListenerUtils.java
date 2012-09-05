@@ -44,7 +44,7 @@ public final class ListenerUtils {
     public static final OnClickListener doViewFlipOnClick(final ViewFlipper flipper, final FlipperDirection flipperDirection) {
         switch (flipperDirection) {
         case NEXT:
-            return new View.OnClickListener() {
+            return new OnClickListener() {
                 @Override
                 public void onClick(final View view) {
                     flipper.setInAnimation(AnimationUtils.inFromRightAnimation());
@@ -53,7 +53,7 @@ public final class ListenerUtils {
                 }
             };
         case PREVIOUS:
-            return new View.OnClickListener() {
+            return new OnClickListener() {
                 @Override
                 public void onClick(final View view) {
                     flipper.setInAnimation(AnimationUtils.inFromLeftAnimation());
