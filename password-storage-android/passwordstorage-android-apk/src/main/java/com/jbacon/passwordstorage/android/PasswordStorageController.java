@@ -1,38 +1,27 @@
 package com.jbacon.passwordstorage.android;
 
-import java.io.UnsupportedEncodingException;
-
-import org.apache.commons.codec.DecoderException;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
-import com.jbacon.passwordstorage.android.utils.AnimationUtils;
+import com.jbacon.passwordstorage.android.utils.ConstantUtils.FlipperDirection;
 import com.jbacon.passwordstorage.android.utils.ListenerUtils;
-import com.jbacon.passwordstorage.encryption.EncrypterAES;
-import com.jbacon.passwordstorage.encryption.EncrypterPBE;
-import com.jbacon.passwordstorage.encryption.EncryptionMode;
-import com.jbacon.passwordstorage.encryption.EncryptionType;
-import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
-import com.jbacon.passwordstorage.encryption.errors.NoSuchEncryptionException;
-import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 
 /**
  * @author JBacon
  */
 public class PasswordStorageController extends Activity {
+
     private static final String PBE_PASSWORD = "password";
     private static final String ENCRYPTED_AES_KEY = "c0ee59b064b00040737ec66e9e6399169d843cc3f35b54b07be67e9f7229845670a4ff9af03181c098406831f3612e34";
     private static final String SALT = "fe89f76a525362c5399279418660fd91b4aef558a1a344d5a9829e1419604c92";
     private static final String ENCRYPTED_PASSWORD = "bc5fdf0bb73a3309829322c69f6c5468";
+
     private SeekBar seekBar;
     private TextView seekBarLabel;
     private ViewFlipper flipper;
@@ -40,32 +29,17 @@ public class PasswordStorageController extends Activity {
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_flipper);
+        setContentView(R.layout.main_view);
         seekBar = (SeekBar) findViewById(R.id.seekBar);
         seekBarLabel = (TextView) findViewById(R.id.seekBarDisplay);
 
-        seekBar.setOnSeekBarChangeListener(ListenerUtils.SeekBarListener(seekBarLabel));
+        seekBar.setOnSeekBarChangeListener(ListenerUtils.seekBarListener(seekBarLabel));
         flipper = (ViewFlipper) findViewById(R.id.flipper);
         final Button button1 = (Button) findViewById(R.id.Button01);
         final Button button2 = (Button) findViewById(R.id.Button02);
 
-        button1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View view) {
-                flipper.setInAnimation(AnimationUtils.inFromRightAnimation());
-                flipper.setOutAnimation(AnimationUtils.outToLeftAnimation());
-                flipper.showNext();
-            }
-        });
-
-        button2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View view) {
-                flipper.setInAnimation(AnimationUtils.inFromLeftAnimation());
-                flipper.setOutAnimation(AnimationUtils.outToRightAnimation());
-                flipper.showPrevious();
-            }
-        });
+        button1.setOnClickListener(ListenerUtils.doViewFlipOnClick(flipper, FlipperDirection.NEXT));
+        button2.setOnClickListener(ListenerUtils.doViewFlipOnClick(flipper, FlipperDirection.PREVIOUS));
 
         final TextView decryptedPassword = (TextView) findViewById(R.id.decryptedPassword);
         final TextView encryptedPassword = (TextView) findViewById(R.id.encryptedPassword);
@@ -74,33 +48,7 @@ public class PasswordStorageController extends Activity {
         encryptedPassword.setText(ENCRYPTED_PASSWORD);
         decryptedPassword.setText("");
 
-        decrypButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(final View view) {
-                try {
-                    final byte[] encryptedKey = EncrypterUtils.hexStringToByte(ENCRYPTED_AES_KEY);
-                    final byte[] salt = EncrypterUtils.hexStringToByte(SALT);
-                    final byte[] encryptedPassword = EncrypterUtils.hexStringToByte(ENCRYPTED_PASSWORD);
-
-                    final EncrypterPBE encrypterPBE = (EncrypterPBE) EncryptionType.PBE_WITH_SHA1_AND_256_AES_CBC_BC.getEncrypter();
-                    final byte[] aesKey = encrypterPBE.doCiper(EncryptionMode.DECRYPT_MODE, salt, encryptedKey, EncrypterUtils.stringToChar(PBE_PASSWORD));
-
-                    final EncrypterAES encrypterAES = (EncrypterAES) EncryptionType.AES_256.getEncrypter();
-                    final byte[] password = encrypterAES.doCiper(EncryptionMode.DECRYPT_MODE, encryptedPassword, aesKey);
-
-                    decryptedPassword.setText(EncrypterUtils.byteToString(password));
-
-                } catch (final DecoderException e) {
-                    decryptedPassword.setText("It Borked");
-                } catch (final NoSuchEncryptionException e) {
-                    decryptedPassword.setText("It Borked");
-                } catch (final AbstractEncrypterException e) {
-                    decryptedPassword.setText("It Borked");
-                } catch (final UnsupportedEncodingException e) {
-                    decryptedPassword.setText("It Borked");
-                }
-            }
-        });
+        decrypButton.setOnClickListener(ListenerUtils.decryptOnClick(decryptedPassword, ENCRYPTED_AES_KEY, SALT, ENCRYPTED_PASSWORD, PBE_PASSWORD));
     }
 
     @Override
