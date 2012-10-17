@@ -51,7 +51,7 @@ public class NewMasterPasswordPanel extends JPanel {
             LOG.debug("Validating NewMasterPasswordPanel [aka MasterPassword].");
             LOG.debug("ProfileEncryptionType: " + newProfile.getProfileEncryptionType());
             LOG.debug("PasswordEncryptionType: " + newProfile.getPasswordEncryptionType());
-            LOG.debug("Salt: " + EncrypterUtils.byteToHexString(newProfile.getSalt()));
+            LOG.debug("Salt: " + EncrypterUtils.bytesToBase64String(newProfile.getSalt()));
             LOG.debug("EncryptedSecretKey: " + newProfile.getEncryptedSecretKey());
             LOG.debug("ProfileName: " + newProfile.getProfileName());
 
@@ -315,7 +315,7 @@ public class NewMasterPasswordPanel extends JPanel {
     public MasterPassword buildProfile() throws AbstractEncrypterException {
         final MasterPassword profile = new MasterPassword();
         profile.setProfileName(getProfileName());
-        profile.setSalt(EncrypterUtils.byteToHexString(getSalt()));
+        profile.setSalt(EncrypterUtils.bytesToBase64String(getSalt()));
         profile.setMasterPasswordEncryptionType(getProfileEncryptionType());
         profile.setStoredPasswordsEncryptionType(getPasswordEncryptionType());
         profile.setEncryptedSecretKey(getEncryptedSecretKey());
@@ -325,7 +325,7 @@ public class NewMasterPasswordPanel extends JPanel {
 
     private void generateSalt() throws AbstractEncrypterException {
         salt = EncrypterUtils.generateSalt(getProfileEncryptionType(), getSaltLength());
-        saltJPasswordField.setText(EncrypterUtils.byteToHexString(salt));
+        saltJPasswordField.setText(EncrypterUtils.bytesToBase64String(salt));
     }
 
     public String getEncryptedSecretKey() throws AbstractEncrypterException {
@@ -334,7 +334,7 @@ public class NewMasterPasswordPanel extends JPanel {
             final byte[] secretKey = EncrypterUtils.generateAesEncryptionKey(getPasswordEncryptionType());
             encryptedSecretKey = encrypter.doCiper(EncryptionMode.ENCRYPT_MODE, salt, secretKey, getPassword());
         }
-        return EncrypterUtils.byteToHexString(encryptedSecretKey);
+        return EncrypterUtils.bytesToBase64String(encryptedSecretKey);
     }
 
     private char[] getPassword() {

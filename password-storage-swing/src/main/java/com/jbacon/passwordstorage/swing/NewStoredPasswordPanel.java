@@ -110,10 +110,8 @@ public class NewStoredPasswordPanel extends JPanel {
     /**
      * Create the panel.
      * 
-     * @param profile
-     *            the current active MasterPassword profile.
-     * @param currentPassword
-     *            the password of the current MasterPassword profile.
+     * @param profile the current active MasterPassword profile.
+     * @param currentPassword the password of the current MasterPassword profile.
      */
     public NewStoredPasswordPanel(final MasterPassword profile, final String currentPassword) {
         this.profile = profile;
@@ -323,14 +321,14 @@ public class NewStoredPasswordPanel extends JPanel {
 
     private String getEncrypted(final byte[] toEncrypt) throws DecoderException, AbstractEncrypterException, UnsupportedEncodingException {
         final EncrypterPBE decrypter = (EncrypterPBE) profile.getMasterPasswordEncryptionType().getEncrypter();
-        final byte[] salt = EncrypterUtils.hexStringToByte(profile.getSalt());
-        final byte[] cipherText = EncrypterUtils.hexStringToByte(profile.getEncryptedSecretKey());
+        final byte[] salt = EncrypterUtils.base64StringToBytes(profile.getSalt());
+        final byte[] cipherText = EncrypterUtils.base64StringToBytes(profile.getEncryptedSecretKey());
         final char[] passPhrase = EncrypterUtils.stringToChar(currentPassword);
         final byte[] aesKey = decrypter.doCiper(EncryptionMode.DECRYPT_MODE, salt, cipherText, passPhrase);
         final EncrypterAES encrypter = (EncrypterAES) profile.getStoredPasswordEncryptionType().getEncrypter();
         final byte[] encryptedValue = encrypter.doCiper(EncryptionMode.ENCRYPT_MODE, toEncrypt, aesKey);
 
-        return EncrypterUtils.byteToHexString(encryptedValue);
+        return EncrypterUtils.bytesToBase64String(encryptedValue);
     }
 
     private String getEncryptedPassword() throws DecoderException, AbstractEncrypterException, UnsupportedEncodingException {

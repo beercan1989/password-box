@@ -68,6 +68,7 @@ import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
 import com.jbacon.passwordstorage.swing.list.MasterPasswordListModel;
+import com.jbacon.passwordstorage.swing.table.StoredPasswordTableColumns;
 import com.jbacon.passwordstorage.swing.table.StoredPasswordTableModel;
 import com.jbacon.passwordstorage.tools.StringUtils;
 
@@ -694,9 +695,25 @@ public class MainWindow {
         storedPasswordsJTable.setRowSelectionAllowed(true);
         storedPasswordsJTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         storedPasswordsJTable.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
-        final TableColumn storedPasswordsIdColumn = storedPasswordsJTable.getColumnModel().getColumn(0);
-        storedPasswordsIdColumn.setMaxWidth(20);
-        storedPasswordsIdColumn.setResizable(false);
+        final int idColumnIndex = storedPasswordsModel.getColumnIndex(StoredPasswordTableColumns.ID);
+        final TableColumn idColumn = storedPasswordsJTable.getColumnModel().getColumn(idColumnIndex);
+        idColumn.setMaxWidth(20);
+        idColumn.setResizable(false);
+
+        final int createdAtColumnIndex = storedPasswordsModel.getColumnIndex(StoredPasswordTableColumns.CREATED_AT);
+        final TableColumn createdAtColumn = storedPasswordsJTable.getColumnModel().getColumn(createdAtColumnIndex);
+        createdAtColumn.setMaxWidth(140);
+        createdAtColumn.setMinWidth(140);
+        createdAtColumn.setPreferredWidth(140);
+        createdAtColumn.setResizable(false);
+
+        final int updatedAtColumnIndex = storedPasswordsModel.getColumnIndex(StoredPasswordTableColumns.UPDATED_AT);
+        final TableColumn updatedAtColumn = storedPasswordsJTable.getColumnModel().getColumn(updatedAtColumnIndex);
+        updatedAtColumn.setMaxWidth(140);
+        updatedAtColumn.setMinWidth(140);
+        updatedAtColumn.setPreferredWidth(140);
+        updatedAtColumn.setResizable(false);
+
         storedPasswordsJScrollPane.setViewportView(storedPasswordsJTable);
     }
 
@@ -715,8 +732,8 @@ public class MainWindow {
             if (encryptionType.getEncrypter() instanceof EncrypterPBE) {
                 final EncrypterPBE encrypter = (EncrypterPBE) encryptionType.getEncrypter();
 
-                final byte[] salt = EncrypterUtils.hexStringToByte(masterPassword.getSalt());
-                final byte[] cipherText = EncrypterUtils.hexStringToByte(masterPassword.getEncryptedSecretKey());
+                final byte[] salt = EncrypterUtils.base64StringToBytes(masterPassword.getSalt());
+                final byte[] cipherText = EncrypterUtils.base64StringToBytes(masterPassword.getEncryptedSecretKey());
                 final char[] passPhrase = EncrypterUtils.stringToChar(enteredPassword);
 
                 final byte[] result = encrypter.doCiper(EncryptionMode.DECRYPT_MODE, salt, cipherText, passPhrase);
@@ -729,16 +746,11 @@ public class MainWindow {
             }
         } catch (final NoSuchEncryptionException e) {
             e.printStackTrace();
-            return false;
         } catch (final AbstractEncrypterException e) {
             if (e.getCause() instanceof javax.crypto.BadPaddingException) {
                 return false;
             }
             e.printStackTrace();
-            return false;
-        } catch (final DecoderException e) {
-            e.printStackTrace();
-            return false;
         }
         return false;
     }
@@ -962,9 +974,9 @@ public class MainWindow {
         }
 
         // Password & Name & Notes are not the same
-        if (encryptedPassword.equals(encryptedPasswordName) || encryptedPassword.equals(encryptedPasswordNotes) || encryptedPasswordName.equals(encryptedPasswordNotes)) {
-            return false;
-        }
+        // if (encryptedPassword.equals(encryptedPasswordName) || encryptedPassword.equals(encryptedPasswordNotes) || encryptedPasswordName.equals(encryptedPasswordNotes)) {
+        // return false;
+        // }
 
         return true;
     }

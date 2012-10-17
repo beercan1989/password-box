@@ -237,14 +237,14 @@ public class ViewStoredPasswordPanel extends JPanel {
 
     private static String getDecrypted(final String toDecrypt, final MasterPassword profile, final String currentPassword) throws UnsupportedEncodingException, DecoderException,
             AbstractEncrypterException {
-        return getDecrypted(EncrypterUtils.hexStringToByte(toDecrypt), profile, currentPassword);
+        return getDecrypted(EncrypterUtils.base64StringToBytes(toDecrypt), profile, currentPassword);
     }
 
     private static String getDecrypted(final byte[] toDecrypt, final MasterPassword profile, final String currentPassword) throws DecoderException, AbstractEncrypterException,
             UnsupportedEncodingException {
         final EncrypterPBE pbeDecrypter = (EncrypterPBE) profile.getMasterPasswordEncryptionType().getEncrypter();
-        final byte[] salt = EncrypterUtils.hexStringToByte(profile.getSalt());
-        final byte[] cipherText = EncrypterUtils.hexStringToByte(profile.getEncryptedSecretKey());
+        final byte[] salt = EncrypterUtils.base64StringToBytes(profile.getSalt());
+        final byte[] cipherText = EncrypterUtils.base64StringToBytes(profile.getEncryptedSecretKey());
         final char[] passPhrase = EncrypterUtils.stringToChar(currentPassword);
         final byte[] aesKey = pbeDecrypter.doCiper(EncryptionMode.DECRYPT_MODE, salt, cipherText, passPhrase);
         final EncrypterAES aesDecrypter = (EncrypterAES) profile.getStoredPasswordEncryptionType().getEncrypter();
