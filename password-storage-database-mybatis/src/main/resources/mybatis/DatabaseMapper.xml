@@ -92,13 +92,13 @@
 	<!-- Database Configuration Mappings -->
 	<!-- Create DB tables. -->
 	<update id="createStoredPasswordTable">
-		CREATE TABLE IF NOT EXISTS StoredPasswords (id INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE ON CONFLICT FAIL, profileName TEXT NOT NULL, passwordName TEXT NOT NULL, password TEXT NOT NULL, passwordNotes TEXT NOT NULL, createdAt TEXT NOT NULL, updatedAt TEXT NOT NULL);
+		CREATE TABLE IF NOT EXISTS StoredPasswords (id INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE ON CONFLICT FAIL, profileName TEXT NOT NULL, passwordName TEXT NOT NULL, password TEXT NOT NULL, passwordNotes TEXT NOT NULL, createdAt DATETIME NOT NULL, updatedAt DATETIME NOT NULL);
 	</update>
 	<update id="createMasterPasswordTable">
-		CREATE TABLE IF NOT EXISTS MasterPasswords (id INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE ON CONFLICT FAIL, profileName TEXT NOT NULL UNIQUE ON CONFLICT FAIL, secretKey TEXT NOT NULL, salt TEXT NOT NULL, createdAt TEXT NOT NULL, updatedAt TEXT NOT NULL, masterET TEXT NOT NULL, storedET TEXT NOT NULL);
+		CREATE TABLE IF NOT EXISTS MasterPasswords (id INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE ON CONFLICT FAIL, profileName TEXT NOT NULL UNIQUE ON CONFLICT FAIL, secretKey TEXT NOT NULL, salt TEXT NOT NULL, createdAt DATETIME NOT NULL, updatedAt DATETIME NOT NULL, masterET TEXT NOT NULL, storedET TEXT NOT NULL);
 	</update>
 	<update id="createSettingsTable">
-	    CREATE TABLE IS NOT EXISTS Settings (id INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE ON CONFLICT FAIL, settingName TEXT NOT NULL UNIQUE ON CONFLICT FAIL, settingValue TEXT NOT NULL, createdAt TEXT NOT NULL, updatedAt TEXT NOT NULL);
+	    CREATE TABLE IS NOT EXISTS Settings (id INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE ON CONFLICT FAIL, settingName TEXT NOT NULL UNIQUE ON CONFLICT FAIL, settingValue TEXT NOT NULL, createdAt DATETIME NOT NULL, DATETIME TEXT NOT NULL);
 	</update>
 	
 	
@@ -118,8 +118,8 @@
 	<resultMap id="GenericPassword" type="com.jbacon.passwordstorage.password.GenericPassword">
 		<result column="id" 		    property="id" />
 		<result column="profileName" 	property="profileName" />
-		<result column="createdAt" 		property="createdAt" javaType="java.sql.Timestamp" jdbcType="VARCHAR"/>
-		<result column="updatedAt" 		property="updatedAt" javaType="java.sql.Timestamp" jdbcType="VARCHAR"/>
+		<result column="createdAt" 		property="createdAt" />
+		<result column="updatedAt" 		property="updatedAt" />
 	</resultMap>
 	
 	<resultMap id="MasterPassword" type="com.jbacon.passwordstorage.password.MasterPassword" extends="GenericPassword">

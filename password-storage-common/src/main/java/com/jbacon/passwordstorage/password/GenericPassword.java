@@ -1,62 +1,62 @@
 package com.jbacon.passwordstorage.password;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 import com.jbacon.passwordstorage.formatters.TimestampFormatter;
 
 public abstract class GenericPassword {
-	private Integer id;
-	private Timestamp createdAt;
-	private Timestamp updatedAt;
-	private String profileName;
+    private Integer id;
+    private Date createdAt;
+    private Date updatedAt;
+    private String profileName;
 
-	public GenericPassword() {
-	}
+    public GenericPassword() {
+    }
 
-	public GenericPassword(final Timestamp createdAt, final Timestamp updatedAt, final Integer id, final String profileName) {
-		this.createdAt = createdAt;
-		this.updatedAt = updatedAt;
-		this.id = id;
-		this.setProfileName(profileName);
-	}
+    public GenericPassword(final Date createdAt, final Date updatedAt, final Integer id, final String profileName) {
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.id = id;
+        setProfileName(profileName);
+    }
 
-	public Timestamp getCreatedAt() {
-		return createdAt;
-	}
+    public Date getCreatedAt() {
+        return createdAt;
+    }
 
-	public String getCreatedAtAsString() {
-		return TimestampFormatter.format(createdAt);
-	}
+    public String getCreatedAtAsString() {
+        return TimestampFormatter.format(createdAt);
+    }
 
-	public Integer getId() {
-		return id;
-	}
+    public Integer getId() {
+        return id;
+    }
 
-	public String getProfileName() {
-		return profileName;
-	}
+    public String getProfileName() {
+        return profileName;
+    }
 
-	public Timestamp getUpdatedAt() {
-		return updatedAt;
-	}
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
 
-	public String getUpdatedAtAsString() {
-		return TimestampFormatter.format(updatedAt);
-	}
+    public String getUpdatedAtAsString() {
+        return TimestampFormatter.format(updatedAt);
+    }
 
-	public void setCreatedAt(final Timestamp createdAt) {
-		this.createdAt = createdAt;
-	}
+    public void setCreatedAt(final Date createdAt) {
+        this.createdAt = createdAt;
+    }
 
-	public void setId(final Integer id) {
-		this.id = id;
-	}
+    public void setId(final Integer id) {
+        this.id = id;
+    }
 
-	public void setProfileName(final String profileName) {
-		this.profileName = profileName;
-	}
+    public void setProfileName(final String profileName) {
+        this.profileName = profileName;
+    }
 
-	public void setUpdatedAt(final Timestamp updatedAt) {
-		this.updatedAt = updatedAt;
-	}
+    public void setUpdatedAt(final Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }
