@@ -1,6 +1,6 @@
 package com.jbacon.passwordstorage.password;
 
-import java.util.Date;
+import java.sql.Date;
 
 import com.jbacon.passwordstorage.encryption.EncryptionType;
 

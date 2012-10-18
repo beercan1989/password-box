@@ -1,6 +1,6 @@
 package com.jbacon.passwordstorage.password;
 
-import java.util.Date;
+import java.sql.Date;
 
 public class StoredPassword extends GenericPassword {
 
