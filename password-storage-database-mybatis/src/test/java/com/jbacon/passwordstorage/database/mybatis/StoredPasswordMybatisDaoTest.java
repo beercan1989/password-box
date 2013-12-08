@@ -1,14 +1,17 @@
 package com.jbacon.passwordstorage.database.mybatis;
 
-import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -16,35 +19,36 @@ import org.junit.Test;
 import com.jbacon.passwordstorage.encryption.EncryptionType;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
+import com.jbacon.test.tools.RemoveTestFiles;
 
 public class StoredPasswordMybatisDaoTest {
 
-    private static final String             TV_SP_ENCRYPTED_PASSWORD_NOTES      = "encryptedPasswordNotes";
-    private static final String             TV_SP_ENCRYPTED_PASSWORD            = "encryptedPassword";
-    private static final String             TV_SP_ENCRYPTED_PASSWORD_NAME       = "encryptedPasswordName";
-    private static final String             TEST_SQLITE_DATABASE_FILENAME       = "dbTest.sqlite";
-    private static final String             TEST_MYBATIS_CONFIGURATION_FILENAME = "mybatisTest/Configuration.xml";
+    private static final String TV_SP_ENCRYPTED_PASSWORD_NOTES = "encryptedPasswordNotes";
+    private static final String TV_SP_ENCRYPTED_PASSWORD = "encryptedPassword";
+    private static final String TV_SP_ENCRYPTED_PASSWORD_NAME = "encryptedPasswordName";
+    private static final String TEST_SQLITE_DATABASE_FILENAME = "dbTest.sqlite";
+    private static final String TEST_MYBATIS_CONFIGURATION_FILENAME = "mybatisTest/Configuration.xml";
 
-    private static final String             TV_MP_SALT                          = "salt";
-    private static final String             TV_MP_ENCRYPTED_SECRET_KEY          = "encryptedSecretKey";
-    private static final String             TV_MP_PROFILE_NAME                  = "profileName";
+    private static final String TV_MP_SALT = "salt";
+    private static final String TV_MP_ENCRYPTED_SECRET_KEY = "encryptedSecretKey";
+    private static final String TV_MP_PROFILE_NAME = "profileName";
 
-    private static MaintenanceMybatisDao    MAINTENANCE_DAO;
+    private static MaintenanceMybatisDao MAINTENANCE_DAO;
     private static StoredPasswordMybatisDao STORED_PASSWORD_DAO;
 
     @AfterClass
     public static void cleanUp() throws IOException {
-        // RemoveTestFiles.remove(TEST_SQLITE_DATABASE_FILENAME);
+        RemoveTestFiles.remove(TEST_SQLITE_DATABASE_FILENAME);
     }
 
     private static MasterPassword generateMasterPassword(final int id) {
-        return new MasterPassword(TV_MP_PROFILE_NAME + id, TV_MP_ENCRYPTED_SECRET_KEY + id, TV_MP_SALT + id, null, null, null,
-                EncryptionType.AES_256, EncryptionType.PBE_WITH_MD5_AND_DES);
+        return new MasterPassword(TV_MP_PROFILE_NAME + id, TV_MP_ENCRYPTED_SECRET_KEY + id, TV_MP_SALT + id,
+                new Date(), new Date(), null, EncryptionType.AES_256, EncryptionType.PBE_WITH_MD5_AND_DES);
     }
 
     private static StoredPassword generateStoredPassword(final int spId, final int mpId) {
-        return new StoredPassword(TV_SP_ENCRYPTED_PASSWORD_NAME + spId, TV_MP_PROFILE_NAME + mpId, TV_SP_ENCRYPTED_PASSWORD + spId,
-                TV_SP_ENCRYPTED_PASSWORD_NOTES + spId, null, null, null);
+        return new StoredPassword(TV_SP_ENCRYPTED_PASSWORD_NAME + spId, TV_MP_PROFILE_NAME + mpId,
+                TV_SP_ENCRYPTED_PASSWORD + spId, TV_SP_ENCRYPTED_PASSWORD_NOTES + spId, new Date(), new Date(), null);
     }
 
     @BeforeClass
@@ -88,6 +92,7 @@ public class StoredPasswordMybatisDaoTest {
         assertThat(result.getEncryptedPasswordName(), is(equalTo(TV_SP_ENCRYPTED_PASSWORD_NAME + 1)));
         assertThat(result.getEncryptedPasswordNotes(), is(equalTo(TV_SP_ENCRYPTED_PASSWORD_NOTES + 1)));
         assertThat(result.getProfileName(), is(equalTo(TV_MP_PROFILE_NAME + 1)));
+        assertThat(result.getCreatedAt(), is(greaterThan(DateUtils.addSeconds(new Date(), -10))));
     }
 
     @Test
@@ -117,5 +122,4 @@ public class StoredPasswordMybatisDaoTest {
         assertThat(result, is(not(nullValue())));
         assertThat(result, is(equalTo(1)));
     }
-
 }

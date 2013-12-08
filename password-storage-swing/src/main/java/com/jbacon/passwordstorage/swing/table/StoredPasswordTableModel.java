@@ -10,13 +10,10 @@ import javax.swing.table.AbstractTableModel;
 import com.jbacon.passwordstorage.password.StoredPassword;
 
 public class StoredPasswordTableModel extends AbstractTableModel implements Serializable {
-
-    /**
-     * Eclipse Generated.
-     */
     private static final long serialVersionUID = -6892459980031513925L;
 
-    private static final List<StoredPasswordTableColumns> TABLE_COLUMNS = new ArrayList<StoredPasswordTableColumns>(EnumSet.allOf(StoredPasswordTableColumns.class));
+    private static final List<StoredPasswordTableColumns> TABLE_COLUMNS = new ArrayList<StoredPasswordTableColumns>(
+            EnumSet.allOf(StoredPasswordTableColumns.class));
     private final List<StoredPassword> tableData = new ArrayList<StoredPassword>();
 
     public void add(final StoredPassword storedPassword) {

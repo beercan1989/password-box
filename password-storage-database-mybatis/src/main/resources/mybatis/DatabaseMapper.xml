@@ -113,13 +113,12 @@
 		DROP TABLE IF EXISTS Settings;
 	</update>
 	
-	
 	<!-- Result Mappings -->
 	<resultMap id="GenericPassword" type="com.jbacon.passwordstorage.password.GenericPassword">
 		<result column="id" 		    property="id" />
 		<result column="profileName" 	property="profileName" />
-		<result column="createdAt" 		property="createdAt" />
-		<result column="updatedAt" 		property="updatedAt" />
+		<result column="createdAt" 		property="createdAt" typeHandler="com.jbacon.passwordstorage.database.mybatis.typehandlers.DateTimeTypeHandler" />
+		<result column="updatedAt" 		property="updatedAt" typeHandler="com.jbacon.passwordstorage.database.mybatis.typehandlers.DateTimeTypeHandler" />
 	</resultMap>
 	
 	<resultMap id="MasterPassword" type="com.jbacon.passwordstorage.password.MasterPassword" extends="GenericPassword">
