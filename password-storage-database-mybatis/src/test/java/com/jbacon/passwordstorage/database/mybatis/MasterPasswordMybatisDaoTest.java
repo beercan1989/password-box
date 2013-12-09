@@ -1,10 +1,10 @@
 package com.jbacon.passwordstorage.database.mybatis;
 
-import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.util.List;
@@ -15,22 +15,23 @@ import org.junit.Test;
 
 import com.jbacon.passwordstorage.encryption.EncryptionType;
 import com.jbacon.passwordstorage.password.MasterPassword;
+import com.jbacon.test.tools.RemoveTestFiles;
 
 public class MasterPasswordMybatisDaoTest {
 
-    private static final String             TEST_SQLITE_DATABASE_FILENAME       = "dbTest.sqlite";
-    private static final String             TEST_MYBATIS_CONFIGURATION_FILENAME = "mybatisTest/Configuration.xml";
+    private static final String TEST_SQLITE_DATABASE_FILENAME = "dbTest.sqlite";
+    private static final String TEST_MYBATIS_CONFIGURATION_FILENAME = "mybatisTest/Configuration.xml";
 
-    private static final String             TEST_VALUE_SALT                     = "salt";
-    private static final String             TEST_VALUE_ENCRYPTED_SECRET_KEY     = "encryptedSecretKey";
-    private static final String             TEST_VALUE_PROFILE_NAME             = "profileName";
+    private static final String TEST_VALUE_SALT = "salt";
+    private static final String TEST_VALUE_ENCRYPTED_SECRET_KEY = "encryptedSecretKey";
+    private static final String TEST_VALUE_PROFILE_NAME = "profileName";
 
-    private static MaintenanceMybatisDao    MAINTENANCE_DAO;
+    private static MaintenanceMybatisDao MAINTENANCE_DAO;
     private static MasterPasswordMybatisDao MASTER_PASSWORD_DAO;
 
     @AfterClass
     public static void cleanUp() throws IOException {
-        // RemoveTestFiles.remove(TEST_SQLITE_DATABASE_FILENAME);
+        RemoveTestFiles.remove(TEST_SQLITE_DATABASE_FILENAME);
     }
 
     private static void createTables() throws IOException {
@@ -44,8 +45,8 @@ public class MasterPasswordMybatisDaoTest {
     }
 
     private static MasterPassword generateMasterPassword(final int id) {
-        return new MasterPassword(TEST_VALUE_PROFILE_NAME + id, TEST_VALUE_ENCRYPTED_SECRET_KEY + id, TEST_VALUE_SALT + id, null, null,
-                null, EncryptionType.PBE_WITH_MD5_AND_DES, EncryptionType.AES_256);
+        return new MasterPassword(TEST_VALUE_PROFILE_NAME + id, TEST_VALUE_ENCRYPTED_SECRET_KEY + id, TEST_VALUE_SALT
+                + id, null, null, null, EncryptionType.PBE_WITH_MD5_AND_DES, EncryptionType.AES_256);
     }
 
     @BeforeClass
