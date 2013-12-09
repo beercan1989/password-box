@@ -1,4 +1,4 @@
-package com.jbacon.passwordstorage.swing;
+package com.jbacon.passwordstorage.swing.panels;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -36,6 +36,7 @@ import com.jbacon.passwordstorage.encryption.EncryptionType;
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 import com.jbacon.passwordstorage.password.MasterPassword;
+import com.jbacon.passwordstorage.swing.MainWindow;
 import com.jbacon.passwordstorage.tools.GenericUtils;
 import com.jbacon.passwordstorage.tools.StringUtils;
 

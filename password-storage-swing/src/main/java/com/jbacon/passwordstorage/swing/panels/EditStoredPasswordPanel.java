@@ -1,4 +1,4 @@
-package com.jbacon.passwordstorage.swing;
+package com.jbacon.passwordstorage.swing.panels;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -22,12 +22,15 @@ import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
+import com.jbacon.passwordstorage.swing.listeners.CloseJOptionPaneKeyListener;
 
-public class ViewStoredPasswordPanel extends JPanel {
+public class EditStoredPasswordPanel extends JPanel {
 
     private static final long serialVersionUID = 7627750248397407249L;
     private static final AbstractBorder TEXT_AREA_BORDER = new EtchedBorder(EtchedBorder.LOWERED, null, null);
     private static final Insets TEXT_AREA_MARGIN = new Insets(1, 5, 1, 5);
+
+    private final CloseJOptionPaneKeyListener closeJOptionPaneKeyListener;
 
     private final StoredPassword password;
     private final JLabel passwordNameJLabel;
@@ -45,8 +48,11 @@ public class ViewStoredPasswordPanel extends JPanel {
     private final JTextArea createdAtJTextArea;
     private final JTextArea passwordNotesJTextArea;
 
-    public ViewStoredPasswordPanel(final StoredPassword password, final MasterPassword profile, final String currentPassword, final boolean doDecryption)
-            throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+    public EditStoredPasswordPanel(final StoredPassword password, final MasterPassword profile,
+            final String currentPassword, final boolean doDecryption) throws UnsupportedEncodingException,
+            DecoderException, AbstractEncrypterException {
+        this.closeJOptionPaneKeyListener = new CloseJOptionPaneKeyListener();
+
         setBorder(new EmptyBorder(10, 10, 10, 10));
         this.password = password;
         final GridBagLayout gridBagLayout = new GridBagLayout();
@@ -159,7 +165,6 @@ public class ViewStoredPasswordPanel extends JPanel {
         passwordNameJTextArea = new JTextArea();
         passwordNameJTextArea.setWrapStyleWord(true);
         passwordNameJTextArea.setLineWrap(true);
-        passwordNameJTextArea.setEditable(false);
         passwordNameJTextArea.setBorder(TEXT_AREA_BORDER);
         passwordNameJTextArea.setMargin(TEXT_AREA_MARGIN);
         final GridBagConstraints gbc_passwordNameJTextArea = new GridBagConstraints();
@@ -168,6 +173,7 @@ public class ViewStoredPasswordPanel extends JPanel {
         gbc_passwordNameJTextArea.gridx = 1;
         gbc_passwordNameJTextArea.gridy = 4;
         add(passwordNameJTextArea, gbc_passwordNameJTextArea);
+        passwordNameJTextArea.addKeyListener(closeJOptionPaneKeyListener);
 
         passwordJLabel = new JLabel("Password");
         final GridBagConstraints gbc_passwordJLabel = new GridBagConstraints();
@@ -181,7 +187,6 @@ public class ViewStoredPasswordPanel extends JPanel {
         passwordJTextArea = new JTextArea();
         passwordJTextArea.setWrapStyleWord(true);
         passwordJTextArea.setLineWrap(true);
-        passwordJTextArea.setEditable(false);
         passwordJTextArea.setBorder(TEXT_AREA_BORDER);
         passwordJTextArea.setMargin(TEXT_AREA_MARGIN);
         final GridBagConstraints gbc_passwordJTextArea = new GridBagConstraints();
@@ -190,6 +195,7 @@ public class ViewStoredPasswordPanel extends JPanel {
         gbc_passwordJTextArea.gridx = 1;
         gbc_passwordJTextArea.gridy = 5;
         add(passwordJTextArea, gbc_passwordJTextArea);
+        passwordJTextArea.addKeyListener(closeJOptionPaneKeyListener);
 
         passwordNotesJLabel = new JLabel("Password Notes");
         final GridBagConstraints gbc_passwordNotesJLabel = new GridBagConstraints();
@@ -202,7 +208,6 @@ public class ViewStoredPasswordPanel extends JPanel {
         passwordNotesJTextArea = new JTextArea();
         passwordNotesJTextArea.setWrapStyleWord(true);
         passwordNotesJTextArea.setLineWrap(true);
-        passwordNotesJTextArea.setEditable(false);
         passwordNotesJTextArea.setBorder(TEXT_AREA_BORDER);
         passwordNotesJTextArea.setMargin(TEXT_AREA_MARGIN);
         final GridBagConstraints gbc_textArea = new GridBagConstraints();
@@ -210,6 +215,7 @@ public class ViewStoredPasswordPanel extends JPanel {
         gbc_textArea.gridx = 1;
         gbc_textArea.gridy = 6;
         add(passwordNotesJTextArea, gbc_textArea);
+        passwordNotesJTextArea.addKeyListener(closeJOptionPaneKeyListener);
 
         final Dimension preferedSize = new Dimension(600, 400);
         this.setPreferredSize(preferedSize);
@@ -218,8 +224,9 @@ public class ViewStoredPasswordPanel extends JPanel {
         insertPasswordDetails(profile, currentPassword, doDecryption);
     }
 
-    private void insertPasswordDetails(final MasterPassword profile, final String currentPassword, final boolean doDecryption) throws UnsupportedEncodingException,
-            DecoderException, AbstractEncrypterException {
+    private void insertPasswordDetails(final MasterPassword profile, final String currentPassword,
+            final boolean doDecryption) throws UnsupportedEncodingException, DecoderException,
+            AbstractEncrypterException {
 
         passwordIdJTextArea.setText(password.getId().toString());
         profileNameJTextArea.setText(password.getProfileName());
@@ -227,7 +234,8 @@ public class ViewStoredPasswordPanel extends JPanel {
         if (doDecryption) {
             passwordNameJTextArea.setText(getDecrypted(password.getEncryptedPasswordName(), profile, currentPassword));
             passwordJTextArea.setText(getDecrypted(password.getEncryptedPassword(), profile, currentPassword));
-            passwordNotesJTextArea.setText(getDecrypted(password.getEncryptedPasswordNotes(), profile, currentPassword));
+            passwordNotesJTextArea
+                    .setText(getDecrypted(password.getEncryptedPasswordNotes(), profile, currentPassword));
         } else {
             passwordNameJTextArea.setText(password.getEncryptedPasswordName());
             passwordJTextArea.setText(password.getEncryptedPassword());
@@ -235,12 +243,14 @@ public class ViewStoredPasswordPanel extends JPanel {
         }
     }
 
-    private static String getDecrypted(final String toDecrypt, final MasterPassword profile, final String currentPassword) throws UnsupportedEncodingException, DecoderException,
+    private static String getDecrypted(final String toDecrypt, final MasterPassword profile,
+            final String currentPassword) throws UnsupportedEncodingException, DecoderException,
             AbstractEncrypterException {
         return getDecrypted(EncrypterUtils.base64StringToBytes(toDecrypt), profile, currentPassword);
     }
 
-    private static String getDecrypted(final byte[] toDecrypt, final MasterPassword profile, final String currentPassword) throws DecoderException, AbstractEncrypterException,
+    private static String getDecrypted(final byte[] toDecrypt, final MasterPassword profile,
+            final String currentPassword) throws DecoderException, AbstractEncrypterException,
             UnsupportedEncodingException {
         final EncrypterPBE pbeDecrypter = (EncrypterPBE) profile.getMasterPasswordEncryptionType().getEncrypter();
         final byte[] salt = EncrypterUtils.base64StringToBytes(profile.getSalt());
@@ -251,5 +261,9 @@ public class ViewStoredPasswordPanel extends JPanel {
         final byte[] encryptedValue = aesDecrypter.doCiper(EncryptionMode.DECRYPT_MODE, toDecrypt, aesKey);
 
         return EncrypterUtils.byteToString(encryptedValue);
+    }
+
+    public boolean isClosedByKey() {
+        return closeJOptionPaneKeyListener.isClosedByKeyListener();
     }
 }

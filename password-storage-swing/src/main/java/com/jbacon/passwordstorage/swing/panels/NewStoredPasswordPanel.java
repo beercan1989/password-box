@@ -1,4 +1,4 @@
-package com.jbacon.passwordstorage.swing;
+package com.jbacon.passwordstorage.swing.panels;
 
 import static com.jbacon.passwordstorage.tools.GenericUtils.isNull;
 
