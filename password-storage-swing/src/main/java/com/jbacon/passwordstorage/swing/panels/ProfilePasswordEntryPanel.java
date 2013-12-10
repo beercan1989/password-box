@@ -1,4 +1,4 @@
-package com.jbacon.passwordstorage.swing;
+package com.jbacon.passwordstorage.swing.panels;
 
 import java.awt.BorderLayout;
 
@@ -42,7 +42,7 @@ public class ProfilePasswordEntryPanel extends JPanel {
         return new String(passwordField.getPassword());
     }
 
-    public boolean isClosedByKeyListener() {
+    public boolean isClosedByKey() {
         return closeJOptionPaneKeyListener.isClosedByKeyListener();
     }
 }
