@@ -37,7 +37,6 @@ import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -113,7 +112,7 @@ public class MainWindow {
     }
 
     private static int showCustomInputWindow(final Object message, final String title, final String[] options) {
-        return showOptionDialog(null, message, title, OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, "");
+        return showOptionDialog(null, message, title, OK_CANCEL_OPTION, QUESTION_MESSAGE, null, options, "");
     }
 
     private static void showMessageWindow(final Object message, final String title) {
@@ -262,8 +261,7 @@ public class MainWindow {
 
         final int selection = availableProfilesJList.getSelectedIndex();
         if (selection < 0) {
-            showMessageWindow("Please select a profile from the \"Available Profiles\" to remove.",
-                    "Please Select A Profile");
+            showMessageWindow("Please select a profile from the \"Available Profiles\" to remove.", "Please Select A Profile");
             return;
         }
         final MasterPassword masterPassword = availableProfilesModel.get(selection);
@@ -278,8 +276,7 @@ public class MainWindow {
         updateAvailableProfiles();
         updateStoredPasswords(false);
 
-        showMessageWindow("Profile " + masterPassword.getProfileName() + " has successfully been deleted.",
-                "Profile Successfully Deleted");
+        showMessageWindow("Profile " + masterPassword.getProfileName() + " has successfully been deleted.", "Profile Successfully Deleted");
     }
 
     private void displayStoredPassword(final MouseEvent mouseEvent) {
@@ -302,7 +299,7 @@ public class MainWindow {
             final StoredPassword password = storedPasswordsModel.getRow(selectedRow);
             if (password != null) {
                 try {
-                    editPassword(password, activeProfile, currentPassword, true, storedPasswordDao);
+                    editPassword(password, true);
                 } catch (final UnsupportedEncodingException e) {
                     errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
                 } catch (final DecoderException e) {
@@ -311,8 +308,7 @@ public class MainWindow {
                     errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
                 }
             } else {
-                errorMessage("The Storedpassword was null, while trying to view a password", "Storedpassword was null",
-                        null);
+                errorMessage("The Storedpassword was null, while trying to view a password", "Storedpassword was null", null);
             }
         } else {
             showMessageWindow("Please select a password and try again.", "No Password Selected");
@@ -376,14 +372,11 @@ public class MainWindow {
                 try {
                     newPassword();
                 } catch (final UnsupportedEncodingException t) {
-                    errorMessage("An error occured when the creation of your new password.", "Password Creation Error",
-                            t);
+                    errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
                 } catch (final DecoderException t) {
-                    errorMessage("An error occured when the creation of your new password.", "Password Creation Error",
-                            t);
+                    errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
                 } catch (final AbstractEncrypterException t) {
-                    errorMessage("An error occured when the creation of your new password.", "Password Creation Error",
-                            t);
+                    errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
                 }
             }
         });
@@ -444,11 +437,13 @@ public class MainWindow {
             public void actionPerformed(final ActionEvent evt) {
                 final boolean isSelected = chckbxmntmToggleSidebar.isSelected();
                 setVisible(isSelected, westJPanel);
-                setEnabled(isSelected, chckbxmntmToggleActionButtons, chckbxmntmToggleAvailableProfiles);
+                // setEnabled(isSelected, chckbxmntmToggleActionButtons, chckbxmntmToggleAvailableProfiles);
                 if (isSelected) {
                     setSelected(isSelected, chckbxmntmToggleActionButtons, chckbxmntmToggleAvailableProfiles);
                     setVisible(isSelected, availableProfilesNorthButtonJPanel, availableProfilesJList);
                 }
+
+                updateAllActionStates();
             }
         });
         mnView.add(chckbxmntmToggleSidebar);
@@ -521,8 +516,7 @@ public class MainWindow {
         gbl_availableProfilesNorthButtonJPanel.columnWidths = new int[] { 0, 0 };
         gbl_availableProfilesNorthButtonJPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         gbl_availableProfilesNorthButtonJPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-        gbl_availableProfilesNorthButtonJPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                0.0, 0.0, 0.0, Double.MIN_VALUE };
+        gbl_availableProfilesNorthButtonJPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
         availableProfilesNorthButtonJPanel.setLayout(gbl_availableProfilesNorthButtonJPanel);
 
         newProfileJButton = new JButton("New Profile");
@@ -601,14 +595,11 @@ public class MainWindow {
                 try {
                     newPassword();
                 } catch (final UnsupportedEncodingException t) {
-                    errorMessage("An error occured when the creation of your new password.", "Password Creation Error",
-                            t);
+                    errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
                 } catch (final DecoderException t) {
-                    errorMessage("An error occured when the creation of your new password.", "Password Creation Error",
-                            t);
+                    errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
                 } catch (final AbstractEncrypterException t) {
-                    errorMessage("An error occured when the creation of your new password.", "Password Creation Error",
-                            t);
+                    errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
                 }
             }
         });
@@ -694,17 +685,15 @@ public class MainWindow {
         });
         availableProfilesJList.setModel(availableProfilesModel);
         availableProfilesJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        availableProfilesJList.setBorder(new CompoundBorder(new EmptyBorder(10, 5, 5, 5), new CompoundBorder(
-                new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Available Profiles", TitledBorder.CENTER,
-                        TitledBorder.TOP, null, new Color(51, 51, 51)), new EmptyBorder(0, 3, 3, 3))));
+        availableProfilesJList.setBorder(new CompoundBorder(new EmptyBorder(10, 5, 5, 5), new CompoundBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)),
+                "Available Profiles", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(51, 51, 51)), new EmptyBorder(0, 3, 3, 3))));
         availableProfilesJList.setPreferredSize(new java.awt.Dimension(165, 0));
         westJPanel.add(availableProfilesJList, BorderLayout.CENTER);
 
         activeProfileJPanel = new JPanel();
         activeProfileJPanel.setBackground(Color.WHITE);
-        activeProfileJPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 5, 4, 5), new CompoundBorder(
-                new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Active Profile", TitledBorder.CENTER,
-                        TitledBorder.TOP, null, new Color(51, 51, 51)), new EmptyBorder(0, 3, 3, 3))));
+        activeProfileJPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 5, 4, 5), new CompoundBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)),
+                "Active Profile", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(51, 51, 51)), new EmptyBorder(0, 3, 3, 3))));
         westJPanel.add(activeProfileJPanel, BorderLayout.SOUTH);
 
         activeProfileJLabel = new JLabel(activeProfile.getProfileName());
@@ -756,6 +745,8 @@ public class MainWindow {
         updatedAtColumn.setResizable(false);
 
         storedPasswordsJScrollPane.setViewportView(storedPasswordsJTable);
+
+        updateAllActionStates();
     }
 
     private boolean isDoubleClick(final MouseEvent mouseEvent) {
@@ -824,13 +815,11 @@ public class MainWindow {
 
         while (!isPasswordCorrect(masterPassword, enteredPassword)) {
             if (enteredPassword == null) {
-                errorMessage("User has canclled the process to load a profile, when entering the password.",
-                        "User Cancelled Profile Load", null);
+                errorMessage("User has canclled the process to load a profile, when entering the password.", "User Cancelled Profile Load", null);
                 return;
             }
 
-            showMessageWindow("The password you entered was incorrect, please try again.",
-                    "Please Enter A Correct Password");
+            showMessageWindow("The password you entered was incorrect, please try again.", "Please Enter A Correct Password");
             enteredPassword = promptUserForProfilePassword();
         }
 
@@ -856,23 +845,19 @@ public class MainWindow {
         final NewStoredPasswordPanel newPassword = new NewStoredPasswordPanel(activeProfile, currentPassword);
         if (showDefaultInputWindow(newPassword, "New Profile") == OK_OPTION) {
             if (!isValid(newPassword)) {
-                errorMessage("Failed to create a new password, as you did not fill in all the fields.",
-                        "Failed To Create New Password", null);
+                errorMessage("Failed to create a new password, as you did not fill in all the fields.", "Failed To Create New Password", null);
                 return;
             }
 
             final StoredPassword storedPassword = newPassword.buildPassword();
 
             if (!validateNewPassword(storedPassword)) {
-                errorMessage(
-                        "Failed to create a new password, as the new password is not valid, either fields were empty or none existant.",
-                        "Failed To Create New Password", null);
+                errorMessage("Failed to create a new password, as the new password is not valid, either fields were empty or none existant.", "Failed To Create New Password", null);
                 return;
             }
 
             if (unsuccessfulImport(storedPasswordDao.instertStoredPassword(storedPassword))) {
-                errorMessage("Failed to create a new password, inserting into the database failed.",
-                        "Failed To Create New Password", null);
+                errorMessage("Failed to create a new password, inserting into the database failed.", "Failed To Create New Password", null);
                 return;
             }
 
@@ -887,23 +872,19 @@ public class MainWindow {
         if (showDefaultInputWindow(newProfile, "New Profile") == OK_OPTION) {
 
             if (!isValid(newProfile)) {
-                errorMessage("Failed to create a new profile, as you did not fill in all the fields.",
-                        "Failed To Create New Profile", null);
+                errorMessage("Failed to create a new profile, as you did not fill in all the fields.", "Failed To Create New Profile", null);
                 return;
             }
 
             final MasterPassword masterPassword = newProfile.buildProfile();
 
             if (!validateNewProfile(masterPassword)) {
-                errorMessage(
-                        "Failed to create a new profile, as the new profile is not valid, either fields were empty or none existant.",
-                        "Failed To Create New Profile", null);
+                errorMessage("Failed to create a new profile, as the new profile is not valid, either fields were empty or none existant.", "Failed To Create New Profile", null);
                 return;
             }
 
             if (unsuccessfulImport(masterPasswordDao.instertMasterPassword(masterPassword))) {
-                errorMessage("Failed to create a new profile, inserting into the database failed.",
-                        "Failed To Create New Profile", null);
+                errorMessage("Failed to create a new profile, inserting into the database failed.", "Failed To Create New Profile", null);
                 return;
             }
 
@@ -989,8 +970,7 @@ public class MainWindow {
 
         if (masterPassword == null) {
             if (showErrorMessages) {
-                errorMessage("The master password was null, while updating the stored passwords table.",
-                        "Masterpassword was null", null);
+                errorMessage("The master password was null, while updating the stored passwords table.", "Masterpassword was null", null);
             }
             return;
         }
@@ -1010,9 +990,8 @@ public class MainWindow {
 
         if (areNull(profileName, encryptedPassword, encryptedPasswordName, encryptedPasswordNotes)) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Failed to validate password, as a value was null. profileName: [" + profileName
-                        + "], encryptedPassword: [" + encryptedPassword + "], encryptedPasswordName: ["
-                        + encryptedPasswordName + "], encryptedPasswordNotes: [" + encryptedPasswordNotes + "]");
+                LOG.debug("Failed to validate password, as a value was null. profileName: [" + profileName + "], encryptedPassword: [" + encryptedPassword
+                        + "], encryptedPasswordName: [" + encryptedPasswordName + "], encryptedPasswordNotes: [" + encryptedPasswordNotes + "]");
             }
             return false;
         }
@@ -1021,8 +1000,7 @@ public class MainWindow {
         final List<String> currentProfileNames = masterPasswordDao.getMasterPasswordNames();
         if (!currentProfileNames.contains(profileName)) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Failed to validate password as the profile name did not appear in the database. profileName: ["
-                        + profileName + "]");
+                LOG.debug("Failed to validate password as the profile name did not appear in the database. profileName: [" + profileName + "]");
             }
             return false;
         }
@@ -1037,10 +1015,8 @@ public class MainWindow {
     }
 
     private boolean validateNewProfile(final MasterPassword profile) {
-        final boolean encryptionTypesValid = EncryptionType.areValid(profile.getMasterPasswordEncryptionType(),
-                profile.getStoredPasswordEncryptionType());
-        final boolean areNotEmpty = StringUtils.areNotEmpty(profile.getEncryptedSecretKey(), profile.getProfileName(),
-                profile.getSalt());
+        final boolean encryptionTypesValid = EncryptionType.areValid(profile.getMasterPasswordEncryptionType(), profile.getStoredPasswordEncryptionType());
+        final boolean areNotEmpty = StringUtils.areNotEmpty(profile.getEncryptedSecretKey(), profile.getProfileName(), profile.getSalt());
 
         if (encryptionTypesValid && areNotEmpty) {
             final List<String> currentProfileNames = masterPasswordDao.getMasterPasswordNames();
@@ -1060,7 +1036,7 @@ public class MainWindow {
             final StoredPassword password = storedPasswordsModel.getRow(selectedRow);
             if (password != null) {
                 try {
-                    viewPassword(password, activeProfile, currentPassword, true);
+                    viewPassword(password, true);
                 } catch (final UnsupportedEncodingException e) {
                     errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
                     viewPasswordEncrypted(password);
@@ -1072,17 +1048,16 @@ public class MainWindow {
                     viewPasswordEncrypted(password);
                 }
             } else {
-                errorMessage("The Storedpassword was null, while trying to view a password", "Storedpassword was null",
-                        null);
+                errorMessage("The Storedpassword was null, while trying to view a password", "Storedpassword was null", null);
             }
         } else {
             showMessageWindow("Please select a password and try again.", "No Password Selected");
         }
     }
 
-    private static void viewPasswordEncrypted(final StoredPassword password) {
+    private void viewPasswordEncrypted(final StoredPassword password) {
         try {
-            viewPassword(password, activeProfile, currentPassword, false);
+            viewPassword(password, false);
         } catch (final UnsupportedEncodingException e) {
             errorMessage("An error occured when trying to view your password.", "Password Error", e);
         } catch (final DecoderException e) {
@@ -1092,28 +1067,53 @@ public class MainWindow {
         }
     }
 
-    private static void viewPassword(final StoredPassword password, final MasterPassword activeProfile,
-            final String currentPassword, final boolean doDecrypt) throws UnsupportedEncodingException,
-            DecoderException, AbstractEncrypterException {
-        final ViewStoredPasswordPanel viewStoredPassword = new ViewStoredPasswordPanel(password, activeProfile,
-                currentPassword, doDecrypt);
-        showMessageWindow(viewStoredPassword, "View Stored Password");
+    private void viewPassword(final StoredPassword password, final boolean doDecrypt) throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+        final ViewStoredPasswordPanel viewStoredPassword = new ViewStoredPasswordPanel(password, activeProfile, currentPassword, doDecrypt);
+
+        // showMessageWindow(viewStoredPassword, "View Stored Password");
+
+        final int result = showCustomInputWindow(viewStoredPassword, "View Stored Password", new String[] { "Edit", "Close" });
+
+        LOG.debug("View password closed with result [" + result + "]");
+
+        // Edit chosen.
+        if (result == 0) {
+            editPassword(password, doDecrypt);
+        }
     }
 
-    private static void editPassword(final StoredPassword password, final MasterPassword activeProfile,
-            final String currentPassword, final boolean doDecrypt, final StoredPasswordsDao storedPasswordDao)
-            throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
-        final EditStoredPasswordPanel editStoredPassword = new EditStoredPasswordPanel(password, activeProfile,
-                currentPassword, doDecrypt);
+    private void editPassword(final StoredPassword password, final boolean doDecrypt) throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+        final EditStoredPasswordPanel editStoredPassword = new EditStoredPasswordPanel(password, activeProfile, currentPassword, doDecrypt);
 
-        final int result = showCustomInputWindow(editStoredPassword, "Edit Stored Password", new String[] { "Save",
-                "Cancel" });
+        final int result = showCustomInputWindow(editStoredPassword, "Edit Stored Password", new String[] { "Save", "Cancel" });
 
         if (result == OK_OPTION || editStoredPassword.isClosedByKey()) {
             LOG.debug("Going to save changes.");
-            storedPasswordDao.updateStoredPassword(editStoredPassword.getUpdatedPassword());
+            storedPasswordDao.updateStoredPassword(editStoredPassword.getUpdatedPassword(activeProfile, currentPassword));
         } else {
             LOG.debug("Not going to save changes.");
         }
+    }
+
+    private void updateAllActionStates() {
+        // View Menu
+        // - Sidebar toggles:
+        // - + Action Buttons
+        // - + Available Profiles
+        setEnabled(chckbxmntmToggleSidebar.isSelected(), chckbxmntmToggleActionButtons, chckbxmntmToggleAvailableProfiles);
+
+        // Action Buttons & File Menu
+        // - New Profile - always available
+        // - Load, Close, Delete Profile - Only if a profile is selected
+        final boolean isAProfileSelected = availableProfilesJList.getSelectedIndex() >= 0;
+        setEnabled(isAProfileSelected, loadProfileJButton, closeProfileJButton, deleteProfileJButton, mntmLoadProfile, mntmDeleteProfile);
+
+        // - New Password - always available
+        // - View, Edit, Delete Password - Only if a password is selected
+        final boolean isAPasswordSelected = storedPasswordsJTable.getSelectedRow() >= 0;
+        setEnabled(isAPasswordSelected, viewPasswordJButton, editPasswordJButton, deletePasswordJButton, mntmViewPassword, mntmEditPassword, mntmDeletePassword);
+
+        // - Delete Database - Only if menu item in Edit is enabled. TODO
+        setEnabled(false, deleteDatabaseJButton);
     }
 }
