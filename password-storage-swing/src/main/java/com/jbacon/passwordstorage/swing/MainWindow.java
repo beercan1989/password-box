@@ -64,9 +64,11 @@ import com.jbacon.passwordstorage.encryption.EncryptionType;
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.encryption.errors.NoSuchEncryptionException;
 import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
+import com.jbacon.passwordstorage.functions.AnnonymousFunction;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
 import com.jbacon.passwordstorage.swing.list.MasterPasswordListModel;
+import com.jbacon.passwordstorage.swing.listeners.MouseActionListener;
 import com.jbacon.passwordstorage.swing.panels.EditStoredPasswordPanel;
 import com.jbacon.passwordstorage.swing.panels.NewMasterPasswordPanel;
 import com.jbacon.passwordstorage.swing.panels.NewStoredPasswordPanel;
@@ -156,7 +158,6 @@ public class MainWindow {
     private JMenuItem mntmNewProfile;
     private JMenuItem mntmNewPassword;
     private JMenuItem mntmExit;
-    private JMenuItem mntmSettings;
     private JMenuItem mntmAbout;
     private JMenuItem mntmCheckForUpdates;
     private JMenuItem mntmFaq;
@@ -191,6 +192,8 @@ public class MainWindow {
     private JPanel activeProfileJPanel;
     private JLabel activeProfileJLabel;
     private JButton closeProfileJButton;
+    private JCheckBoxMenuItem chckbxmntmEnableDeleteDatabase;
+    private JMenu mnSettings;
 
     public MainWindow() {
         maintenanceDao = setupMaintenanceDao();
@@ -342,6 +345,7 @@ public class MainWindow {
                 }
             }
         });
+        mntmNewProfile.addActionListener(updateAllActionStatesAL);
         mnFile.add(mntmNewProfile);
 
         mntmLoadProfile = new JMenuItem("Load Profile");
@@ -351,6 +355,7 @@ public class MainWindow {
                 loadProfile();
             }
         });
+        mntmLoadProfile.addActionListener(updateAllActionStatesAL);
         mnFile.add(mntmLoadProfile);
 
         mntmDeleteProfile = new JMenuItem("Delete Profile");
@@ -360,6 +365,7 @@ public class MainWindow {
                 deleteProfile();
             }
         });
+        mntmDeleteProfile.addActionListener(updateAllActionStatesAL);
         mnFile.add(mntmDeleteProfile);
 
         firstFileMenuJSeparator = new JSeparator();
@@ -380,6 +386,7 @@ public class MainWindow {
                 }
             }
         });
+        mntmNewPassword.addActionListener(updateAllActionStatesAL);
         mnFile.add(mntmNewPassword);
 
         mntmViewPassword = new JMenuItem("View Password");
@@ -390,6 +397,7 @@ public class MainWindow {
             }
         });
         mnFile.add(mntmViewPassword);
+        mnFile.addActionListener(updateAllActionStatesAL);
 
         mntmDeletePassword = new JMenuItem("Delete Password");
         mntmDeletePassword.addActionListener(new ActionListener() {
@@ -398,6 +406,7 @@ public class MainWindow {
                 deletePassword();
             }
         });
+        mntmDeletePassword.addActionListener(updateAllActionStatesAL);
 
         mntmEditPassword = new JMenuItem("Edit Password");
         mntmEditPassword.addActionListener(new ActionListener() {
@@ -406,6 +415,7 @@ public class MainWindow {
                 editPassword();
             }
         });
+        mntmEditPassword.addActionListener(updateAllActionStatesAL);
         mnFile.add(mntmEditPassword);
         mnFile.add(mntmDeletePassword);
 
@@ -424,8 +434,12 @@ public class MainWindow {
         mnEdit = new JMenu("Edit");
         menuBar.add(mnEdit);
 
-        mntmSettings = new JMenuItem("Settings");
-        mnEdit.add(mntmSettings);
+        mnSettings = new JMenu("Settings");
+        mnEdit.add(mnSettings);
+
+        chckbxmntmEnableDeleteDatabase = new JCheckBoxMenuItem("Enable Delete Database");
+        chckbxmntmEnableDeleteDatabase.addActionListener(updateAllActionStatesAL);
+        mnSettings.add(chckbxmntmEnableDeleteDatabase);
 
         mnView = new JMenu("View");
         menuBar.add(mnView);
@@ -442,10 +456,9 @@ public class MainWindow {
                     setSelected(isSelected, chckbxmntmToggleActionButtons, chckbxmntmToggleAvailableProfiles);
                     setVisible(isSelected, availableProfilesNorthButtonJPanel, availableProfilesJList);
                 }
-
-                updateAllActionStates();
             }
         });
+        chckbxmntmToggleSidebar.addActionListener(updateAllActionStatesAL);
         mnView.add(chckbxmntmToggleSidebar);
 
         viewMenuSeparator = new JSeparator();
@@ -459,6 +472,7 @@ public class MainWindow {
                 setVisible(chckbxmntmToggleActionButtons.isSelected(), availableProfilesNorthButtonJPanel);
             }
         });
+        chckbxmntmToggleActionButtons.addActionListener(updateAllActionStatesAL);
         mnView.add(chckbxmntmToggleActionButtons);
 
         chckbxmntmToggleAvailableProfiles = new JCheckBoxMenuItem("Available Profiles");
@@ -469,6 +483,7 @@ public class MainWindow {
                 setVisible(chckbxmntmToggleAvailableProfiles.isSelected(), availableProfilesJList);
             }
         });
+        chckbxmntmToggleAvailableProfiles.addActionListener(updateAllActionStatesAL);
         mnView.add(chckbxmntmToggleAvailableProfiles);
 
         mnHelp = new JMenu("Help");
@@ -530,6 +545,7 @@ public class MainWindow {
                 }
             }
         });
+        newProfileJButton.addActionListener(updateAllActionStatesAL);
         final GridBagConstraints gbc_newProfileJButton = new GridBagConstraints();
         gbc_newProfileJButton.fill = GridBagConstraints.HORIZONTAL;
         gbc_newProfileJButton.insets = new Insets(0, 0, 5, 0);
@@ -544,6 +560,7 @@ public class MainWindow {
                 loadProfile();
             }
         });
+        newProfileJButton.addActionListener(updateAllActionStatesAL);
         final GridBagConstraints gbc_loadProfileJButton = new GridBagConstraints();
         gbc_loadProfileJButton.fill = GridBagConstraints.HORIZONTAL;
         gbc_loadProfileJButton.insets = new Insets(0, 0, 5, 0);
@@ -558,6 +575,7 @@ public class MainWindow {
                 deleteProfile();
             }
         });
+        deleteProfileJButton.addActionListener(updateAllActionStatesAL);
 
         closeProfileJButton = new JButton("Close Profile");
         closeProfileJButton.addActionListener(new ActionListener() {
@@ -566,6 +584,7 @@ public class MainWindow {
                 closeProfile();
             }
         });
+        closeProfileJButton.addActionListener(updateAllActionStatesAL);
         final GridBagConstraints gbc_closeProfileJButton = new GridBagConstraints();
         gbc_closeProfileJButton.fill = GridBagConstraints.HORIZONTAL;
         gbc_closeProfileJButton.insets = new Insets(0, 0, 5, 0);
@@ -603,6 +622,7 @@ public class MainWindow {
                 }
             }
         });
+        newPasswordJBbutton.addActionListener(updateAllActionStatesAL);
         final GridBagConstraints gbc_newPasswordJBbutton = new GridBagConstraints();
         gbc_newPasswordJBbutton.fill = GridBagConstraints.HORIZONTAL;
         gbc_newPasswordJBbutton.insets = new Insets(0, 0, 5, 0);
@@ -617,6 +637,7 @@ public class MainWindow {
                 viewPassword();
             }
         });
+        viewPasswordJButton.addActionListener(updateAllActionStatesAL);
         final GridBagConstraints gbc_openPasswordJButton = new GridBagConstraints();
         gbc_openPasswordJButton.fill = GridBagConstraints.HORIZONTAL;
         gbc_openPasswordJButton.insets = new Insets(0, 0, 5, 0);
@@ -631,6 +652,7 @@ public class MainWindow {
                 editPassword();
             }
         });
+        editPasswordJButton.addActionListener(updateAllActionStatesAL);
         final GridBagConstraints gbc_editPasswordJButton = new GridBagConstraints();
         gbc_editPasswordJButton.fill = GridBagConstraints.HORIZONTAL;
         gbc_editPasswordJButton.insets = new Insets(0, 0, 5, 0);
@@ -645,6 +667,7 @@ public class MainWindow {
                 deletePassword();
             }
         });
+        deletePasswordJButton.addActionListener(updateAllActionStatesAL);
         final GridBagConstraints gbc_deletePasswordJButton = new GridBagConstraints();
         gbc_deletePasswordJButton.insets = new Insets(0, 0, 5, 0);
         gbc_deletePasswordJButton.fill = GridBagConstraints.HORIZONTAL;
@@ -662,6 +685,7 @@ public class MainWindow {
         availableProfilesNorthButtonJPanel.add(deleteDatabaseJSeparator, gbc_deleteDatabaseJSeparator);
 
         deleteDatabaseJButton = new JButton("Delete Database");
+        deleteDatabaseJButton.addActionListener(updateAllActionStatesAL);
         deleteDatabaseJButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -677,6 +701,7 @@ public class MainWindow {
 
         availableProfilesModel = new MasterPasswordListModel();
         availableProfilesJList = new JList();
+        availableProfilesJList.addMouseListener(updateAllActionStatesME);
         availableProfilesJList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent mouseEvent) {
@@ -712,6 +737,7 @@ public class MainWindow {
 
         storedPasswordsModel = new StoredPasswordTableModel();
         storedPasswordsJTable = new JTable();
+        storedPasswordsJTable.addMouseListener(updateAllActionStatesME);
         storedPasswordsJTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent mouseEvent) {
@@ -1095,6 +1121,20 @@ public class MainWindow {
         }
     }
 
+    private final ActionListener updateAllActionStatesAL = new ActionListener() {
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            updateAllActionStates();
+        }
+    };
+
+    private final MouseAdapter updateAllActionStatesME = MouseActionListener.get(new AnnonymousFunction() {
+        @Override
+        public void apply() {
+            updateAllActionStates();
+        }
+    });
+
     private void updateAllActionStates() {
         // View Menu
         // - Sidebar toggles:
@@ -1113,7 +1153,7 @@ public class MainWindow {
         final boolean isAPasswordSelected = storedPasswordsJTable.getSelectedRow() >= 0;
         setEnabled(isAPasswordSelected, viewPasswordJButton, editPasswordJButton, deletePasswordJButton, mntmViewPassword, mntmEditPassword, mntmDeletePassword);
 
-        // - Delete Database - Only if menu item in Edit is enabled. TODO
-        setEnabled(false, deleteDatabaseJButton);
+        // - Delete Database - Only if menu item in Edit is enabled.
+        setEnabled(chckbxmntmEnableDeleteDatabase.isSelected(), deleteDatabaseJButton);
     }
 }
