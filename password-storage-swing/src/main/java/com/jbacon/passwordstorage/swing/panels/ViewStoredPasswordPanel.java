@@ -7,7 +7,6 @@ import java.awt.Insets;
 import java.io.UnsupportedEncodingException;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.border.AbstractBorder;
@@ -16,21 +15,16 @@ import javax.swing.border.EtchedBorder;
 
 import org.apache.commons.codec.DecoderException;
 
-import com.jbacon.passwordstorage.encryption.EncrypterAES;
-import com.jbacon.passwordstorage.encryption.EncrypterPBE;
-import com.jbacon.passwordstorage.encryption.EncryptionMode;
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
-import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
 
-public class ViewStoredPasswordPanel extends JPanel {
+public class ViewStoredPasswordPanel extends AbstractStoredPasswordPanel {
 
     private static final long serialVersionUID = 7627750248397407249L;
     private static final AbstractBorder TEXT_AREA_BORDER = new EtchedBorder(EtchedBorder.LOWERED, null, null);
     private static final Insets TEXT_AREA_MARGIN = new Insets(1, 5, 1, 5);
 
-    private final StoredPassword password;
     private final JLabel passwordNameJLabel;
     private final JLabel passwordIdJLabel;
     private final JLabel profileNameJLabel;
@@ -49,8 +43,9 @@ public class ViewStoredPasswordPanel extends JPanel {
 
     public ViewStoredPasswordPanel(final StoredPassword password, final MasterPassword profile, final String currentPassword, final boolean doDecryption)
             throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+        super(password);
+
         setBorder(new EmptyBorder(10, 10, 10, 10));
-        this.password = password;
         final GridBagLayout gridBagLayout = new GridBagLayout();
         gridBagLayout.columnWidths = new int[] { 0, 0, 0 };
         gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -226,41 +221,31 @@ public class ViewStoredPasswordPanel extends JPanel {
         this.setPreferredSize(preferedSize);
         this.setMinimumSize(preferedSize);
 
-        insertPasswordDetails(profile, currentPassword, doDecryption);
+        setupPasswordDetails(profile, currentPassword, doDecryption);
     }
 
-    private void insertPasswordDetails(final MasterPassword profile, final String currentPassword, final boolean doDecryption) throws UnsupportedEncodingException,
-            DecoderException, AbstractEncrypterException {
-
-        passwordIdJTextArea.setText(password.getId().toString());
-        profileNameJTextArea.setText(password.getProfileName());
-
-        if (doDecryption) {
-            passwordNameJTextArea.setText(getDecrypted(password.getEncryptedPasswordName(), profile, currentPassword));
-            passwordJTextArea.setText(getDecrypted(password.getEncryptedPassword(), profile, currentPassword));
-            passwordNotesJTextArea.setText(getDecrypted(password.getEncryptedPasswordNotes(), profile, currentPassword));
-        } else {
-            passwordNameJTextArea.setText(password.getEncryptedPasswordName());
-            passwordJTextArea.setText(password.getEncryptedPassword());
-            passwordNotesJTextArea.setText(password.getEncryptedPasswordNotes());
-        }
+    @Override
+    protected JTextArea getPasswordIdJTextArea() {
+        return passwordIdJTextArea;
     }
 
-    private static String getDecrypted(final String toDecrypt, final MasterPassword profile, final String currentPassword) throws UnsupportedEncodingException, DecoderException,
-            AbstractEncrypterException {
-        return getDecrypted(EncrypterUtils.base64StringToBytes(toDecrypt), profile, currentPassword);
+    @Override
+    protected JTextArea getProfileNameJTextArea() {
+        return profileNameJTextArea;
     }
 
-    private static String getDecrypted(final byte[] toDecrypt, final MasterPassword profile, final String currentPassword) throws DecoderException, AbstractEncrypterException,
-            UnsupportedEncodingException {
-        final EncrypterPBE pbeDecrypter = (EncrypterPBE) profile.getMasterPasswordEncryptionType().getEncrypter();
-        final byte[] salt = EncrypterUtils.base64StringToBytes(profile.getSalt());
-        final byte[] cipherText = EncrypterUtils.base64StringToBytes(profile.getEncryptedSecretKey());
-        final char[] passPhrase = EncrypterUtils.stringToChar(currentPassword);
-        final byte[] aesKey = pbeDecrypter.doCiper(EncryptionMode.DECRYPT_MODE, salt, cipherText, passPhrase);
-        final EncrypterAES aesDecrypter = (EncrypterAES) profile.getStoredPasswordEncryptionType().getEncrypter();
-        final byte[] encryptedValue = aesDecrypter.doCiper(EncryptionMode.DECRYPT_MODE, toDecrypt, aesKey);
+    @Override
+    protected JTextArea getPasswordNameJTextArea() {
+        return passwordNameJTextArea;
+    }
 
-        return EncrypterUtils.byteToString(encryptedValue);
+    @Override
+    protected JTextArea getPasswordJTextArea() {
+        return passwordJTextArea;
+    }
+
+    @Override
+    protected JTextArea getPasswordNotesJTextArea() {
+        return passwordNotesJTextArea;
     }
 }

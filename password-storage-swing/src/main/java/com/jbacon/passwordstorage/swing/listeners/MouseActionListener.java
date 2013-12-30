@@ -5,7 +5,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
 import com.jbacon.passwordstorage.functions.AnnonymousFunction;
-import com.jbacon.passwordstorage.functions.FunctionFrom;
+import com.jbacon.passwordstorage.functions.ProcessFunction;
 
 public class MouseActionListener extends MouseAdapter {
 
@@ -53,7 +53,7 @@ public class MouseActionListener extends MouseAdapter {
         };
     }
 
-    public static MouseAdapter get(final FunctionFrom<MouseEvent> mouseFunction, final FunctionFrom<MouseWheelEvent> mouseWheelFunction) {
+    public static MouseAdapter get(final ProcessFunction<MouseEvent> mouseFunction, final ProcessFunction<MouseWheelEvent> mouseWheelFunction) {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {

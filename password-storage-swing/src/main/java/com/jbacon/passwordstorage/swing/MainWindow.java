@@ -772,7 +772,7 @@ public class MainWindow {
 
         storedPasswordsJScrollPane.setViewportView(storedPasswordsJTable);
 
-        updateAllActionStates();
+        updateAllActionStates.apply();
     }
 
     private boolean isDoubleClick(final MouseEvent mouseEvent) {
@@ -1124,36 +1124,34 @@ public class MainWindow {
     private final ActionListener updateAllActionStatesAL = new ActionListener() {
         @Override
         public void actionPerformed(final ActionEvent e) {
-            updateAllActionStates();
+            updateAllActionStates.apply();
         }
     };
 
-    private final MouseAdapter updateAllActionStatesME = MouseActionListener.get(new AnnonymousFunction() {
+    private final AnnonymousFunction updateAllActionStates = new AnnonymousFunction() {
         @Override
         public void apply() {
-            updateAllActionStates();
+            // View Menu
+            // - Sidebar toggles:
+            // - + Action Buttons
+            // - + Available Profiles
+            setEnabled(chckbxmntmToggleSidebar.isSelected(), chckbxmntmToggleActionButtons, chckbxmntmToggleAvailableProfiles);
+
+            // Action Buttons & File Menu
+            // - New Profile - always available
+            // - Load, Close, Delete Profile - Only if a profile is selected
+            final boolean isAProfileSelected = availableProfilesJList.getSelectedIndex() >= 0;
+            setEnabled(isAProfileSelected, loadProfileJButton, closeProfileJButton, deleteProfileJButton, mntmLoadProfile, mntmDeleteProfile);
+
+            // - New Password - always available
+            // - View, Edit, Delete Password - Only if a password is selected
+            final boolean isAPasswordSelected = storedPasswordsJTable.getSelectedRow() >= 0;
+            setEnabled(isAPasswordSelected, viewPasswordJButton, editPasswordJButton, deletePasswordJButton, mntmViewPassword, mntmEditPassword, mntmDeletePassword);
+
+            // - Delete Database - Only if menu item in Edit is enabled.
+            setEnabled(chckbxmntmEnableDeleteDatabase.isSelected(), deleteDatabaseJButton);
         }
-    });
+    };
 
-    private void updateAllActionStates() {
-        // View Menu
-        // - Sidebar toggles:
-        // - + Action Buttons
-        // - + Available Profiles
-        setEnabled(chckbxmntmToggleSidebar.isSelected(), chckbxmntmToggleActionButtons, chckbxmntmToggleAvailableProfiles);
-
-        // Action Buttons & File Menu
-        // - New Profile - always available
-        // - Load, Close, Delete Profile - Only if a profile is selected
-        final boolean isAProfileSelected = availableProfilesJList.getSelectedIndex() >= 0;
-        setEnabled(isAProfileSelected, loadProfileJButton, closeProfileJButton, deleteProfileJButton, mntmLoadProfile, mntmDeleteProfile);
-
-        // - New Password - always available
-        // - View, Edit, Delete Password - Only if a password is selected
-        final boolean isAPasswordSelected = storedPasswordsJTable.getSelectedRow() >= 0;
-        setEnabled(isAPasswordSelected, viewPasswordJButton, editPasswordJButton, deletePasswordJButton, mntmViewPassword, mntmEditPassword, mntmDeletePassword);
-
-        // - Delete Database - Only if menu item in Edit is enabled.
-        setEnabled(chckbxmntmEnableDeleteDatabase.isSelected(), deleteDatabaseJButton);
-    }
+    private final MouseAdapter updateAllActionStatesME = MouseActionListener.get(updateAllActionStates);
 }

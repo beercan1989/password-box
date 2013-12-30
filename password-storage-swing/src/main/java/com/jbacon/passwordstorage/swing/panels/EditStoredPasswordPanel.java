@@ -7,7 +7,6 @@ import java.awt.Insets;
 import java.io.UnsupportedEncodingException;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.border.AbstractBorder;
@@ -20,18 +19,14 @@ import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
-import com.jbacon.passwordstorage.swing.listeners.CloseJOptionPaneKeyListener;
 import com.jbacon.passwordstorage.utils.PasswordEncryptionUtil;
 
-public class EditStoredPasswordPanel extends JPanel {
+public class EditStoredPasswordPanel extends AbstractStoredPasswordPanel {
 
     private static final long serialVersionUID = 7627750248397407249L;
     private static final AbstractBorder TEXT_AREA_BORDER = new EtchedBorder(EtchedBorder.LOWERED, null, null);
     private static final Insets TEXT_AREA_MARGIN = new Insets(1, 5, 1, 5);
 
-    private final CloseJOptionPaneKeyListener closeJOptionPaneKeyListener;
-
-    private final StoredPassword password;
     private final JLabel passwordNameJLabel;
     private final JLabel passwordIdJLabel;
     private final JLabel profileNameJLabel;
@@ -50,10 +45,9 @@ public class EditStoredPasswordPanel extends JPanel {
 
     public EditStoredPasswordPanel(final StoredPassword password, final MasterPassword profile, final String currentPassword, final boolean doDecryption)
             throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
-        this.closeJOptionPaneKeyListener = new CloseJOptionPaneKeyListener();
+        super(password);
 
         setBorder(new EmptyBorder(10, 10, 10, 10));
-        this.password = password;
         final GridBagLayout gridBagLayout = new GridBagLayout();
         gridBagLayout.columnWidths = new int[] { 0, 0, 0 };
         gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -229,24 +223,7 @@ public class EditStoredPasswordPanel extends JPanel {
         this.setPreferredSize(preferedSize);
         this.setMinimumSize(preferedSize);
 
-        insertPasswordDetails(profile, currentPassword, doDecryption);
-    }
-
-    private void insertPasswordDetails(final MasterPassword profile, final String currentPassword, final boolean doDecryption) throws UnsupportedEncodingException,
-            DecoderException, AbstractEncrypterException {
-
-        passwordIdJTextArea.setText(password.getId().toString());
-        profileNameJTextArea.setText(password.getProfileName());
-
-        if (doDecryption) {
-            passwordNameJTextArea.setText(PasswordEncryptionUtil.getDecrypted(password.getEncryptedPasswordName(), profile, currentPassword));
-            passwordJTextArea.setText(PasswordEncryptionUtil.getDecrypted(password.getEncryptedPassword(), profile, currentPassword));
-            passwordNotesJTextArea.setText(PasswordEncryptionUtil.getDecrypted(password.getEncryptedPasswordNotes(), profile, currentPassword));
-        } else {
-            passwordNameJTextArea.setText(password.getEncryptedPasswordName());
-            passwordJTextArea.setText(password.getEncryptedPassword());
-            passwordNotesJTextArea.setText(password.getEncryptedPasswordNotes());
-        }
+        setupPasswordDetails(profile, currentPassword, doDecryption);
     }
 
     public StoredPassword getUpdatedPassword(final MasterPassword profile, final String currentPassword) throws UnsupportedEncodingException, DecoderException,
@@ -259,7 +236,28 @@ public class EditStoredPasswordPanel extends JPanel {
         return password;
     }
 
-    public boolean isClosedByKey() {
-        return closeJOptionPaneKeyListener.isClosedByKeyListener();
+    @Override
+    protected JTextArea getPasswordIdJTextArea() {
+        return passwordIdJTextArea;
+    }
+
+    @Override
+    protected JTextArea getProfileNameJTextArea() {
+        return profileNameJTextArea;
+    }
+
+    @Override
+    protected JTextArea getPasswordNameJTextArea() {
+        return passwordNameJTextArea;
+    }
+
+    @Override
+    protected JTextArea getPasswordJTextArea() {
+        return passwordJTextArea;
+    }
+
+    @Override
+    protected JTextArea getPasswordNotesJTextArea() {
+        return passwordNotesJTextArea;
     }
 }
