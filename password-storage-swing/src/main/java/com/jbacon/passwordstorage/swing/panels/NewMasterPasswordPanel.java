@@ -36,9 +36,9 @@ import com.jbacon.passwordstorage.encryption.EncryptionType;
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 import com.jbacon.passwordstorage.password.MasterPassword;
-import com.jbacon.passwordstorage.swing.MainWindow;
 import com.jbacon.passwordstorage.tools.GenericUtils;
 import com.jbacon.passwordstorage.tools.StringUtils;
+import com.jbacon.passwordstorage.utils.JOptionUtil;
 
 public class NewMasterPasswordPanel extends JPanel {
 
@@ -242,7 +242,7 @@ public class NewMasterPasswordPanel extends JPanel {
                 try {
                     generateSalt();
                 } catch (final AbstractEncrypterException ex) {
-                    MainWindow.errorMessage("Failed to generate salt value.", "Salt Generation Failure", ex);
+                    JOptionUtil.errorMessage("Failed to generate salt value.", "Salt Generation Failure", ex);
                 }
             }
         });

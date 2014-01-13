@@ -1,0 +1,97 @@
+package com.jbacon.passwordstorage.actions;
+
+import static com.jbacon.passwordstorage.tools.GenericUtils.areNull;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
+import javax.swing.JOptionPane;
+
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.jbacon.passwordstorage.database.dao.MasterPasswordsDao;
+import com.jbacon.passwordstorage.database.dao.StoredPasswordsDao;
+import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
+import com.jbacon.passwordstorage.functions.AnnonymousFunction;
+import com.jbacon.passwordstorage.password.MasterPassword;
+import com.jbacon.passwordstorage.password.StoredPassword;
+import com.jbacon.passwordstorage.swing.panels.NewStoredPasswordPanel;
+import com.jbacon.passwordstorage.utils.DBUtil;
+import com.jbacon.passwordstorage.utils.JOptionUtil;
+
+public class NewPasswordAction {
+    private static final Log LOG = LogFactory.getLog(NewPasswordAction.class);
+
+    private final MasterPassword defaultActiveProfile;
+    private final StoredPasswordsDao storedPasswordDao;
+    private final MasterPasswordsDao masterPasswordDao;
+    private final AnnonymousFunction updateStoredPasswordsFN;
+
+    public NewPasswordAction(final MasterPassword defaultActiveProfile, final MasterPasswordsDao masterPasswordDao, final StoredPasswordsDao storedPasswordDao,
+            final AnnonymousFunction updateStoredPasswordsFN) {
+        this.defaultActiveProfile = defaultActiveProfile;
+        this.storedPasswordDao = storedPasswordDao;
+        this.updateStoredPasswordsFN = updateStoredPasswordsFN;
+        this.masterPasswordDao = masterPasswordDao;
+    }
+
+    public void newPassword(final MasterPassword activeProfile, final String currentPassword) throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+        LOG.debug("Creating a new Password");
+        if (activeProfile.equals(defaultActiveProfile)) {
+            JOptionUtil.errorMessage("You need to create or load a profile first.", "No Profile Loaded", null);
+            return;
+        }
+        final NewStoredPasswordPanel newPassword = new NewStoredPasswordPanel(activeProfile, currentPassword);
+        if (JOptionUtil.showDefaultInputWindow(newPassword, "New Profile") == JOptionPane.OK_OPTION) {
+            if (!NewStoredPasswordPanel.isValid(newPassword)) {
+                JOptionUtil.errorMessage("Failed to create a new password, as you did not fill in all the fields.", "Failed To Create New Password", null);
+                return;
+            }
+
+            final StoredPassword storedPassword = newPassword.buildPassword();
+
+            if (!validateNewPassword(storedPassword)) {
+                JOptionUtil.errorMessage("Failed to create a new password, as the new password is not valid, either fields were empty or none existant.",
+                        "Failed To Create New Password", null);
+                return;
+            }
+
+            if (DBUtil.unsuccessfulImport(storedPasswordDao.instertStoredPassword(storedPassword))) {
+                JOptionUtil.errorMessage("Failed to create a new password, inserting into the database failed.", "Failed To Create New Password", null);
+                return;
+            }
+
+            updateStoredPasswordsFN.apply();
+
+            LOG.debug("Created storedPassword for profile " + storedPassword.getProfileName());
+        }
+    }
+
+    private boolean validateNewPassword(final StoredPassword password) {
+        final String profileName = password.getProfileName();
+        final String encryptedPassword = password.getEncryptedPassword();
+        final String encryptedPasswordName = password.getEncryptedPasswordName();
+        final String encryptedPasswordNotes = password.getEncryptedPasswordNotes();
+
+        if (areNull(profileName, encryptedPassword, encryptedPasswordName, encryptedPasswordNotes)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Failed to validate password, as a value was null. profileName: [" + profileName + "], encryptedPassword: [" + encryptedPassword
+                        + "], encryptedPasswordName: [" + encryptedPasswordName + "], encryptedPasswordNotes: [" + encryptedPasswordNotes + "]");
+            }
+            return false;
+        }
+
+        // Profile Name matches one that already exists.
+        final List<String> currentProfileNames = masterPasswordDao.getMasterPasswordNames();
+        if (!currentProfileNames.contains(profileName)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Failed to validate password as the profile name did not appear in the database. profileName: [" + profileName + "]");
+            }
+            return false;
+        }
+
+        return true;
+    }
+}

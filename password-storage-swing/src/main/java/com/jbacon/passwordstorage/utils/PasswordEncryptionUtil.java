@@ -18,41 +18,33 @@ public class PasswordEncryptionUtil {
     private PasswordEncryptionUtil() {
     }
 
-    public static String getEncrypted(final byte[] toEncrypt, final MasterPassword profile, final String currentPassword)
-            throws DecoderException, AbstractEncrypterException, UnsupportedEncodingException {
-
-        final byte[] aesKey = getSymmetricKey(profile, currentPassword);
-        final EncrypterAES encrypter = (EncrypterAES) profile.getStoredPasswordEncryptionType().getEncrypter();
-        final byte[] encryptedValue = encrypter.doCiper(EncryptionMode.ENCRYPT_MODE, toEncrypt, aesKey);
-
-        try {
-            return EncrypterUtils.bytesToBase64String(encryptedValue);
-        } finally {
-            newRandom().nextBytes(aesKey);
-        }
+    public static String getEncrypted(final byte[] toEncrypt, final MasterPassword profile, final String currentPassword) throws DecoderException, AbstractEncrypterException,
+            UnsupportedEncodingException {
+        return EncrypterUtils.bytesToBase64String(doCipher(EncryptionMode.ENCRYPT_MODE, toEncrypt, profile, currentPassword));
     }
 
-    public static String getDecrypted(final String toDecrypt, final MasterPassword profile, final String currentPassword)
-            throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+    public static String getDecrypted(final String toDecrypt, final MasterPassword profile, final String currentPassword) throws UnsupportedEncodingException, DecoderException,
+            AbstractEncrypterException {
         return getDecrypted(EncrypterUtils.base64StringToBytes(toDecrypt), profile, currentPassword);
     }
 
-    public static String getDecrypted(final byte[] toDecrypt, final MasterPassword profile, final String currentPassword)
-            throws DecoderException, AbstractEncrypterException, UnsupportedEncodingException {
+    public static String getDecrypted(final byte[] toDecrypt, final MasterPassword profile, final String currentPassword) throws DecoderException, AbstractEncrypterException,
+            UnsupportedEncodingException {
+        return EncrypterUtils.byteToString(doCipher(EncryptionMode.DECRYPT_MODE, toDecrypt, profile, currentPassword));
 
+    }
+
+    private static byte[] doCipher(final EncryptionMode mode, final byte[] message, final MasterPassword profile, final String currentPassword) throws AbstractEncrypterException {
         final byte[] aesKey = getSymmetricKey(profile, currentPassword);
-        final EncrypterAES aesDecrypter = (EncrypterAES) profile.getStoredPasswordEncryptionType().getEncrypter();
-        final byte[] encryptedValue = aesDecrypter.doCiper(EncryptionMode.DECRYPT_MODE, toDecrypt, aesKey);
-
         try {
-            return EncrypterUtils.byteToString(encryptedValue);
+            final EncrypterAES cipher = (EncrypterAES) profile.getStoredPasswordEncryptionType().getEncrypter();
+            return cipher.doCiper(mode, message, aesKey);
         } finally {
             newRandom().nextBytes(aesKey);
         }
     }
 
-    private static byte[] getSymmetricKey(final MasterPassword profile, final String currentPassword)
-            throws AbstractEncrypterException {
+    private static byte[] getSymmetricKey(final MasterPassword profile, final String currentPassword) throws AbstractEncrypterException {
         final EncrypterPBE decrypter = (EncrypterPBE) profile.getMasterPasswordEncryptionType().getEncrypter();
         final byte[] salt = EncrypterUtils.base64StringToBytes(profile.getSalt());
         final byte[] cipherText = EncrypterUtils.base64StringToBytes(profile.getEncryptedSecretKey());

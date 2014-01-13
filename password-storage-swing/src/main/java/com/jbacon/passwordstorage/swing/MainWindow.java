@@ -1,16 +1,7 @@
 package com.jbacon.passwordstorage.swing;
 
-import static com.jbacon.passwordstorage.tools.GenericUtils.areNull;
 import static com.jbacon.passwordstorage.tools.GenericUtils.isNotNull;
-import static javax.swing.JOptionPane.ERROR_MESSAGE;
-import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
-import static javax.swing.JOptionPane.OK_CANCEL_OPTION;
 import static javax.swing.JOptionPane.OK_OPTION;
-import static javax.swing.JOptionPane.QUESTION_MESSAGE;
-import static javax.swing.JOptionPane.showConfirmDialog;
-import static javax.swing.JOptionPane.showInputDialog;
-import static javax.swing.JOptionPane.showMessageDialog;
-import static javax.swing.JOptionPane.showOptionDialog;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -22,6 +13,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -52,6 +45,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.jbacon.passwordstorage.actions.NewPasswordAction;
 import com.jbacon.passwordstorage.database.dao.MaintenanceDao;
 import com.jbacon.passwordstorage.database.dao.MasterPasswordsDao;
 import com.jbacon.passwordstorage.database.dao.StoredPasswordsDao;
@@ -70,21 +64,17 @@ import com.jbacon.passwordstorage.password.StoredPassword;
 import com.jbacon.passwordstorage.swing.list.MasterPasswordListModel;
 import com.jbacon.passwordstorage.swing.panels.EditStoredPasswordPanel;
 import com.jbacon.passwordstorage.swing.panels.NewMasterPasswordPanel;
-import com.jbacon.passwordstorage.swing.panels.NewStoredPasswordPanel;
 import com.jbacon.passwordstorage.swing.panels.ProfilePasswordEntryPanel;
 import com.jbacon.passwordstorage.swing.panels.ViewStoredPasswordPanel;
 import com.jbacon.passwordstorage.swing.table.StoredPasswordTableColumns;
 import com.jbacon.passwordstorage.swing.table.StoredPasswordTableModel;
 import com.jbacon.passwordstorage.tools.StringUtils;
+import com.jbacon.passwordstorage.utils.DBUtil;
+import com.jbacon.passwordstorage.utils.JOptionUtil;
 
 public class MainWindow {
 
     private static final Log LOG = LogFactory.getLog(MainWindow.class);
-
-    public static void errorMessage(final String message, final String title, final Exception e) {
-        showMessageDialog(null, message, title, ERROR_MESSAGE);
-        LOG.error(message, e);
-    }
 
     private static void logDebugMessage(final String message) {
         LOG.debug(message);
@@ -104,32 +94,12 @@ public class MainWindow {
         });
     }
 
-    private static int showDefaultInputWindow(final Object message, final String title) {
-        return showConfirmDialog(null, message, title, OK_CANCEL_OPTION);
-    }
-
-    private static int showCustomInputWindow(final Object message, final String title) {
-        return showCustomInputWindow(message, title, new String[] { "OK", "Cancel" });
-    }
-
-    private static int showCustomInputWindow(final Object message, final String title, final String[] options) {
-        return showOptionDialog(null, message, title, OK_CANCEL_OPTION, QUESTION_MESSAGE, null, options, "");
-    }
-
-    private static void showMessageWindow(final Object message, final String title) {
-        showMessageDialog(null, message, title, INFORMATION_MESSAGE);
-    }
-
-    private static String showSimpleInputWindow(final String message, final String title) {
-        return showInputDialog(null, message, title, QUESTION_MESSAGE);
-    }
-
     private final MaintenanceDao maintenanceDao;
     private final MasterPasswordsDao masterPasswordDao;
     private final StoredPasswordsDao storedPasswordDao;
 
-    private static final MasterPassword DEFAULT_ACTIVE_PROFILE = new MasterPassword();
-    private static final String DEFAULT_CURRENT_PASSWORD = "### --- Default Current Password --- ###";
+    protected static final MasterPassword DEFAULT_ACTIVE_PROFILE = new MasterPassword();
+    protected static final String DEFAULT_CURRENT_PASSWORD = "### --- Default Current Password --- ###";
 
     private static MasterPassword activeProfile = DEFAULT_ACTIVE_PROFILE;
     private static String currentPassword = DEFAULT_CURRENT_PASSWORD;
@@ -155,6 +125,7 @@ public class MainWindow {
     private JMenu mnHelp;
     private JMenuItem mntmLoadProfile;
     private JMenuItem mntmNewProfile;
+    private JMenuItem mntmCloseProfile;
     private JMenuItem mntmNewPassword;
     private JMenuItem mntmExit;
     private JMenuItem mntmAbout;
@@ -194,6 +165,8 @@ public class MainWindow {
     private JCheckBoxMenuItem chckbxmntmEnableDeleteDatabase;
     private JMenu mnSettings;
 
+    private final NewPasswordAction newPasswordAction;
+
     public MainWindow() {
         maintenanceDao = setupMaintenanceDao();
         masterPasswordDao = setupMasterPasswordDao();
@@ -206,6 +179,13 @@ public class MainWindow {
 
         final List<MasterPassword> savedProfiles = masterPasswordDao.getMasterPasswords();
         availableProfilesModel.addAll(savedProfiles);
+
+        newPasswordAction = new NewPasswordAction(DEFAULT_ACTIVE_PROFILE, masterPasswordDao, storedPasswordDao, new AnnonymousFunction() {
+            @Override
+            public void apply() {
+                updateStoredPasswords(false);
+            }
+        });
     }
 
     private void setEnabled(final boolean isEnabled, final Component... components) {
@@ -251,7 +231,7 @@ public class MainWindow {
         updateAvailableProfiles();
         updateStoredPasswords(false);
 
-        showMessageWindow("You have successfully deleted the database.", "Database Delete Successfull");
+        JOptionUtil.showMessageWindow("You have successfully deleted the database.", "Database Delete Successfull");
     }
 
     private void deletePassword() {
@@ -263,7 +243,7 @@ public class MainWindow {
 
         final int selection = availableProfilesJList.getSelectedIndex();
         if (selection < 0) {
-            showMessageWindow("Please select a profile from the \"Available Profiles\" to remove.", "Please Select A Profile");
+            JOptionUtil.showMessageWindow("Please select a profile from the \"Available Profiles\" to remove.", "Please Select A Profile");
             return;
         }
         final MasterPassword masterPassword = availableProfilesModel.get(selection);
@@ -278,7 +258,7 @@ public class MainWindow {
         updateAvailableProfiles();
         updateStoredPasswords(false);
 
-        showMessageWindow("Profile " + masterPassword.getProfileName() + " has successfully been deleted.", "Profile Successfully Deleted");
+        JOptionUtil.showMessageWindow("Profile " + masterPassword.getProfileName() + " has successfully been deleted.", "Profile Successfully Deleted");
     }
 
     private void displayStoredPassword(final MouseEvent mouseEvent) {
@@ -303,17 +283,17 @@ public class MainWindow {
                 try {
                     editPassword(password, true);
                 } catch (final UnsupportedEncodingException e) {
-                    errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
+                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
                 } catch (final DecoderException e) {
-                    errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
+                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
                 } catch (final AbstractEncrypterException e) {
-                    errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
+                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
                 }
             } else {
-                errorMessage("The Storedpassword was null, while trying to view a password", "Storedpassword was null", null);
+                JOptionUtil.errorMessage("The Storedpassword was null, while trying to view a password", "Storedpassword was null", null);
             }
         } else {
-            showMessageWindow("Please select a password and try again.", "No Password Selected");
+            JOptionUtil.showMessageWindow("Please select a password and try again.", "No Password Selected");
         }
     }
 
@@ -340,7 +320,7 @@ public class MainWindow {
                 try {
                     newProfile();
                 } catch (final AbstractEncrypterException t) {
-                    errorMessage("An error occured when the creation of your new profile.", "Profile Creation Error", t);
+                    JOptionUtil.errorMessage("An error occured when the creation of your new profile.", "Profile Creation Error", t);
                 } finally {
                     updateAllActionStates.apply();
                 }
@@ -357,6 +337,16 @@ public class MainWindow {
             }
         });
         mnFile.add(mntmLoadProfile);
+
+        mntmCloseProfile = new JMenuItem("Close Profile");
+        mntmCloseProfile.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                closeProfile();
+                updateAllActionStates.apply();
+            }
+        });
+        mnFile.add(mntmCloseProfile);
 
         mntmDeleteProfile = new JMenuItem("Delete Profile");
         mntmDeleteProfile.addActionListener(new ActionListener() {
@@ -376,13 +366,13 @@ public class MainWindow {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 try {
-                    newPassword();
+                    newPasswordAction.newPassword(activeProfile, currentPassword);
                 } catch (final UnsupportedEncodingException t) {
-                    errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
+                    JOptionUtil.errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
                 } catch (final DecoderException t) {
-                    errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
+                    JOptionUtil.errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
                 } catch (final AbstractEncrypterException t) {
-                    errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
+                    JOptionUtil.errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
                 } finally {
                     updateAllActionStates.apply();
                 }
@@ -518,7 +508,7 @@ public class MainWindow {
                 try {
                     newProfile();
                 } catch (final AbstractEncrypterException t) {
-                    errorMessage("An error occured when the creation of your new profile.", "Profile Creation Error", t);
+                    JOptionUtil.errorMessage("An error occured when the creation of your new profile.", "Profile Creation Error", t);
                 } finally {
                     updateAllActionStates.apply();
                 }
@@ -590,13 +580,13 @@ public class MainWindow {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 try {
-                    newPassword();
+                    newPasswordAction.newPassword(activeProfile, currentPassword);
                 } catch (final UnsupportedEncodingException t) {
-                    errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
+                    JOptionUtil.errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
                 } catch (final DecoderException t) {
-                    errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
+                    JOptionUtil.errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
                 } catch (final AbstractEncrypterException t) {
-                    errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
+                    JOptionUtil.errorMessage("An error occured when the creation of your new password.", "Password Creation Error", t);
                 } finally {
                     updateAllActionStates.apply();
                 }
@@ -680,6 +670,15 @@ public class MainWindow {
 
         availableProfilesModel = new MasterPasswordListModel();
         availableProfilesJList = new JList();
+        availableProfilesJList.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(final KeyEvent e) {
+                if (KeyEvent.VK_ENTER == e.getKeyChar()) {
+                    loadProfile();
+                    updateAllActionStates.apply();
+                }
+            }
+        });
         availableProfilesJList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent mouseEvent) {
@@ -716,6 +715,15 @@ public class MainWindow {
 
         storedPasswordsModel = new StoredPasswordTableModel();
         storedPasswordsJTable = new JTable();
+        storedPasswordsJTable.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(final KeyEvent e) {
+                if (KeyEvent.VK_ENTER == e.getKeyChar()) {
+                    viewPassword();
+                    updateAllActionStates.apply();
+                }
+            }
+        });
         storedPasswordsJTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent mouseEvent) {
@@ -792,10 +800,6 @@ public class MainWindow {
         return false;
     }
 
-    private boolean isValid(final NewStoredPasswordPanel newPassword) {
-        return NewStoredPasswordPanel.isValid(newPassword);
-    }
-
     private boolean isValid(final NewMasterPasswordPanel newProfile) {
         return NewMasterPasswordPanel.isValid(newProfile);
     }
@@ -805,13 +809,13 @@ public class MainWindow {
         // is a profile selected
         final int selectedProfileIndex = availableProfilesJList.getSelectedIndex();
         if (selectedProfileIndex < 0) {
-            showMessageWindow("Please select a profile to load and try again.", "Select A Profile");
+            JOptionUtil.showMessageWindow("Please select a profile to load and try again.", "Select A Profile");
             return;
         }
 
         final MasterPassword masterPassword = availableProfilesModel.get(selectedProfileIndex);
         if (masterPassword == null) {
-            errorMessage("The Selected Profile Returned Null From The Database", "Profile Was Null", null);
+            JOptionUtil.errorMessage("The Selected Profile Returned Null From The Database", "Profile Was Null", null);
             return;
         }
 
@@ -820,11 +824,11 @@ public class MainWindow {
 
         while (!isPasswordCorrect(masterPassword, enteredPassword)) {
             if (enteredPassword == null) {
-                errorMessage("User has canclled the process to load a profile, when entering the password.", "User Cancelled Profile Load", null);
+                JOptionUtil.errorMessage("User has canclled the process to load a profile, when entering the password.", "User Cancelled Profile Load", null);
                 return;
             }
 
-            showMessageWindow("The password you entered was incorrect, please try again.", "Please Enter A Correct Password");
+            JOptionUtil.showMessageWindow("The password you entered was incorrect, please try again.", "Please Enter A Correct Password");
             enteredPassword = promptUserForProfilePassword();
         }
 
@@ -841,55 +845,26 @@ public class MainWindow {
         logDebugMessage("Loading a Profile - " + activeProfile);
     }
 
-    private void newPassword() throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
-        logDebugMessage("Creating a new Password");
-        if (activeProfile.equals(DEFAULT_ACTIVE_PROFILE)) {
-            errorMessage("You need to create or load a profile first.", "No Profile Loaded", null);
-            return;
-        }
-        final NewStoredPasswordPanel newPassword = new NewStoredPasswordPanel(activeProfile, currentPassword);
-        if (showDefaultInputWindow(newPassword, "New Profile") == OK_OPTION) {
-            if (!isValid(newPassword)) {
-                errorMessage("Failed to create a new password, as you did not fill in all the fields.", "Failed To Create New Password", null);
-                return;
-            }
-
-            final StoredPassword storedPassword = newPassword.buildPassword();
-
-            if (!validateNewPassword(storedPassword)) {
-                errorMessage("Failed to create a new password, as the new password is not valid, either fields were empty or none existant.", "Failed To Create New Password", null);
-                return;
-            }
-
-            if (unsuccessfulImport(storedPasswordDao.instertStoredPassword(storedPassword))) {
-                errorMessage("Failed to create a new password, inserting into the database failed.", "Failed To Create New Password", null);
-                return;
-            }
-
-            updateStoredPasswords(false);
-            logDebugMessage("Created storedPassword for profile " + storedPassword.getProfileName());
-        }
-    }
-
     private void newProfile() throws AbstractEncrypterException {
         logDebugMessage("Creating a new Profile");
         final NewMasterPasswordPanel newProfile = new NewMasterPasswordPanel();
-        if (showDefaultInputWindow(newProfile, "New Profile") == OK_OPTION) {
+        if (JOptionUtil.showDefaultInputWindow(newProfile, "New Profile") == OK_OPTION) {
 
             if (!isValid(newProfile)) {
-                errorMessage("Failed to create a new profile, as you did not fill in all the fields.", "Failed To Create New Profile", null);
+                JOptionUtil.errorMessage("Failed to create a new profile, as you did not fill in all the fields.", "Failed To Create New Profile", null);
                 return;
             }
 
             final MasterPassword masterPassword = newProfile.buildProfile();
 
             if (!validateNewProfile(masterPassword)) {
-                errorMessage("Failed to create a new profile, as the new profile is not valid, either fields were empty or none existant.", "Failed To Create New Profile", null);
+                JOptionUtil.errorMessage("Failed to create a new profile, as the new profile is not valid, either fields were empty or none existant.",
+                        "Failed To Create New Profile", null);
                 return;
             }
 
-            if (unsuccessfulImport(masterPasswordDao.instertMasterPassword(masterPassword))) {
-                errorMessage("Failed to create a new profile, inserting into the database failed.", "Failed To Create New Profile", null);
+            if (DBUtil.unsuccessfulImport(masterPasswordDao.instertMasterPassword(masterPassword))) {
+                JOptionUtil.errorMessage("Failed to create a new profile, inserting into the database failed.", "Failed To Create New Profile", null);
                 return;
             }
 
@@ -900,7 +875,7 @@ public class MainWindow {
 
     private String promptUserForProfilePassword() {
         final ProfilePasswordEntryPanel passwordEntryPanel = new ProfilePasswordEntryPanel();
-        final int result = showCustomInputWindow(passwordEntryPanel, "Enter Profile Password");
+        final int result = JOptionUtil.showCustomInputWindow(passwordEntryPanel, "Enter Profile Password");
 
         if (result == OK_OPTION || passwordEntryPanel.isClosedByKey()) {
             return passwordEntryPanel.getPassword();
@@ -914,7 +889,7 @@ public class MainWindow {
         try {
             maintenance = new MaintenanceMybatisDao();
         } catch (final IOException e) {
-            errorMessage("Failed to load mybatis configuration details", "Mybatis Fail", e);
+            JOptionUtil.errorMessage("Failed to load mybatis configuration details", "Mybatis Fail", e);
         }
         return maintenance;
     }
@@ -924,7 +899,7 @@ public class MainWindow {
         try {
             master = new MasterPasswordMybatisDao();
         } catch (final IOException e) {
-            errorMessage("Failed to load mybatis configuration details", "Mybatis Fail", e);
+            JOptionUtil.errorMessage("Failed to load mybatis configuration details", "Mybatis Fail", e);
         }
         return master;
     }
@@ -934,16 +909,9 @@ public class MainWindow {
         try {
             stored = new StoredPasswordMybatisDao();
         } catch (final IOException e) {
-            errorMessage("Failed to load mybatis configuration details", "Mybatis Fail", e);
+            JOptionUtil.errorMessage("Failed to load mybatis configuration details", "Mybatis Fail", e);
         }
         return stored;
-    }
-
-    private boolean unsuccessfulImport(final int result) {
-        if (result == 1) {
-            return false;
-        }
-        return true;
     }
 
     private void updateAvailableProfiles() {
@@ -966,7 +934,7 @@ public class MainWindow {
 
         if (selected < 0) {
             if (showErrorMessages) {
-                errorMessage("There is no selected profile.", "No Profile Selected", null);
+                JOptionUtil.errorMessage("There is no selected profile.", "No Profile Selected", null);
             }
             return;
         }
@@ -975,7 +943,7 @@ public class MainWindow {
 
         if (masterPassword == null) {
             if (showErrorMessages) {
-                errorMessage("The master password was null, while updating the stored passwords table.", "Masterpassword was null", null);
+                JOptionUtil.errorMessage("The master password was null, while updating the stored passwords table.", "Masterpassword was null", null);
             }
             return;
         }
@@ -985,38 +953,6 @@ public class MainWindow {
         if (storedPasswords != null) {
             storedPasswordsModel.addAll(storedPasswords);
         }
-    }
-
-    private boolean validateNewPassword(final StoredPassword password) {
-        final String profileName = password.getProfileName();
-        final String encryptedPassword = password.getEncryptedPassword();
-        final String encryptedPasswordName = password.getEncryptedPasswordName();
-        final String encryptedPasswordNotes = password.getEncryptedPasswordNotes();
-
-        if (areNull(profileName, encryptedPassword, encryptedPasswordName, encryptedPasswordNotes)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Failed to validate password, as a value was null. profileName: [" + profileName + "], encryptedPassword: [" + encryptedPassword
-                        + "], encryptedPasswordName: [" + encryptedPasswordName + "], encryptedPasswordNotes: [" + encryptedPasswordNotes + "]");
-            }
-            return false;
-        }
-
-        // Profile Name matches one that already exists.
-        final List<String> currentProfileNames = masterPasswordDao.getMasterPasswordNames();
-        if (!currentProfileNames.contains(profileName)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Failed to validate password as the profile name did not appear in the database. profileName: [" + profileName + "]");
-            }
-            return false;
-        }
-
-        // Password & Name & Notes are not the same
-        // if (encryptedPassword.equals(encryptedPasswordName) || encryptedPassword.equals(encryptedPasswordNotes) ||
-        // encryptedPasswordName.equals(encryptedPasswordNotes)) {
-        // return false;
-        // }
-
-        return true;
     }
 
     private boolean validateNewProfile(final MasterPassword profile) {
@@ -1043,20 +979,20 @@ public class MainWindow {
                 try {
                     viewPassword(password, true);
                 } catch (final UnsupportedEncodingException e) {
-                    errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
+                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
                     viewPasswordEncrypted(password);
                 } catch (final DecoderException e) {
-                    errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
+                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
                     viewPasswordEncrypted(password);
                 } catch (final AbstractEncrypterException e) {
-                    errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
+                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
                     viewPasswordEncrypted(password);
                 }
             } else {
-                errorMessage("The Storedpassword was null, while trying to view a password", "Storedpassword was null", null);
+                JOptionUtil.errorMessage("The Storedpassword was null, while trying to view a password", "Storedpassword was null", null);
             }
         } else {
-            showMessageWindow("Please select a password and try again.", "No Password Selected");
+            JOptionUtil.showMessageWindow("Please select a password and try again.", "No Password Selected");
         }
     }
 
@@ -1064,33 +1000,36 @@ public class MainWindow {
         try {
             viewPassword(password, false);
         } catch (final UnsupportedEncodingException e) {
-            errorMessage("An error occured when trying to view your password.", "Password Error", e);
+            JOptionUtil.errorMessage("An error occured when trying to view your password.", "Password Error", e);
         } catch (final DecoderException e) {
-            errorMessage("An error occured when trying to view your password.", "Password Error", e);
+            JOptionUtil.errorMessage("An error occured when trying to view your password.", "Password Error", e);
         } catch (final AbstractEncrypterException e) {
-            errorMessage("An error occured when trying to view your password.", "Password Error", e);
+            JOptionUtil.errorMessage("An error occured when trying to view your password.", "Password Error", e);
         }
     }
 
     private void viewPassword(final StoredPassword password, final boolean doDecrypt) throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
         final ViewStoredPasswordPanel viewStoredPassword = new ViewStoredPasswordPanel(password, activeProfile, currentPassword, doDecrypt);
 
-        // showMessageWindow(viewStoredPassword, "View Stored Password");
+        if (!doDecrypt) {
+            JOptionUtil.showMessageWindow(viewStoredPassword, "View Stored Password");
+        } else {
 
-        final int result = showCustomInputWindow(viewStoredPassword, "View Stored Password", new String[] { "Edit", "Close" });
+            final int result = JOptionUtil.showCustomInputWindow(viewStoredPassword, "View Stored Password", new String[] { "Edit", "Close" });
 
-        LOG.debug("View password closed with result [" + result + "]");
+            LOG.debug("View password closed with result [" + result + "]");
 
-        // Edit chosen.
-        if (result == 0) {
-            editPassword(password, doDecrypt);
+            // Edit chosen.
+            if (result == 0) {
+                editPassword(password, doDecrypt);
+            }
         }
     }
 
     private void editPassword(final StoredPassword password, final boolean doDecrypt) throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
         final EditStoredPasswordPanel editStoredPassword = new EditStoredPasswordPanel(password, activeProfile, currentPassword, doDecrypt);
 
-        final int result = showCustomInputWindow(editStoredPassword, "Edit Stored Password", new String[] { "Save", "Cancel" });
+        final int result = JOptionUtil.showCustomInputWindow(editStoredPassword, "Edit Stored Password", new String[] { "Save", "Cancel" });
 
         if (result == OK_OPTION || editStoredPassword.isClosedByKey()) {
             LOG.debug("Going to save changes.");
@@ -1133,7 +1072,7 @@ public class MainWindow {
 
             // Action Buttons - New Password, Close Profile - Only if a profile is active (not the default)
             final boolean isAProfileActive = activeProfile != DEFAULT_ACTIVE_PROFILE;
-            setEnabled(isAProfileActive, closeProfileJButton, newPasswordJBbutton);
+            setEnabled(isAProfileActive, closeProfileJButton, mntmCloseProfile, newPasswordJBbutton);
 
             // Action Buttons - View, Edit, Delete Password - Only if a password is selected
             final boolean isAPasswordSelected = storedPasswordsJTable.getSelectedRow() >= 0;
