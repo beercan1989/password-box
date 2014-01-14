@@ -1,10 +1,10 @@
-package com.jbacon.passwordstorage.tools;
+package com.jbacon.passwordstorage.utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
 
-public class GenericUtils {
+public class GenericValidationUtil {
 
     public static <T> boolean areNotNull(final T... collections) {
         for (final T collection : collections) {
@@ -119,57 +119,57 @@ public class GenericUtils {
             return ((double[]) collection).length < 1;
         }
 
-        final Method isEmptyMethod = ReflectionUtils.getAccessibleMethod(collection, "isEmpty");
+        final Method isEmptyMethod = ReflectionUtil.getAccessibleMethod(collection, "isEmpty");
         if (isEmptyMethod != null) {
-            final Boolean isEmpty = ReflectionUtils.invokeMethod(collection, isEmptyMethod);
+            final Boolean isEmpty = ReflectionUtil.invokeMethod(collection, isEmptyMethod);
             if (isEmpty != null) {
                 return isEmpty.booleanValue();
             }
         }
 
-        final Method sizeMethod = ReflectionUtils.getAccessibleMethod(collection, "size");
+        final Method sizeMethod = ReflectionUtil.getAccessibleMethod(collection, "size");
         if (sizeMethod != null) {
-            final Number size = ReflectionUtils.invokeMethod(collection, sizeMethod);
+            final Number size = ReflectionUtil.invokeMethod(collection, sizeMethod);
             if (size != null) {
                 return size.longValue() < 1L;
             }
         }
 
-        final Method getSizeMethod = ReflectionUtils.getAccessibleMethod(collection, "getSize");
+        final Method getSizeMethod = ReflectionUtil.getAccessibleMethod(collection, "getSize");
         if (getSizeMethod != null) {
-            final Number size = ReflectionUtils.invokeMethod(collection, getSizeMethod);
+            final Number size = ReflectionUtil.invokeMethod(collection, getSizeMethod);
             if (size != null) {
                 return size.longValue() < 1L;
             }
         }
 
-        final Method lengthMethod = ReflectionUtils.getAccessibleMethod(collection, "length");
+        final Method lengthMethod = ReflectionUtil.getAccessibleMethod(collection, "length");
         if (lengthMethod != null) {
-            final Number length = ReflectionUtils.invokeMethod(collection, lengthMethod);
+            final Number length = ReflectionUtil.invokeMethod(collection, lengthMethod);
             if (length != null) {
                 return length.longValue() < 1L;
             }
         }
 
-        final Method getLengthMethod = ReflectionUtils.getAccessibleMethod(collection, "getLength");
+        final Method getLengthMethod = ReflectionUtil.getAccessibleMethod(collection, "getLength");
         if (getLengthMethod != null) {
-            final Number length = ReflectionUtils.invokeMethod(collection, getLengthMethod);
+            final Number length = ReflectionUtil.invokeMethod(collection, getLengthMethod);
             if (length != null) {
                 return length.longValue() < 1L;
             }
         }
 
-        final Field lengthField = ReflectionUtils.getAccessibleField(collection, "length");
+        final Field lengthField = ReflectionUtil.getAccessibleField(collection, "length");
         if (lengthField != null) {
-            final Number length = ReflectionUtils.accessField(collection, lengthField);
+            final Number length = ReflectionUtil.accessField(collection, lengthField);
             if (length != null) {
                 return length.longValue() < 1L;
             }
         }
 
-        final Field sizeField = ReflectionUtils.getAccessibleField(collection, "size");
+        final Field sizeField = ReflectionUtil.getAccessibleField(collection, "size");
         if (sizeField != null) {
-            final Number size = ReflectionUtils.accessField(collection, sizeField);
+            final Number size = ReflectionUtil.accessField(collection, sizeField);
             if (size != null) {
                 return size.longValue() < 1L;
             }

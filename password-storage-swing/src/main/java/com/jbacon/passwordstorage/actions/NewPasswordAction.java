@@ -1,6 +1,6 @@
 package com.jbacon.passwordstorage.actions;
 
-import static com.jbacon.passwordstorage.tools.GenericUtils.areNull;
+import static com.jbacon.passwordstorage.utils.GenericValidationUtil.areNull;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -15,6 +15,7 @@ import com.jbacon.passwordstorage.database.dao.MasterPasswordsDao;
 import com.jbacon.passwordstorage.database.dao.StoredPasswordsDao;
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.functions.AnnonymousFunction;
+import com.jbacon.passwordstorage.functions.ProcessFunction;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
 import com.jbacon.passwordstorage.swing.panels.NewStoredPasswordPanel;
@@ -27,17 +28,28 @@ public class NewPasswordAction {
     private final MasterPassword defaultActiveProfile;
     private final StoredPasswordsDao storedPasswordDao;
     private final MasterPasswordsDao masterPasswordDao;
-    private final AnnonymousFunction updateStoredPasswordsFN;
+    private final ProcessFunction<Boolean> updateStoredPasswordsFN;
 
     public NewPasswordAction(final MasterPassword defaultActiveProfile, final MasterPasswordsDao masterPasswordDao, final StoredPasswordsDao storedPasswordDao,
-            final AnnonymousFunction updateStoredPasswordsFN) {
+            final ProcessFunction<Boolean> updateStoredPasswordsFN) {
         this.defaultActiveProfile = defaultActiveProfile;
         this.storedPasswordDao = storedPasswordDao;
         this.updateStoredPasswordsFN = updateStoredPasswordsFN;
         this.masterPasswordDao = masterPasswordDao;
     }
 
-    public void newPassword(final MasterPassword activeProfile, final String currentPassword) throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+    public void newPassword(final MasterPassword activeProfile, final String currentPassword, final AnnonymousFunction andFinallyFunction) {
+        try {
+            newPasswordUnsafe(activeProfile, currentPassword);
+        } catch (final Exception e) {
+            JOptionUtil.errorMessage("An error occured when the creation of your new password.", "Password Creation Error", e);
+        } finally {
+            andFinallyFunction.apply();
+        }
+    }
+
+    private void newPasswordUnsafe(final MasterPassword activeProfile, final String currentPassword) throws UnsupportedEncodingException, DecoderException,
+            AbstractEncrypterException {
         LOG.debug("Creating a new Password");
         if (activeProfile.equals(defaultActiveProfile)) {
             JOptionUtil.errorMessage("You need to create or load a profile first.", "No Profile Loaded", null);
@@ -63,7 +75,7 @@ public class NewPasswordAction {
                 return;
             }
 
-            updateStoredPasswordsFN.apply();
+            updateStoredPasswordsFN.apply(false);
 
             LOG.debug("Created storedPassword for profile " + storedPassword.getProfileName());
         }

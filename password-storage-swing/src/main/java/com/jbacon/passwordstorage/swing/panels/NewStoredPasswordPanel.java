@@ -1,6 +1,6 @@
 package com.jbacon.passwordstorage.swing.panels;
 
-import static com.jbacon.passwordstorage.tools.GenericUtils.isNull;
+import static com.jbacon.passwordstorage.utils.GenericValidationUtil.isNull;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -32,8 +32,8 @@ import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
-import com.jbacon.passwordstorage.tools.StringUtils;
 import com.jbacon.passwordstorage.utils.PasswordEncryptionUtil;
+import com.jbacon.passwordstorage.utils.StringUtil;
 
 public class NewStoredPasswordPanel extends JPanel {
 
@@ -52,20 +52,20 @@ public class NewStoredPasswordPanel extends JPanel {
             if (LOG.isDebugEnabled()) {
                 final StringBuilder logEntry = new StringBuilder();
                 logEntry.append("Validating NewStoredPasswordPanel [aka StoredPassword].");
-                logEntry.append(StringUtils.NEW_LINE);
-                logEntry.append(StringUtils.SINGLE_TAB);
+                logEntry.append(StringUtil.NEW_LINE);
+                logEntry.append(StringUtil.SINGLE_TAB);
                 logEntry.append("NewStoredPasswordPanel Entered Values [Encrypted Where Necessary]");
-                logEntry.append(StringUtils.NEW_LINE);
-                logEntry.append(StringUtils.DOUBLE_TAB);
+                logEntry.append(StringUtil.NEW_LINE);
+                logEntry.append(StringUtil.DOUBLE_TAB);
                 logEntry.append("Profile Name: " + profileName);
-                logEntry.append(StringUtils.NEW_LINE);
-                logEntry.append(StringUtils.DOUBLE_TAB);
+                logEntry.append(StringUtil.NEW_LINE);
+                logEntry.append(StringUtil.DOUBLE_TAB);
                 logEntry.append("Encrypted Password Name: " + encryptedPasswordName);
-                logEntry.append(StringUtils.NEW_LINE);
-                logEntry.append(StringUtils.DOUBLE_TAB);
+                logEntry.append(StringUtil.NEW_LINE);
+                logEntry.append(StringUtil.DOUBLE_TAB);
                 logEntry.append("Encrypted Password: " + encryptedPassword);
-                logEntry.append(StringUtils.NEW_LINE);
-                logEntry.append(StringUtils.DOUBLE_TAB);
+                logEntry.append(StringUtil.NEW_LINE);
+                logEntry.append(StringUtil.DOUBLE_TAB);
                 logEntry.append("Encrypted Password Notes: " + encryptedPasswordNotes);
                 LOG.debug(logEntry.toString());
             }
@@ -324,7 +324,7 @@ public class NewStoredPasswordPanel extends JPanel {
     }
 
     private boolean enteredPasswordNameIsValid() {
-        if (StringUtils.isEmpty(passwordNameJTextField.getText())) {
+        if (StringUtil.isEmpty(passwordNameJTextField.getText())) {
             return false;
         }
         return true;

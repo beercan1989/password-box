@@ -1,11 +1,14 @@
 package com.jbacon.passwordstorage.tools;
 
-import static com.jbacon.passwordstorage.tools.StringUtils.BLANK;
-import static com.jbacon.passwordstorage.tools.StringUtils.SPACE;
+import static com.jbacon.passwordstorage.utils.StringUtil.BLANK;
+import static com.jbacon.passwordstorage.utils.StringUtil.SPACE;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import org.junit.Test;
+
+import com.jbacon.passwordstorage.utils.GenericValidationUtil;
+import com.jbacon.passwordstorage.utils.StringUtil;
 
 public class StringUtilsTest {
 
@@ -14,76 +17,76 @@ public class StringUtilsTest {
 
 	@Test
 	public void shouldFindStringAsEmpty() {
-		boolean result = StringUtils.isEmpty(SPACE);
+		boolean result = StringUtil.isEmpty(SPACE);
 		assertThat(result, is(true));
 
-		result = StringUtils.isEmpty(BLANK);
+		result = StringUtil.isEmpty(BLANK);
 		assertThat(result, is(true));
 
-		result = StringUtils.isEmpty(ABC);
+		result = StringUtil.isEmpty(ABC);
 		assertThat(result, is(false));
 	}
 
 	@Test
 	public void shouldFindStringAsNotEmpty() {
-		boolean result = StringUtils.isNotEmpty(ABC);
+		boolean result = StringUtil.isNotEmpty(ABC);
 		assertThat(result, is(true));
 
-		result = StringUtils.isNotEmpty(BLANK);
+		result = StringUtil.isNotEmpty(BLANK);
 		assertThat(result, is(false));
 	}
 
 	@Test
 	public void shouldFindStringAsNotNull() {
-		boolean result = GenericUtils.isNotNull(A);
+		boolean result = GenericValidationUtil.isNotNull(A);
 		assertThat(result, is(true));
 
-		result = GenericUtils.isNotNull(null);
+		result = GenericValidationUtil.isNotNull(null);
 		assertThat(result, is(false));
 	}
 
 	@Test
 	public void shouldFindStringAsNull() {
-		boolean result = GenericUtils.isNull(null);
+		boolean result = GenericValidationUtil.isNull(null);
 		assertThat(result, is(true));
 
-		result = GenericUtils.isNull(BLANK);
+		result = GenericValidationUtil.isNull(BLANK);
 		assertThat(result, is(false));
 	}
 
 	@Test
 	public void shouldFindThatTheStringsAreEmpty() {
-		boolean result = StringUtils.areEmpty(BLANK, BLANK, BLANK, SPACE);
+		boolean result = StringUtil.areEmpty(BLANK, BLANK, BLANK, SPACE);
 		assertThat(result, is(true));
 
-		result = StringUtils.areEmpty(BLANK, BLANK, BLANK, SPACE, A);
+		result = StringUtil.areEmpty(BLANK, BLANK, BLANK, SPACE, A);
 		assertThat(result, is(false));
 	}
 
 	@Test
 	public void shouldFindThatTheStringsAreNotEmpty() {
-		boolean result = StringUtils.areNotEmpty(A, A, A, A + SPACE);
+		boolean result = StringUtil.areNotEmpty(A, A, A, A + SPACE);
 		assertThat(result, is(true));
 
-		result = StringUtils.areNotEmpty(BLANK, A, A, A + SPACE);
+		result = StringUtil.areNotEmpty(BLANK, A, A, A + SPACE);
 		assertThat(result, is(false));
 	}
 
 	@Test
 	public void shouldFindThatTheStringsAreNotNull() {
-		boolean result = GenericUtils.areNotNull(BLANK, BLANK, BLANK, BLANK);
+		boolean result = GenericValidationUtil.areNotNull(BLANK, BLANK, BLANK, BLANK);
 		assertThat(result, is(true));
 
-		result = GenericUtils.areNotNull(BLANK, BLANK, BLANK, BLANK, null);
+		result = GenericValidationUtil.areNotNull(BLANK, BLANK, BLANK, BLANK, null);
 		assertThat(result, is(false));
 	}
 
 	@Test
 	public void shouldFindThatTheStringsAreNull() {
-		boolean result = GenericUtils.areNull(null, null, null, null);
+		boolean result = GenericValidationUtil.areNull(null, null, null, null);
 		assertThat(result, is(true));
 
-		result = GenericUtils.areNull(BLANK, BLANK, BLANK, BLANK);
+		result = GenericValidationUtil.areNull(BLANK, BLANK, BLANK, BLANK);
 		assertThat(result, is(false));
 	}
 }

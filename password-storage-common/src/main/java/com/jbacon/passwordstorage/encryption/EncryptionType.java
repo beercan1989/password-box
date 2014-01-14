@@ -1,8 +1,8 @@
 package com.jbacon.passwordstorage.encryption;
 
-import static com.jbacon.passwordstorage.tools.GenericUtils.areNull;
-import static com.jbacon.passwordstorage.tools.GenericUtils.isNotNull;
-import static com.jbacon.passwordstorage.tools.GenericUtils.isNull;
+import static com.jbacon.passwordstorage.utils.GenericValidationUtil.areNull;
+import static com.jbacon.passwordstorage.utils.GenericValidationUtil.isNotNull;
+import static com.jbacon.passwordstorage.utils.GenericValidationUtil.isNull;
 
 import com.jbacon.passwordstorage.encryption.errors.NoSuchEncryptionException;
 import com.jbacon.passwordstorage.encryption.specifications.EncryptionSpecification;
