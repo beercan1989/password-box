@@ -18,6 +18,7 @@ import com.jbacon.passwordstorage.functions.AnnonymousFunction;
 import com.jbacon.passwordstorage.functions.ProcessFunction;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
+import com.jbacon.passwordstorage.swing.MainWindow;
 import com.jbacon.passwordstorage.swing.panels.NewStoredPasswordPanel;
 import com.jbacon.passwordstorage.utils.DBUtil;
 import com.jbacon.passwordstorage.utils.JOptionUtil;
@@ -25,20 +26,20 @@ import com.jbacon.passwordstorage.utils.JOptionUtil;
 public class NewPasswordAction {
     private static final Log LOG = LogFactory.getLog(NewPasswordAction.class);
 
-    private final MasterPassword defaultActiveProfile;
     private final StoredPasswordsDao storedPasswordDao;
     private final MasterPasswordsDao masterPasswordDao;
     private final ProcessFunction<Boolean> updateStoredPasswordsFN;
+    private final AnnonymousFunction andFinallyFunction;
 
-    public NewPasswordAction(final MasterPassword defaultActiveProfile, final MasterPasswordsDao masterPasswordDao, final StoredPasswordsDao storedPasswordDao,
-            final ProcessFunction<Boolean> updateStoredPasswordsFN) {
-        this.defaultActiveProfile = defaultActiveProfile;
+    public NewPasswordAction(final MasterPasswordsDao masterPasswordDao, final StoredPasswordsDao storedPasswordDao, final ProcessFunction<Boolean> updateStoredPasswordsFN,
+            final AnnonymousFunction andFinallyFunction) {
         this.storedPasswordDao = storedPasswordDao;
         this.updateStoredPasswordsFN = updateStoredPasswordsFN;
         this.masterPasswordDao = masterPasswordDao;
+        this.andFinallyFunction = andFinallyFunction;
     }
 
-    public void newPassword(final MasterPassword activeProfile, final String currentPassword, final AnnonymousFunction andFinallyFunction) {
+    public void newPassword(final MasterPassword activeProfile, final String currentPassword) {
         try {
             newPasswordUnsafe(activeProfile, currentPassword);
         } catch (final Exception e) {
@@ -51,7 +52,7 @@ public class NewPasswordAction {
     private void newPasswordUnsafe(final MasterPassword activeProfile, final String currentPassword) throws UnsupportedEncodingException, DecoderException,
             AbstractEncrypterException {
         LOG.debug("Creating a new Password");
-        if (activeProfile.equals(defaultActiveProfile)) {
+        if (activeProfile.equals(MainWindow.DEFAULT_ACTIVE_PROFILE)) {
             JOptionUtil.errorMessage("You need to create or load a profile first.", "No Profile Loaded", null);
             return;
         }

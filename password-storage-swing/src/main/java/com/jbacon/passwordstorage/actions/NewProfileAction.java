@@ -11,7 +11,6 @@ import org.apache.commons.logging.LogFactory;
 import com.jbacon.passwordstorage.database.dao.MasterPasswordsDao;
 import com.jbacon.passwordstorage.encryption.EncryptionType;
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
-import com.jbacon.passwordstorage.functions.AnnonymousFunction;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.swing.panels.NewMasterPasswordPanel;
 import com.jbacon.passwordstorage.utils.DBUtil;
@@ -22,14 +21,14 @@ public class NewProfileAction {
     private static final Log LOG = LogFactory.getLog(NewProfileAction.class);
 
     private final MasterPasswordsDao masterPasswordDao;
-    private final AnnonymousFunction updateAvailableProfilesFN;
+    private final UpdateAvailableProfilesAction updateAvailableProfiles;
 
-    public NewProfileAction(final MasterPasswordsDao masterPasswordDao, final AnnonymousFunction updateAvailableProfilesFN) {
+    public NewProfileAction(final MasterPasswordsDao masterPasswordDao, final UpdateAvailableProfilesAction updateAvailableProfiles) {
         this.masterPasswordDao = masterPasswordDao;
-        this.updateAvailableProfilesFN = updateAvailableProfilesFN;
+        this.updateAvailableProfiles = updateAvailableProfiles;
     }
 
-    public void newProfile() throws AbstractEncrypterException {
+    public void newProfile(final MasterPassword currentActiveProfile) throws AbstractEncrypterException {
         LOG.debug("Creating a new Profile");
         final NewMasterPasswordPanel newProfile = new NewMasterPasswordPanel();
         if (JOptionUtil.showDefaultInputWindow(newProfile, "New Profile") == OK_OPTION) {
@@ -52,7 +51,7 @@ public class NewProfileAction {
                 return;
             }
 
-            updateAvailableProfilesFN.apply();
+            updateAvailableProfiles.updateAvailableProfiles(currentActiveProfile);
             LOG.debug("Created masterPassword with a name of " + masterPassword.getProfileName());
         }
     }

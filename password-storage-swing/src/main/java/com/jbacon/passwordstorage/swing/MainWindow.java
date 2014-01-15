@@ -41,27 +41,25 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.jbacon.passwordstorage.actions.LoadProfileAction;
 import com.jbacon.passwordstorage.actions.NewPasswordAction;
 import com.jbacon.passwordstorage.actions.NewProfileAction;
+import com.jbacon.passwordstorage.actions.UpdateAvailableProfilesAction;
 import com.jbacon.passwordstorage.database.dao.MaintenanceDao;
 import com.jbacon.passwordstorage.database.dao.MasterPasswordsDao;
 import com.jbacon.passwordstorage.database.dao.StoredPasswordsDao;
-import com.jbacon.passwordstorage.encryption.EncrypterPBE;
-import com.jbacon.passwordstorage.encryption.EncryptionMode;
-import com.jbacon.passwordstorage.encryption.EncryptionType;
+import com.jbacon.passwordstorage.database.mybatis.MaintenanceMybatisDao;
+import com.jbacon.passwordstorage.database.mybatis.MasterPasswordMybatisDao;
+import com.jbacon.passwordstorage.database.mybatis.StoredPasswordMybatisDao;
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
-import com.jbacon.passwordstorage.encryption.errors.NoSuchEncryptionException;
-import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 import com.jbacon.passwordstorage.functions.AnnonymousFunction;
+import com.jbacon.passwordstorage.functions.Pair;
 import com.jbacon.passwordstorage.functions.ProcessFunction;
-import com.jbacon.passwordstorage.functions.UpdateAvailableProfilesFunction;
 import com.jbacon.passwordstorage.functions.UpdateStoredPasswordsFunction;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
 import com.jbacon.passwordstorage.swing.list.MasterPasswordListModel;
 import com.jbacon.passwordstorage.swing.panels.EditStoredPasswordPanel;
-import com.jbacon.passwordstorage.swing.panels.NewMasterPasswordPanel;
-import com.jbacon.passwordstorage.swing.panels.ProfilePasswordEntryPanel;
 import com.jbacon.passwordstorage.swing.panels.ViewStoredPasswordPanel;
 import com.jbacon.passwordstorage.swing.table.StoredPasswordTableColumns;
 import com.jbacon.passwordstorage.swing.table.StoredPasswordTableModel;
@@ -91,8 +89,8 @@ public class MainWindow {
     private final MasterPasswordsDao masterPasswordDao;
     private final StoredPasswordsDao storedPasswordDao;
 
-    protected static final String DEFAULT_CURRENT_PASSWORD = "### --- Default Current Password --- ###";
-    protected static final MasterPassword DEFAULT_ACTIVE_PROFILE = new MasterPassword() {
+    public static final String DEFAULT_CURRENT_PASSWORD = "### --- Default Current Password --- ###";
+    public static final MasterPassword DEFAULT_ACTIVE_PROFILE = new MasterPassword() {
         {
             this.setProfileName("N/A");
         }
@@ -161,15 +159,17 @@ public class MainWindow {
     // Actions
     private final NewPasswordAction newPasswordAction;
     private final NewProfileAction newProfileAction;
+    private final UpdateAvailableProfilesAction updateAvailableProfilesAction;
+    private final LoadProfileAction loadProfileAction;
 
     // Functions
     private final ProcessFunction<Boolean> updateStoredPasswordsFunction;
-    private final AnnonymousFunction updateAvailableProfilesFunction;
+    private final ProcessFunction<Pair<MasterPassword, String>> updateActiveProfileAndPasswordFunction;
 
     public MainWindow() {
-        maintenanceDao = DBUtil.createMybatisDao(MaintenanceDao.class);
-        masterPasswordDao = DBUtil.createMybatisDao(MasterPasswordsDao.class);
-        storedPasswordDao = DBUtil.createMybatisDao(StoredPasswordsDao.class);
+        maintenanceDao = DBUtil.createMybatisDao(MaintenanceMybatisDao.class);
+        masterPasswordDao = DBUtil.createMybatisDao(MasterPasswordMybatisDao.class);
+        storedPasswordDao = DBUtil.createMybatisDao(StoredPasswordMybatisDao.class);
 
         maintenanceDao.createMasterPasswordTable();
         maintenanceDao.createStoredPasswordTable();
@@ -181,11 +181,20 @@ public class MainWindow {
 
         // Functions
         updateStoredPasswordsFunction = new UpdateStoredPasswordsFunction(storedPasswordDao, storedPasswordsModel, availableProfilesModel, availableProfilesJList);
-        updateAvailableProfilesFunction = new UpdateAvailableProfilesFunction();
+        updateActiveProfileAndPasswordFunction = new ProcessFunction<Pair<MasterPassword, String>>() {
+            @Override
+            public void apply(final Pair<MasterPassword, String> input) {
+                activeProfile = input.getFirst();
+                currentPassword = input.getSecond();
+            }
+        };
 
         // Actions
-        newPasswordAction = new NewPasswordAction(DEFAULT_ACTIVE_PROFILE, masterPasswordDao, storedPasswordDao, updateStoredPasswordsFunction);
-        newProfileAction = new NewProfileAction(masterPasswordDao, updateAvailableProfilesFunction);
+        updateAvailableProfilesAction = new UpdateAvailableProfilesAction(availableProfilesModel, masterPasswordDao);
+        newPasswordAction = new NewPasswordAction(masterPasswordDao, storedPasswordDao, updateStoredPasswordsFunction, updateAllActionStates);
+        newProfileAction = new NewProfileAction(masterPasswordDao, updateAvailableProfilesAction);
+        loadProfileAction = new LoadProfileAction(availableProfilesJList, availableProfilesModel, updateStoredPasswordsFunction, updateActiveProfileAndPasswordFunction,
+                updateAllActionStates);
     }
 
     private void closeProfile() {
@@ -196,7 +205,7 @@ public class MainWindow {
         activeProfile = DEFAULT_ACTIVE_PROFILE;
         currentPassword = DEFAULT_CURRENT_PASSWORD;
 
-        updateAvailableProfilesFunction.apply();
+        updateAvailableProfilesAction.updateAvailableProfiles(activeProfile);
         updateStoredPasswordsFunction.apply(false);
     }
 
@@ -210,7 +219,7 @@ public class MainWindow {
         availableProfilesModel.clear();
         storedPasswordsModel.clear();
 
-        updateAvailableProfilesFunction.apply();
+        updateAvailableProfilesAction.updateAvailableProfiles(activeProfile);
         updateStoredPasswordsFunction.apply(false);
 
         JOptionUtil.showMessageWindow("You have successfully deleted the database.", "Database Delete Successfull");
@@ -237,7 +246,7 @@ public class MainWindow {
             storedPasswordDao.deleteStoredPassword(storedPassword);
         }
 
-        updateAvailableProfilesFunction.apply();
+        updateAvailableProfilesAction.updateAvailableProfiles(activeProfile);
         updateStoredPasswordsFunction.apply(false);
 
         JOptionUtil.showMessageWindow("Profile " + masterPassword.getProfileName() + " has successfully been deleted.", "Profile Successfully Deleted");
@@ -251,7 +260,7 @@ public class MainWindow {
 
     private void displayStoredPasswords(final MouseEvent mouseEvent) {
         if (isDoubleClick(mouseEvent)) {
-            loadProfile();
+            loadProfileAction.loadProfile();
         }
     }
 
@@ -300,7 +309,7 @@ public class MainWindow {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 try {
-                    newProfileAction.newProfile();
+                    newProfileAction.newProfile(activeProfile);
                 } catch (final AbstractEncrypterException t) {
                     JOptionUtil.errorMessage("An error occured when the creation of your new profile.", "Profile Creation Error", t);
                 } finally {
@@ -314,7 +323,7 @@ public class MainWindow {
         mntmLoadProfile.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                loadProfile();
+                loadProfileAction.loadProfile();
                 updateAllActionStates.apply();
             }
         });
@@ -347,7 +356,7 @@ public class MainWindow {
         mntmNewPassword.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                newPasswordAction.newPassword(activeProfile, currentPassword, updateAllActionStates);
+                newPasswordAction.newPassword(activeProfile, currentPassword);
             }
         });
         mnFile.add(mntmNewPassword);
@@ -478,7 +487,7 @@ public class MainWindow {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 try {
-                    newProfileAction.newProfile();
+                    newProfileAction.newProfile(activeProfile);
                 } catch (final AbstractEncrypterException t) {
                     JOptionUtil.errorMessage("An error occured when the creation of your new profile.", "Profile Creation Error", t);
                 } finally {
@@ -497,7 +506,7 @@ public class MainWindow {
         loadProfileJButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                loadProfile();
+                loadProfileAction.loadProfile();
                 updateAllActionStates.apply();
             }
         });
@@ -551,7 +560,7 @@ public class MainWindow {
         newPasswordJBbutton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                newPasswordAction.newPassword(activeProfile, currentPassword, updateAllActionStates);
+                newPasswordAction.newPassword(activeProfile, currentPassword);
             }
         });
         final GridBagConstraints gbc_newPasswordJBbutton = new GridBagConstraints();
@@ -636,7 +645,7 @@ public class MainWindow {
             @Override
             public void keyTyped(final KeyEvent e) {
                 if (KeyEvent.VK_ENTER == e.getKeyChar()) {
-                    loadProfile();
+                    loadProfileAction.loadProfile();
                     updateAllActionStates.apply();
                 }
             }
@@ -726,96 +735,6 @@ public class MainWindow {
 
     private boolean isDoubleClick(final MouseEvent mouseEvent) {
         return mouseEvent.getClickCount() >= 2;
-    }
-
-    private boolean isPasswordCorrect(final MasterPassword masterPassword, final String enteredPassword) {
-        if (masterPassword == null || enteredPassword == null) {
-            return false;
-        }
-
-        final EncryptionType encryptionType = masterPassword.getMasterPasswordEncryptionType();
-
-        try {
-            if (encryptionType.getEncrypter() instanceof EncrypterPBE) {
-                final EncrypterPBE encrypter = (EncrypterPBE) encryptionType.getEncrypter();
-
-                final byte[] salt = EncrypterUtils.base64StringToBytes(masterPassword.getSalt());
-                final byte[] cipherText = EncrypterUtils.base64StringToBytes(masterPassword.getEncryptedSecretKey());
-                final char[] passPhrase = EncrypterUtils.stringToChar(enteredPassword);
-
-                final byte[] result = encrypter.doCiper(EncryptionMode.DECRYPT_MODE, salt, cipherText, passPhrase);
-
-                if (result == null) {
-                    return false;
-                }
-
-                return true;
-            }
-        } catch (final NoSuchEncryptionException e) {
-            e.printStackTrace();
-        } catch (final AbstractEncrypterException e) {
-            if (e.getCause() instanceof javax.crypto.BadPaddingException) {
-                return false;
-            }
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    private boolean isValid(final NewMasterPasswordPanel newProfile) {
-        return NewMasterPasswordPanel.isValid(newProfile);
-    }
-
-    private void loadProfile() {
-
-        // is a profile selected
-        final int selectedProfileIndex = availableProfilesJList.getSelectedIndex();
-        if (selectedProfileIndex < 0) {
-            JOptionUtil.showMessageWindow("Please select a profile to load and try again.", "Select A Profile");
-            return;
-        }
-
-        final MasterPassword masterPassword = availableProfilesModel.get(selectedProfileIndex);
-        if (masterPassword == null) {
-            JOptionUtil.errorMessage("The Selected Profile Returned Null From The Database", "Profile Was Null", null);
-            return;
-        }
-
-        // prompt for password
-        String enteredPassword = promptUserForProfilePassword();
-
-        while (!isPasswordCorrect(masterPassword, enteredPassword)) {
-            if (enteredPassword == null) {
-                JOptionUtil.errorMessage("User has canclled the process to load a profile, when entering the password.", "User Cancelled Profile Load", null);
-                return;
-            }
-
-            JOptionUtil.showMessageWindow("The password you entered was incorrect, please try again.", "Please Enter A Correct Password");
-            enteredPassword = promptUserForProfilePassword();
-        }
-
-        // set ActiveProfile to the selected MP
-        activeProfile = masterPassword;
-
-        // set CurrentPassword to the entered password
-        currentPassword = enteredPassword;
-
-        // Load all the StoredPasswords for the selected ActiveProfile
-        updateStoredPasswordsFunction.apply(true);
-        activeProfileJLabel.setText(activeProfile.getProfileName());
-
-        LOG.debug("Loading a Profile - " + activeProfile);
-    }
-
-    private String promptUserForProfilePassword() {
-        final ProfilePasswordEntryPanel passwordEntryPanel = new ProfilePasswordEntryPanel();
-        final int result = JOptionUtil.showCustomInputWindow(passwordEntryPanel, "Enter Profile Password");
-
-        if (result == OK_OPTION || passwordEntryPanel.isClosedByKey()) {
-            return passwordEntryPanel.getPassword();
-        }
-
-        return null;
     }
 
     private void viewPassword() {
@@ -928,6 +847,9 @@ public class MainWindow {
 
             // - Delete Database - Only if menu item in Edit is enabled.
             SwingUtil.setEnabled(chckbxmntmEnableDeleteDatabase.isSelected(), deleteDatabaseJButton);
+
+            // - Update the active profile text to match the current profile
+            activeProfileJLabel.setText(activeProfile.getProfileName());
         }
     };
 }
