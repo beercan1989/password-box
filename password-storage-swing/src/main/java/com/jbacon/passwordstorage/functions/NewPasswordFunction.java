@@ -1,4 +1,4 @@
-package com.jbacon.passwordstorage.actions;
+package com.jbacon.passwordstorage.functions;
 
 import static com.jbacon.passwordstorage.utils.GenericValidationUtil.areNull;
 
@@ -16,6 +16,7 @@ import com.jbacon.passwordstorage.database.dao.StoredPasswordsDao;
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.functions.AnnonymousFunction;
 import com.jbacon.passwordstorage.functions.ProcessFunction;
+import com.jbacon.passwordstorage.models.FluidEntity;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
 import com.jbacon.passwordstorage.swing.MainWindow;
@@ -23,25 +24,32 @@ import com.jbacon.passwordstorage.swing.panels.NewStoredPasswordPanel;
 import com.jbacon.passwordstorage.utils.DBUtil;
 import com.jbacon.passwordstorage.utils.JOptionUtil;
 
-public class NewPasswordAction {
-    private static final Log LOG = LogFactory.getLog(NewPasswordAction.class);
+public class NewPasswordFunction implements AnnonymousFunction {
+    private static final Log LOG = LogFactory.getLog(NewPasswordFunction.class);
 
     private final StoredPasswordsDao storedPasswordDao;
     private final MasterPasswordsDao masterPasswordDao;
+
+    private final FluidEntity<MasterPassword> activeProfile;
+    private final FluidEntity<String> currentPassword;
+
     private final ProcessFunction<Boolean> updateStoredPasswordsFN;
     private final AnnonymousFunction andFinallyFunction;
 
-    public NewPasswordAction(final MasterPasswordsDao masterPasswordDao, final StoredPasswordsDao storedPasswordDao, final ProcessFunction<Boolean> updateStoredPasswordsFN,
-            final AnnonymousFunction andFinallyFunction) {
+    public NewPasswordFunction(final MasterPasswordsDao masterPasswordDao, final StoredPasswordsDao storedPasswordDao, final ProcessFunction<Boolean> updateStoredPasswordsFN,
+            final AnnonymousFunction andFinallyFunction, final FluidEntity<MasterPassword> activeProfile, final FluidEntity<String> currentPassword) {
         this.storedPasswordDao = storedPasswordDao;
         this.updateStoredPasswordsFN = updateStoredPasswordsFN;
         this.masterPasswordDao = masterPasswordDao;
         this.andFinallyFunction = andFinallyFunction;
+        this.activeProfile = activeProfile;
+        this.currentPassword = currentPassword;
     }
 
-    public void newPassword(final MasterPassword activeProfile, final String currentPassword) {
+    @Override
+    public void apply() {
         try {
-            newPasswordUnsafe(activeProfile, currentPassword);
+            newPasswordUnsafe();
         } catch (final Exception e) {
             JOptionUtil.errorMessage("An error occured when the creation of your new password.", "Password Creation Error", e);
         } finally {
@@ -49,14 +57,14 @@ public class NewPasswordAction {
         }
     }
 
-    private void newPasswordUnsafe(final MasterPassword activeProfile, final String currentPassword) throws UnsupportedEncodingException, DecoderException,
-            AbstractEncrypterException {
+    private void newPasswordUnsafe() throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
         LOG.debug("Creating a new Password");
-        if (activeProfile.equals(MainWindow.DEFAULT_ACTIVE_PROFILE)) {
+
+        if (activeProfile.get().equals(MainWindow.DEFAULT_ACTIVE_PROFILE)) {
             JOptionUtil.errorMessage("You need to create or load a profile first.", "No Profile Loaded", null);
             return;
         }
-        final NewStoredPasswordPanel newPassword = new NewStoredPasswordPanel(activeProfile, currentPassword);
+        final NewStoredPasswordPanel newPassword = new NewStoredPasswordPanel(activeProfile.get(), currentPassword.get());
         if (JOptionUtil.showDefaultInputWindow(newPassword, "New Profile") == JOptionPane.OK_OPTION) {
             if (!NewStoredPasswordPanel.isValid(newPassword)) {
                 JOptionUtil.errorMessage("Failed to create a new password, as you did not fill in all the fields.", "Failed To Create New Password", null);

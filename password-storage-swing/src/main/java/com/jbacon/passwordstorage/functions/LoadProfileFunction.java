@@ -1,4 +1,4 @@
-package com.jbacon.passwordstorage.actions;
+package com.jbacon.passwordstorage.functions;
 
 import static javax.swing.JOptionPane.OK_OPTION;
 
@@ -19,35 +19,38 @@ import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.encryption.errors.NoSuchEncryptionException;
 import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 import com.jbacon.passwordstorage.functions.AnnonymousFunction;
-import com.jbacon.passwordstorage.functions.Pair;
 import com.jbacon.passwordstorage.functions.ProcessFunction;
+import com.jbacon.passwordstorage.models.FluidEntity;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.swing.list.MasterPasswordListModel;
 import com.jbacon.passwordstorage.swing.panels.ProfilePasswordEntryPanel;
 import com.jbacon.passwordstorage.utils.JOptionUtil;
 
-public class LoadProfileAction extends KeyAdapter implements ActionListener {
+public class LoadProfileFunction extends KeyAdapter implements ActionListener, AnnonymousFunction {
 
-    private static final Log LOG = LogFactory.getLog(LoadProfileAction.class);
+    private static final Log LOG = LogFactory.getLog(LoadProfileFunction.class);
 
     private final JList availableProfilesJList;
     private final MasterPasswordListModel availableProfilesModel;
     private final ProcessFunction<Boolean> updateStoredPasswordsFunction;
-    private final ProcessFunction<Pair<MasterPassword, String>> updateActiveProfileAndPassword;
+    private final FluidEntity<MasterPassword> activeProfile;
+    private final FluidEntity<String> currentPassword;
 
     private final AnnonymousFunction updateAllActionStates;
 
-    public LoadProfileAction(final JList availableProfilesJList, final MasterPasswordListModel availableProfilesModel,
-            final ProcessFunction<Boolean> updateStoredPasswordsFunction, final ProcessFunction<Pair<MasterPassword, String>> updateActiveProfileAndPassword,
-            final AnnonymousFunction updateAllActionStates) {
+    public LoadProfileFunction(final JList availableProfilesJList, final MasterPasswordListModel availableProfilesModel,
+            final ProcessFunction<Boolean> updateStoredPasswordsFunction, final AnnonymousFunction updateAllActionStates, final FluidEntity<MasterPassword> activeProfile,
+            final FluidEntity<String> currentPassword) {
         this.availableProfilesJList = availableProfilesJList;
         this.availableProfilesModel = availableProfilesModel;
         this.updateStoredPasswordsFunction = updateStoredPasswordsFunction;
-        this.updateActiveProfileAndPassword = updateActiveProfileAndPassword;
         this.updateAllActionStates = updateAllActionStates;
+        this.activeProfile = activeProfile;
+        this.currentPassword = currentPassword;
     }
 
-    public void loadProfile() {
+    @Override
+    public void apply() {
 
         // is a profile selected
         final int selectedProfileIndex = availableProfilesJList.getSelectedIndex();
@@ -77,7 +80,8 @@ public class LoadProfileAction extends KeyAdapter implements ActionListener {
 
         // set ActiveProfile to the selected MP
         // set CurrentPassword to the entered password
-        updateActiveProfileAndPassword.apply(new Pair<MasterPassword, String>(masterPassword, enteredPassword));
+        activeProfile.set(masterPassword);
+        currentPassword.set(enteredPassword);
 
         // Load all the StoredPasswords for the selected ActiveProfile
         updateStoredPasswordsFunction.apply(true);
@@ -132,14 +136,14 @@ public class LoadProfileAction extends KeyAdapter implements ActionListener {
 
     @Override
     public void actionPerformed(final ActionEvent e) {
-        loadProfile();
+        apply();
         updateAllActionStates.apply();
     }
 
     @Override
     public void keyTyped(final KeyEvent e) {
         if (KeyEvent.VK_ENTER == e.getKeyChar()) {
-            loadProfile();
+            apply();
             updateAllActionStates.apply();
         }
     }

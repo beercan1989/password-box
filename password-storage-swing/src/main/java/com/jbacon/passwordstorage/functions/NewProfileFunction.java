@@ -1,4 +1,4 @@
-package com.jbacon.passwordstorage.actions;
+package com.jbacon.passwordstorage.functions;
 
 import static com.jbacon.passwordstorage.utils.GenericValidationUtil.isNotNull;
 import static javax.swing.JOptionPane.OK_OPTION;
@@ -11,24 +11,26 @@ import org.apache.commons.logging.LogFactory;
 import com.jbacon.passwordstorage.database.dao.MasterPasswordsDao;
 import com.jbacon.passwordstorage.encryption.EncryptionType;
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
+import com.jbacon.passwordstorage.functions.AnnonymousFunctionWithException;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.swing.panels.NewMasterPasswordPanel;
 import com.jbacon.passwordstorage.utils.DBUtil;
 import com.jbacon.passwordstorage.utils.JOptionUtil;
 import com.jbacon.passwordstorage.utils.StringUtil;
 
-public class NewProfileAction {
-    private static final Log LOG = LogFactory.getLog(NewProfileAction.class);
+public class NewProfileFunction implements AnnonymousFunctionWithException<AbstractEncrypterException> {
+    private static final Log LOG = LogFactory.getLog(NewProfileFunction.class);
 
     private final MasterPasswordsDao masterPasswordDao;
-    private final UpdateAvailableProfilesAction updateAvailableProfiles;
+    private final UpdateAvailableProfilesFunction updateAvailableProfiles;
 
-    public NewProfileAction(final MasterPasswordsDao masterPasswordDao, final UpdateAvailableProfilesAction updateAvailableProfiles) {
+    public NewProfileFunction(final MasterPasswordsDao masterPasswordDao, final UpdateAvailableProfilesFunction updateAvailableProfiles) {
         this.masterPasswordDao = masterPasswordDao;
         this.updateAvailableProfiles = updateAvailableProfiles;
     }
 
-    public void newProfile(final MasterPassword currentActiveProfile) throws AbstractEncrypterException {
+    @Override
+    public void apply() throws AbstractEncrypterException {
         LOG.debug("Creating a new Profile");
         final NewMasterPasswordPanel newProfile = new NewMasterPasswordPanel();
         if (JOptionUtil.showDefaultInputWindow(newProfile, "New Profile") == OK_OPTION) {
@@ -51,7 +53,7 @@ public class NewProfileAction {
                 return;
             }
 
-            updateAvailableProfiles.updateAvailableProfiles(currentActiveProfile);
+            updateAvailableProfiles.apply();
             LOG.debug("Created masterPassword with a name of " + masterPassword.getProfileName());
         }
     }

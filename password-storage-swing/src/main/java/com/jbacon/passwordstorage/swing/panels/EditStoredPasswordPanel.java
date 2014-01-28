@@ -6,6 +6,7 @@ import org.apache.commons.codec.DecoderException;
 
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
+import com.jbacon.passwordstorage.models.FluidEntity;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
 import com.jbacon.passwordstorage.swing.listeners.CloseJOptionPaneKeyListener;
@@ -15,11 +16,11 @@ public class EditStoredPasswordPanel extends AbstractStoredPasswordPanel {
 
     private static final long serialVersionUID = -5901240381146451861L;
 
-    protected final CloseJOptionPaneKeyListener closeJOptionPaneKeyListener = new CloseJOptionPaneKeyListener();
+    private final CloseJOptionPaneKeyListener closeJOptionPaneKeyListener = new CloseJOptionPaneKeyListener();
 
-    public EditStoredPasswordPanel(final StoredPassword password, final MasterPassword profile, final String currentPassword, final boolean doDecryption)
-            throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
-        super(password, "Edit Password");
+    public EditStoredPasswordPanel(final StoredPassword password, final FluidEntity<MasterPassword> activeProfile, final FluidEntity<String> currentPassword,
+            final boolean doDecryption) throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+        super(password, "Edit Password", activeProfile, currentPassword);
 
         passwordNameJTextArea.setEditable(false);
         passwordNotesJTextArea.addKeyListener(closeJOptionPaneKeyListener);
@@ -30,11 +31,13 @@ public class EditStoredPasswordPanel extends AbstractStoredPasswordPanel {
         passwordNotesJTextArea.setEditable(false);
         passwordNameJTextArea.addKeyListener(closeJOptionPaneKeyListener);
 
-        setupPasswordDetails(profile, currentPassword, doDecryption);
+        setupPasswordDetails(doDecryption);
     }
 
-    public StoredPassword getUpdatedPassword(final MasterPassword profile, final String currentPassword) throws UnsupportedEncodingException, DecoderException,
-            AbstractEncrypterException {
+    public StoredPassword getUpdatedPassword() throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+
+        final MasterPassword profile = getProfile();
+        final String currentPassword = getCurrentPassword();
 
         password.setEncryptedPasswordName(PasswordEncryptionUtil.getEncrypted(EncrypterUtils.stringToByte(passwordNameJTextArea.getText()), profile, currentPassword));
         password.setEncryptedPassword(PasswordEncryptionUtil.getEncrypted(EncrypterUtils.stringToByte(passwordJTextArea.getText()), profile, currentPassword));

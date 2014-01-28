@@ -17,6 +17,7 @@ import javax.swing.border.EtchedBorder;
 import org.apache.commons.codec.DecoderException;
 
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
+import com.jbacon.passwordstorage.models.FluidEntity;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
 import com.jbacon.passwordstorage.utils.PasswordEncryptionUtil;
@@ -27,6 +28,9 @@ public class AbstractStoredPasswordPanel extends JPanel {
 
     private static final AbstractBorder TEXT_AREA_BORDER = new EtchedBorder(EtchedBorder.LOWERED, null, null);
     private static final Insets TEXT_AREA_MARGIN = new Insets(1, 5, 1, 5);
+
+    private final FluidEntity<MasterPassword> activeProfile;
+    private final FluidEntity<String> currentPassword;
 
     protected final StoredPassword password;
 
@@ -46,8 +50,11 @@ public class AbstractStoredPasswordPanel extends JPanel {
     protected final JTextArea passwordNotesJTextArea;
     protected final JLabel titleJLabel;
 
-    public AbstractStoredPasswordPanel(final StoredPassword password, final String titleLabel) {
+    public AbstractStoredPasswordPanel(final StoredPassword password, final String titleLabel, final FluidEntity<MasterPassword> activeProfile,
+            final FluidEntity<String> currentPassword) {
         this.password = password;
+        this.activeProfile = activeProfile;
+        this.currentPassword = currentPassword;
 
         setBorder(new EmptyBorder(10, 10, 10, 10));
         final GridBagLayout gridBagLayout = new GridBagLayout();
@@ -226,11 +233,13 @@ public class AbstractStoredPasswordPanel extends JPanel {
         this.setMinimumSize(preferedSize);
     }
 
-    protected void setupPasswordDetails(final MasterPassword profile, final String currentPassword, final boolean doDecryption) throws UnsupportedEncodingException,
-            DecoderException, AbstractEncrypterException {
+    protected void setupPasswordDetails(final boolean doDecryption) throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
 
         passwordIdJTextArea.setText(password.getId().toString());
         profileNameJTextArea.setText(password.getProfileName());
+
+        final MasterPassword profile = getProfile();
+        final String currentPassword = getCurrentPassword();
 
         if (doDecryption) {
             passwordNameJTextArea.setText(PasswordEncryptionUtil.getDecrypted(password.getEncryptedPasswordName(), profile, currentPassword));
@@ -244,5 +253,13 @@ public class AbstractStoredPasswordPanel extends JPanel {
             passwordNotesJTextArea.setText(password.getEncryptedPasswordNotes());
             passwordNotesJTextArea.setEnabled(false);
         }
+    }
+
+    protected MasterPassword getProfile() {
+        return activeProfile.get();
+    }
+
+    protected String getCurrentPassword() {
+        return currentPassword.get();
     }
 }

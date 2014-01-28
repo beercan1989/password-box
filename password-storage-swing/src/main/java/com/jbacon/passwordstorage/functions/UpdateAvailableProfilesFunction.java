@@ -1,22 +1,24 @@
-package com.jbacon.passwordstorage.actions;
+package com.jbacon.passwordstorage.functions;
 
 import java.util.List;
 
 import com.jbacon.passwordstorage.database.dao.MasterPasswordsDao;
+import com.jbacon.passwordstorage.functions.AnnonymousFunction;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.swing.list.MasterPasswordListModel;
 
-public class UpdateAvailableProfilesAction {
+public class UpdateAvailableProfilesFunction implements AnnonymousFunction {
 
     private final MasterPasswordListModel availableProfilesModel;
     private final MasterPasswordsDao masterPasswordDao;
 
-    public UpdateAvailableProfilesAction(final MasterPasswordListModel availableProfilesModel, final MasterPasswordsDao masterPasswordDao) {
+    public UpdateAvailableProfilesFunction(final MasterPasswordListModel availableProfilesModel, final MasterPasswordsDao masterPasswordDao) {
         this.availableProfilesModel = availableProfilesModel;
         this.masterPasswordDao = masterPasswordDao;
     }
 
-    public void updateAvailableProfiles(final MasterPassword currentActiveProfile) {
+    @Override
+    public void apply() {
         availableProfilesModel.clear();
         final List<MasterPassword> masterPasswords = masterPasswordDao.getMasterPasswords();
 
