@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JList;
 
@@ -18,15 +20,14 @@ import com.jbacon.passwordstorage.encryption.EncryptionType;
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.encryption.errors.NoSuchEncryptionException;
 import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
-import com.jbacon.passwordstorage.functions.AnnonymousFunction;
-import com.jbacon.passwordstorage.functions.ProcessFunction;
 import com.jbacon.passwordstorage.models.FluidEntity;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.swing.list.MasterPasswordListModel;
 import com.jbacon.passwordstorage.swing.panels.ProfilePasswordEntryPanel;
 import com.jbacon.passwordstorage.utils.JOptionUtil;
+import com.jbacon.passwordstorage.utils.MouseEventUtil;
 
-public class LoadProfileFunction extends KeyAdapter implements ActionListener, AnnonymousFunction {
+public class LoadProfileFunction implements ActionListener, AnnonymousFunction {
 
     private static final Log LOG = LogFactory.getLog(LoadProfileFunction.class);
 
@@ -38,6 +39,9 @@ public class LoadProfileFunction extends KeyAdapter implements ActionListener, A
 
     private final AnnonymousFunction updateAllActionStates;
 
+    private final KeyAdapter enterKeyListener;
+    private final MouseAdapter doubleClickListener;
+
     public LoadProfileFunction(final JList availableProfilesJList, final MasterPasswordListModel availableProfilesModel,
             final ProcessFunction<Boolean> updateStoredPasswordsFunction, final AnnonymousFunction updateAllActionStates, final FluidEntity<MasterPassword> activeProfile,
             final FluidEntity<String> currentPassword) {
@@ -47,6 +51,23 @@ public class LoadProfileFunction extends KeyAdapter implements ActionListener, A
         this.updateAllActionStates = updateAllActionStates;
         this.activeProfile = activeProfile;
         this.currentPassword = currentPassword;
+
+        enterKeyListener = new KeyAdapter() {
+            @Override
+            public void keyTyped(final KeyEvent e) {
+                if (KeyEvent.VK_ENTER == e.getKeyChar()) {
+                    apply();
+                    updateAllActionStates.apply();
+                }
+            }
+        };
+
+        doubleClickListener = new MouseAdapter() {
+            @Override
+            public void mouseClicked(final MouseEvent mouseEvent) {
+                MouseEventUtil.ifDoubleClick(mouseEvent, getThis(), updateAllActionStates);
+            }
+        };
     }
 
     @Override
@@ -140,11 +161,15 @@ public class LoadProfileFunction extends KeyAdapter implements ActionListener, A
         updateAllActionStates.apply();
     }
 
-    @Override
-    public void keyTyped(final KeyEvent e) {
-        if (KeyEvent.VK_ENTER == e.getKeyChar()) {
-            apply();
-            updateAllActionStates.apply();
-        }
+    public KeyAdapter asEnterKeyListener() {
+        return enterKeyListener;
+    }
+
+    public MouseAdapter asDoubleClickListener() {
+        return doubleClickListener;
+    }
+
+    private LoadProfileFunction getThis() {
+        return this;
     }
 }

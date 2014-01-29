@@ -1,13 +1,23 @@
 package com.jbacon.passwordstorage.models;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
-public class FluidEntity<T> {
+public class FluidEntity<T> implements Defaultable<T> {
 
     private T entity;
+    private T defaultEntity;
 
-    public FluidEntity(final T entity) {
+    public static <T> FluidEntity<T> createWithDefault(final T defaultEntity) {
+        return new FluidEntity<T>(defaultEntity, defaultEntity);
+    }
+
+    public static <T> FluidEntity<T> createWithNoDefault(final T entity) {
+        return new FluidEntity<T>(entity, null);
+    }
+
+    public FluidEntity(final T entity, final T defaultEntity) {
         this.set(entity);
     }
 
@@ -17,6 +27,21 @@ public class FluidEntity<T> {
 
     public void set(final T entity) {
         this.entity = entity;
+    }
+
+    @Override
+    public boolean isNotDefault() {
+        return !isDefault();
+    }
+
+    @Override
+    public boolean isDefault() {
+        return EqualsBuilder.reflectionEquals(entity, defaultEntity);
+    }
+
+    @Override
+    public T getDefault() {
+        return defaultEntity;
     }
 
     @Override

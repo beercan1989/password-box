@@ -3,6 +3,8 @@ package com.jbacon.passwordstorage.functions;
 import static com.jbacon.passwordstorage.utils.GenericValidationUtil.isNotNull;
 import static javax.swing.JOptionPane.OK_OPTION;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -11,26 +13,44 @@ import org.apache.commons.logging.LogFactory;
 import com.jbacon.passwordstorage.database.dao.MasterPasswordsDao;
 import com.jbacon.passwordstorage.encryption.EncryptionType;
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
-import com.jbacon.passwordstorage.functions.AnnonymousFunctionWithException;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.swing.panels.NewMasterPasswordPanel;
 import com.jbacon.passwordstorage.utils.DBUtil;
 import com.jbacon.passwordstorage.utils.JOptionUtil;
 import com.jbacon.passwordstorage.utils.StringUtil;
 
-public class NewProfileFunction implements AnnonymousFunctionWithException<AbstractEncrypterException> {
+public class NewProfileFunction implements ActionListener, AnnonymousFunction {
     private static final Log LOG = LogFactory.getLog(NewProfileFunction.class);
 
     private final MasterPasswordsDao masterPasswordDao;
     private final UpdateAvailableProfilesFunction updateAvailableProfiles;
+    private final AnnonymousFunction updateAllActionStates;
 
-    public NewProfileFunction(final MasterPasswordsDao masterPasswordDao, final UpdateAvailableProfilesFunction updateAvailableProfiles) {
+    public NewProfileFunction(final MasterPasswordsDao masterPasswordDao, final UpdateAvailableProfilesFunction updateAvailableProfiles,
+            final AnnonymousFunction updateAllActionStates) {
         this.masterPasswordDao = masterPasswordDao;
         this.updateAvailableProfiles = updateAvailableProfiles;
+        this.updateAllActionStates = updateAllActionStates;
     }
 
     @Override
-    public void apply() throws AbstractEncrypterException {
+    public void actionPerformed(final ActionEvent e) {
+        apply();
+    }
+
+    @Override
+    public void apply() {
+        try {
+            applyWithException();
+        } catch (final AbstractEncrypterException e) {
+            JOptionUtil.errorMessage("An error occured when the creation of your new profile.", "Profile Creation Error", e);
+        } finally {
+            updateAvailableProfiles.apply();
+            updateAllActionStates.apply();
+        }
+    }
+
+    private void applyWithException() throws AbstractEncrypterException {
         LOG.debug("Creating a new Profile");
         final NewMasterPasswordPanel newProfile = new NewMasterPasswordPanel();
         if (JOptionUtil.showDefaultInputWindow(newProfile, "New Profile") == OK_OPTION) {
@@ -53,7 +73,6 @@ public class NewProfileFunction implements AnnonymousFunctionWithException<Abstr
                 return;
             }
 
-            updateAvailableProfiles.apply();
             LOG.debug("Created masterPassword with a name of " + masterPassword.getProfileName());
         }
     }

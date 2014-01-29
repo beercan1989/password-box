@@ -2,6 +2,8 @@ package com.jbacon.passwordstorage.functions;
 
 import static com.jbacon.passwordstorage.utils.GenericValidationUtil.areNull;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
@@ -14,17 +16,14 @@ import org.apache.commons.logging.LogFactory;
 import com.jbacon.passwordstorage.database.dao.MasterPasswordsDao;
 import com.jbacon.passwordstorage.database.dao.StoredPasswordsDao;
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
-import com.jbacon.passwordstorage.functions.AnnonymousFunction;
-import com.jbacon.passwordstorage.functions.ProcessFunction;
 import com.jbacon.passwordstorage.models.FluidEntity;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
-import com.jbacon.passwordstorage.swing.MainWindow;
 import com.jbacon.passwordstorage.swing.panels.NewStoredPasswordPanel;
 import com.jbacon.passwordstorage.utils.DBUtil;
 import com.jbacon.passwordstorage.utils.JOptionUtil;
 
-public class NewPasswordFunction implements AnnonymousFunction {
+public class NewPasswordFunction implements ActionListener, AnnonymousFunction {
     private static final Log LOG = LogFactory.getLog(NewPasswordFunction.class);
 
     private final StoredPasswordsDao storedPasswordDao;
@@ -47,6 +46,11 @@ public class NewPasswordFunction implements AnnonymousFunction {
     }
 
     @Override
+    public void actionPerformed(final ActionEvent e) {
+        apply();
+    }
+
+    @Override
     public void apply() {
         try {
             newPasswordUnsafe();
@@ -60,7 +64,7 @@ public class NewPasswordFunction implements AnnonymousFunction {
     private void newPasswordUnsafe() throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
         LOG.debug("Creating a new Password");
 
-        if (activeProfile.get().equals(MainWindow.DEFAULT_ACTIVE_PROFILE)) {
+        if (activeProfile.isDefault()) {
             JOptionUtil.errorMessage("You need to create or load a profile first.", "No Profile Loaded", null);
             return;
         }

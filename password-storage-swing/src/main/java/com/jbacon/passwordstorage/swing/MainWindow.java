@@ -48,11 +48,11 @@ import com.jbacon.passwordstorage.database.mybatis.MaintenanceMybatisDao;
 import com.jbacon.passwordstorage.database.mybatis.MasterPasswordMybatisDao;
 import com.jbacon.passwordstorage.database.mybatis.StoredPasswordMybatisDao;
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
-import com.jbacon.passwordstorage.functions.AnnonymousFunction;
 import com.jbacon.passwordstorage.functions.LoadProfileFunction;
 import com.jbacon.passwordstorage.functions.NewPasswordFunction;
 import com.jbacon.passwordstorage.functions.NewProfileFunction;
 import com.jbacon.passwordstorage.functions.ProcessFunction;
+import com.jbacon.passwordstorage.functions.UpdateAllActionStatesFunction;
 import com.jbacon.passwordstorage.functions.UpdateAvailableProfilesFunction;
 import com.jbacon.passwordstorage.functions.UpdateStoredPasswordsFunction;
 import com.jbacon.passwordstorage.models.FluidEntity;
@@ -65,7 +65,7 @@ import com.jbacon.passwordstorage.swing.table.StoredPasswordTableColumns;
 import com.jbacon.passwordstorage.swing.table.StoredPasswordTableModel;
 import com.jbacon.passwordstorage.utils.DBUtil;
 import com.jbacon.passwordstorage.utils.JOptionUtil;
-import com.jbacon.passwordstorage.utils.SwingUtil;
+import com.jbacon.passwordstorage.utils.MouseEventUtil;
 
 public class MainWindow {
 
@@ -85,20 +85,21 @@ public class MainWindow {
         });
     }
 
-    public static final String DEFAULT_CURRENT_PASSWORD = "### --- Default Current Password --- ###";
-    public static final MasterPassword DEFAULT_ACTIVE_PROFILE = new MasterPassword() {
-        {
-            this.setProfileName("N/A");
-        }
-    };
-
     private final MaintenanceDao maintenanceDao;
     private final MasterPasswordsDao masterPasswordDao;
     private final StoredPasswordsDao storedPasswordDao;
     private final StoredPasswordTableModel storedPasswordsModel;
     private final MasterPasswordListModel availableProfilesModel;
-    private final FluidEntity<MasterPassword> activeProfile = new FluidEntity<MasterPassword>(DEFAULT_ACTIVE_PROFILE);
-    private final FluidEntity<String> currentPassword = new FluidEntity<String>(DEFAULT_CURRENT_PASSWORD);
+    private final FluidEntity<MasterPassword> activeProfile;
+    private final FluidEntity<String> currentPassword;
+
+    // Functions
+    private final UpdateAvailableProfilesFunction updateAvailableProfilesFunction;
+    private final ProcessFunction<Boolean> updateStoredPasswordsFunction;
+    private final NewProfileFunction newProfileFunction;
+    private final NewPasswordFunction newPasswordFunction;
+    private final LoadProfileFunction loadProfileFunction;
+    private final UpdateAllActionStatesFunction updateAllActionStatesFunction;
 
     private JFrame mainWindowJFrame;
     private JTable storedPasswordsJTable;
@@ -155,13 +156,6 @@ public class MainWindow {
     private JCheckBoxMenuItem chckbxmntmEnableDeleteDatabase;
     private JMenu mnSettings;
 
-    // Functions
-    private final UpdateAvailableProfilesFunction updateAvailableProfilesFunction;
-    private final ProcessFunction<Boolean> updateStoredPasswordsFunction;
-    private final NewProfileFunction newProfileFunction;
-    private final NewPasswordFunction newPasswordFunction;
-    private final LoadProfileFunction loadProfileFunction;
-
     public MainWindow() {
         maintenanceDao = DBUtil.createMybatisDao(MaintenanceMybatisDao.class);
         masterPasswordDao = DBUtil.createMybatisDao(MasterPasswordMybatisDao.class);
@@ -173,19 +167,28 @@ public class MainWindow {
         storedPasswordsModel = new StoredPasswordTableModel();
         availableProfilesModel = new MasterPasswordListModel();
 
+        currentPassword = FluidEntity.createWithDefault("### --- Default Current Password --- ###");
+        activeProfile = FluidEntity.<MasterPassword> createWithDefault(new MasterPassword() {
+            {
+                this.setProfileName("N/A");
+            }
+        });
+
         initialize();
 
         final List<MasterPassword> savedProfiles = masterPasswordDao.getMasterPasswords();
         availableProfilesModel.addAll(savedProfiles);
 
         // Functions
+        updateAllActionStatesFunction = new UpdateAllActionStatesFunction(chckbxmntmToggleSidebar, chckbxmntmToggleActionButtons, chckbxmntmToggleAvailableProfiles, westJPanel,
+                availableProfilesJList, availableProfilesNorthButtonJPanel, loadProfileJButton, deleteProfileJButton, mntmLoadProfile, mntmDeleteProfile, activeProfile,
+                closeProfileJButton, mntmCloseProfile, newPasswordJBbutton, storedPasswordsJTable, viewPasswordJButton, editPasswordJButton, deletePasswordJButton,
+                mntmViewPassword, mntmEditPassword, mntmDeletePassword, chckbxmntmEnableDeleteDatabase, deleteDatabaseJButton, activeProfileJLabel);
         updateStoredPasswordsFunction = new UpdateStoredPasswordsFunction(storedPasswordDao, storedPasswordsModel, availableProfilesModel, availableProfilesJList);
-
-        // Actions
         updateAvailableProfilesFunction = new UpdateAvailableProfilesFunction(availableProfilesModel, masterPasswordDao);
-        newPasswordFunction = new NewPasswordFunction(masterPasswordDao, storedPasswordDao, updateStoredPasswordsFunction, updateAllActionStates, activeProfile, currentPassword);
-        newProfileFunction = new NewProfileFunction(masterPasswordDao, updateAvailableProfilesFunction);
-        loadProfileFunction = new LoadProfileFunction(availableProfilesJList, availableProfilesModel, updateStoredPasswordsFunction, updateAllActionStates, activeProfile,
+        newPasswordFunction = new NewPasswordFunction(masterPasswordDao, storedPasswordDao, updateStoredPasswordsFunction, updateAllActionStatesFunction, activeProfile, currentPassword);
+        newProfileFunction = new NewProfileFunction(masterPasswordDao, updateAvailableProfilesFunction, updateAllActionStatesFunction);
+        loadProfileFunction = new LoadProfileFunction(availableProfilesJList, availableProfilesModel, updateStoredPasswordsFunction, updateAllActionStatesFunction, activeProfile,
                 currentPassword);
     }
 
@@ -194,8 +197,8 @@ public class MainWindow {
 
         availableProfilesJList.clearSelection();
 
-        activeProfile.set(DEFAULT_ACTIVE_PROFILE);
-        currentPassword.set(DEFAULT_CURRENT_PASSWORD);
+        activeProfile.set(activeProfile.getDefault());
+        currentPassword.set(currentPassword.getDefault());
 
         updateAvailableProfilesFunction.apply();
         updateStoredPasswordsFunction.apply(false);
@@ -245,14 +248,8 @@ public class MainWindow {
     }
 
     private void displayStoredPassword(final MouseEvent mouseEvent) {
-        if (isDoubleClick(mouseEvent)) {
+        if (MouseEventUtil.isDoubleClick(mouseEvent)) {
             viewPassword();
-        }
-    }
-
-    private void displayStoredPasswords(final MouseEvent mouseEvent) {
-        if (isDoubleClick(mouseEvent)) {
-            loadProfileFunction.apply();
         }
     }
 
@@ -297,18 +294,7 @@ public class MainWindow {
         menuBar.add(mnFile);
 
         mntmNewProfile = new JMenuItem("New Profile");
-        mntmNewProfile.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                try {
-                    newProfileFunction.apply();
-                } catch (final AbstractEncrypterException t) {
-                    JOptionUtil.errorMessage("An error occured when the creation of your new profile.", "Profile Creation Error", t);
-                } finally {
-                    updateAllActionStates.apply();
-                }
-            }
-        });
+        mntmNewProfile.addActionListener(newProfileFunction);
         mnFile.add(mntmNewProfile);
 
         mntmLoadProfile = new JMenuItem("Load Profile");
@@ -320,7 +306,7 @@ public class MainWindow {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 closeProfile();
-                updateAllActionStates.apply();
+                updateAllActionStatesFunction.apply();
             }
         });
         mnFile.add(mntmCloseProfile);
@@ -330,7 +316,7 @@ public class MainWindow {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 deleteProfile();
-                updateAllActionStates.apply();
+                updateAllActionStatesFunction.apply();
             }
         });
         mnFile.add(mntmDeleteProfile);
@@ -339,12 +325,7 @@ public class MainWindow {
         mnFile.add(firstFileMenuJSeparator);
 
         mntmNewPassword = new JMenuItem("New Password");
-        mntmNewPassword.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                newPasswordFunction.apply();
-            }
-        });
+        mntmNewPassword.addActionListener(newPasswordFunction);
         mnFile.add(mntmNewPassword);
 
         mntmViewPassword = new JMenuItem("View Password");
@@ -352,7 +333,7 @@ public class MainWindow {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 viewPassword();
-                updateAllActionStates.apply();
+                updateAllActionStatesFunction.apply();
             }
         });
         mnFile.add(mntmViewPassword);
@@ -362,7 +343,7 @@ public class MainWindow {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 deletePassword();
-                updateAllActionStates.apply();
+                updateAllActionStatesFunction.apply();
             }
         });
 
@@ -371,7 +352,7 @@ public class MainWindow {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 editPassword();
-                updateAllActionStates.apply();
+                updateAllActionStatesFunction.apply();
             }
         });
         mnFile.add(mntmEditPassword);
@@ -396,7 +377,7 @@ public class MainWindow {
         mnEdit.add(mnSettings);
 
         chckbxmntmEnableDeleteDatabase = new JCheckBoxMenuItem("Enable Delete Database");
-        chckbxmntmEnableDeleteDatabase.addActionListener(updateAllActionStatesActionListener);
+        chckbxmntmEnableDeleteDatabase.addActionListener(updateAllActionStatesFunction);
         mnSettings.add(chckbxmntmEnableDeleteDatabase);
 
         mnView = new JMenu("View");
@@ -404,7 +385,7 @@ public class MainWindow {
 
         chckbxmntmToggleSidebar = new JCheckBoxMenuItem("Sidebar");
         chckbxmntmToggleSidebar.setSelected(true);
-        chckbxmntmToggleSidebar.addActionListener(updateAllActionStatesActionListener);
+        chckbxmntmToggleSidebar.addActionListener(updateAllActionStatesFunction);
         mnView.add(chckbxmntmToggleSidebar);
 
         viewMenuSeparator = new JSeparator();
@@ -412,12 +393,12 @@ public class MainWindow {
 
         chckbxmntmToggleActionButtons = new JCheckBoxMenuItem("Action Buttons");
         chckbxmntmToggleActionButtons.setSelected(true);
-        chckbxmntmToggleActionButtons.addActionListener(updateAllActionStatesActionListener);
+        chckbxmntmToggleActionButtons.addActionListener(updateAllActionStatesFunction);
         mnView.add(chckbxmntmToggleActionButtons);
 
         chckbxmntmToggleAvailableProfiles = new JCheckBoxMenuItem("Available Profiles");
         chckbxmntmToggleAvailableProfiles.setSelected(true);
-        chckbxmntmToggleAvailableProfiles.addActionListener(updateAllActionStatesActionListener);
+        chckbxmntmToggleAvailableProfiles.addActionListener(updateAllActionStatesFunction);
         mnView.add(chckbxmntmToggleAvailableProfiles);
 
         mnHelp = new JMenu("Help");
@@ -469,18 +450,7 @@ public class MainWindow {
         availableProfilesNorthButtonJPanel.setLayout(gbl_availableProfilesNorthButtonJPanel);
 
         newProfileJButton = new JButton("New Profile");
-        newProfileJButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                try {
-                    newProfileFunction.apply();
-                } catch (final AbstractEncrypterException t) {
-                    JOptionUtil.errorMessage("An error occured when the creation of your new profile.", "Profile Creation Error", t);
-                } finally {
-                    updateAllActionStates.apply();
-                }
-            }
-        });
+        newProfileJButton.addActionListener(newProfileFunction);
         final GridBagConstraints gbc_newProfileJButton = new GridBagConstraints();
         gbc_newProfileJButton.fill = GridBagConstraints.HORIZONTAL;
         gbc_newProfileJButton.insets = new Insets(0, 0, 5, 0);
@@ -502,7 +472,7 @@ public class MainWindow {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 deleteProfile();
-                updateAllActionStates.apply();
+                updateAllActionStatesFunction.apply();
             }
         });
 
@@ -511,7 +481,7 @@ public class MainWindow {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 closeProfile();
-                updateAllActionStates.apply();
+                updateAllActionStatesFunction.apply();
             }
         });
         final GridBagConstraints gbc_closeProfileJButton = new GridBagConstraints();
@@ -537,12 +507,7 @@ public class MainWindow {
         availableProfilesNorthButtonJPanel.add(availableProfilesButtonSeparator, gbc_availableProfilesButtonSeparator);
 
         newPasswordJBbutton = new JButton("New Password");
-        newPasswordJBbutton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                newPasswordFunction.apply();
-            }
-        });
+        newPasswordJBbutton.addActionListener(newPasswordFunction);
         final GridBagConstraints gbc_newPasswordJBbutton = new GridBagConstraints();
         gbc_newPasswordJBbutton.fill = GridBagConstraints.HORIZONTAL;
         gbc_newPasswordJBbutton.insets = new Insets(0, 0, 5, 0);
@@ -555,7 +520,7 @@ public class MainWindow {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 viewPassword();
-                updateAllActionStates.apply();
+                updateAllActionStatesFunction.apply();
             }
         });
         final GridBagConstraints gbc_openPasswordJButton = new GridBagConstraints();
@@ -570,7 +535,7 @@ public class MainWindow {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 editPassword();
-                updateAllActionStates.apply();
+                updateAllActionStatesFunction.apply();
             }
         });
         final GridBagConstraints gbc_editPasswordJButton = new GridBagConstraints();
@@ -585,7 +550,7 @@ public class MainWindow {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 deletePassword();
-                updateAllActionStates.apply();
+                updateAllActionStatesFunction.apply();
             }
         });
         final GridBagConstraints gbc_deletePasswordJButton = new GridBagConstraints();
@@ -609,7 +574,7 @@ public class MainWindow {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 deleteDatabase();
-                updateAllActionStates.apply();
+                updateAllActionStatesFunction.apply();
             }
         });
         final GridBagConstraints gbc_deleteDatabaseJButton = new GridBagConstraints();
@@ -620,14 +585,8 @@ public class MainWindow {
         availableProfilesNorthButtonJPanel.add(deleteDatabaseJButton, gbc_deleteDatabaseJButton);
 
         availableProfilesJList = new JList();
-        availableProfilesJList.addKeyListener(loadProfileFunction);
-        availableProfilesJList.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(final MouseEvent mouseEvent) {
-                displayStoredPasswords(mouseEvent);
-                updateAllActionStates.apply();
-            }
-        });
+        availableProfilesJList.addKeyListener(loadProfileFunction.asEnterKeyListener());
+        availableProfilesJList.addMouseListener(loadProfileFunction.asDoubleClickListener());
         availableProfilesJList.setModel(availableProfilesModel);
         availableProfilesJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         availableProfilesJList.setBorder(new CompoundBorder(new EmptyBorder(10, 5, 5, 5), new CompoundBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)),
@@ -661,7 +620,7 @@ public class MainWindow {
             public void keyTyped(final KeyEvent e) {
                 if (KeyEvent.VK_ENTER == e.getKeyChar()) {
                     viewPassword();
-                    updateAllActionStates.apply();
+                    updateAllActionStatesFunction.apply();
                 }
             }
         });
@@ -669,7 +628,7 @@ public class MainWindow {
             @Override
             public void mouseClicked(final MouseEvent mouseEvent) {
                 displayStoredPassword(mouseEvent);
-                updateAllActionStates.apply();
+                updateAllActionStatesFunction.apply();
             }
         });
         storedPasswordsJTable.setFillsViewportHeight(true);
@@ -700,11 +659,7 @@ public class MainWindow {
 
         storedPasswordsJScrollPane.setViewportView(storedPasswordsJTable);
 
-        updateAllActionStates.apply();
-    }
-
-    private boolean isDoubleClick(final MouseEvent mouseEvent) {
-        return mouseEvent.getClickCount() >= 2;
+        updateAllActionStatesFunction.apply();
     }
 
     private void viewPassword() {
@@ -775,51 +730,4 @@ public class MainWindow {
             LOG.debug("Not going to save changes.");
         }
     }
-
-    private final ActionListener updateAllActionStatesActionListener = new ActionListener() {
-        @Override
-        public void actionPerformed(final ActionEvent e) {
-            updateAllActionStates.apply();
-        }
-    };
-
-    private final AnnonymousFunction updateAllActionStates = new AnnonymousFunction() {
-        @Override
-        public void apply() {
-            // View Menu
-            // - Sidebar toggles:
-            // - + Action Buttons
-            // - + Available Profiles
-            SwingUtil.setEnabled(chckbxmntmToggleSidebar.isSelected(), chckbxmntmToggleActionButtons, chckbxmntmToggleAvailableProfiles);
-
-            // West JPanel - Toggled by the 'Toggle Sidebar' menu item.
-            SwingUtil.setVisible(chckbxmntmToggleSidebar.isSelected(), westJPanel);
-
-            // Available Profiles - Only when the menu item is selected.
-            SwingUtil.setVisible(chckbxmntmToggleAvailableProfiles.isSelected(), availableProfilesJList);
-
-            // Action Buttons - Only when the menu item is selected.
-            SwingUtil.setVisible(chckbxmntmToggleActionButtons.isSelected(), availableProfilesNorthButtonJPanel);
-
-            // Action Buttons & File Menu
-            // - New Profile - always available
-            // - Load, Delete Profile - Only if a profile is selected
-            final boolean isAProfileSelected = availableProfilesJList.getSelectedIndex() >= 0;
-            SwingUtil.setEnabled(isAProfileSelected, loadProfileJButton, deleteProfileJButton, mntmLoadProfile, mntmDeleteProfile);
-
-            // Action Buttons - New Password, Close Profile - Only if a profile is active (not the default)
-            final boolean isAProfileActive = activeProfile.get() != DEFAULT_ACTIVE_PROFILE;
-            SwingUtil.setEnabled(isAProfileActive, closeProfileJButton, mntmCloseProfile, newPasswordJBbutton);
-
-            // Action Buttons - View, Edit, Delete Password - Only if a password is selected
-            final boolean isAPasswordSelected = storedPasswordsJTable.getSelectedRow() >= 0;
-            SwingUtil.setEnabled(isAPasswordSelected, viewPasswordJButton, editPasswordJButton, deletePasswordJButton, mntmViewPassword, mntmEditPassword, mntmDeletePassword);
-
-            // - Delete Database - Only if menu item in Edit is enabled.
-            SwingUtil.setEnabled(chckbxmntmEnableDeleteDatabase.isSelected(), deleteDatabaseJButton);
-
-            // - Update the active profile text to match the current profile
-            activeProfileJLabel.setText(activeProfile.get().getProfileName());
-        }
-    };
 }
