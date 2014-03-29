@@ -1,6 +1,6 @@
 package com.jbacon.passwordstorage.swing.panels;
 
-import static com.jbacon.passwordstorage.tools.GenericUtils.isNull;
+import static com.jbacon.passwordstorage.utils.GenericValidationUtil.isNull;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -27,14 +28,12 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.jbacon.passwordstorage.encryption.EncrypterAES;
-import com.jbacon.passwordstorage.encryption.EncrypterPBE;
-import com.jbacon.passwordstorage.encryption.EncryptionMode;
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
-import com.jbacon.passwordstorage.tools.StringUtils;
+import com.jbacon.passwordstorage.utils.PasswordEncryptionUtil;
+import com.jbacon.passwordstorage.utils.StringUtil;
 
 public class NewStoredPasswordPanel extends JPanel {
 
@@ -53,20 +52,20 @@ public class NewStoredPasswordPanel extends JPanel {
             if (LOG.isDebugEnabled()) {
                 final StringBuilder logEntry = new StringBuilder();
                 logEntry.append("Validating NewStoredPasswordPanel [aka StoredPassword].");
-                logEntry.append(StringUtils.NEW_LINE);
-                logEntry.append(StringUtils.SINGLE_TAB);
+                logEntry.append(StringUtil.NEW_LINE);
+                logEntry.append(StringUtil.SINGLE_TAB);
                 logEntry.append("NewStoredPasswordPanel Entered Values [Encrypted Where Necessary]");
-                logEntry.append(StringUtils.NEW_LINE);
-                logEntry.append(StringUtils.DOUBLE_TAB);
+                logEntry.append(StringUtil.NEW_LINE);
+                logEntry.append(StringUtil.DOUBLE_TAB);
                 logEntry.append("Profile Name: " + profileName);
-                logEntry.append(StringUtils.NEW_LINE);
-                logEntry.append(StringUtils.DOUBLE_TAB);
+                logEntry.append(StringUtil.NEW_LINE);
+                logEntry.append(StringUtil.DOUBLE_TAB);
                 logEntry.append("Encrypted Password Name: " + encryptedPasswordName);
-                logEntry.append(StringUtils.NEW_LINE);
-                logEntry.append(StringUtils.DOUBLE_TAB);
+                logEntry.append(StringUtil.NEW_LINE);
+                logEntry.append(StringUtil.DOUBLE_TAB);
                 logEntry.append("Encrypted Password: " + encryptedPassword);
-                logEntry.append(StringUtils.NEW_LINE);
-                logEntry.append(StringUtils.DOUBLE_TAB);
+                logEntry.append(StringUtil.NEW_LINE);
+                logEntry.append(StringUtil.DOUBLE_TAB);
                 logEntry.append("Encrypted Password Notes: " + encryptedPasswordNotes);
                 LOG.debug(logEntry.toString());
             }
@@ -106,12 +105,15 @@ public class NewStoredPasswordPanel extends JPanel {
     private final JTextField passwordNameJTextField;
     private final JLabel passwordNotesJLabel;
     private final JTextArea passwordNotesJTextArea;
+    private final JLabel titleJLabel;
 
     /**
      * Create the panel.
      * 
-     * @param profile the current active MasterPassword profile.
-     * @param currentPassword the password of the current MasterPassword profile.
+     * @param profile
+     *            the current active MasterPassword profile.
+     * @param currentPassword
+     *            the password of the current MasterPassword profile.
      */
     public NewStoredPasswordPanel(final MasterPassword profile, final String currentPassword) {
         this.profile = profile;
@@ -120,10 +122,19 @@ public class NewStoredPasswordPanel extends JPanel {
         setBorder(new EmptyBorder(10, 10, 10, 10));
         final GridBagLayout gridBagLayout = new GridBagLayout();
         gridBagLayout.columnWidths = new int[] { 0, 0, 0 };
-        gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+        gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
         gridBagLayout.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
-        gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
+        gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
         setLayout(gridBagLayout);
+
+        titleJLabel = new JLabel("New Password");
+        titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        final GridBagConstraints gbc_titleJLabel = new GridBagConstraints();
+        gbc_titleJLabel.gridwidth = 3;
+        gbc_titleJLabel.insets = new Insets(0, 0, 5, 5);
+        gbc_titleJLabel.gridx = 0;
+        gbc_titleJLabel.gridy = 0;
+        add(titleJLabel, gbc_titleJLabel);
 
         txtrPleaseEnterThe = new JTextArea();
         txtrPleaseEnterThe.setBackground(UIManager.getColor("Label.background"));
@@ -135,7 +146,7 @@ public class NewStoredPasswordPanel extends JPanel {
         gbc_txtrPleaseEnterThe.insets = new Insets(0, 0, 5, 0);
         gbc_txtrPleaseEnterThe.fill = GridBagConstraints.HORIZONTAL;
         gbc_txtrPleaseEnterThe.gridx = 0;
-        gbc_txtrPleaseEnterThe.gridy = 0;
+        gbc_txtrPleaseEnterThe.gridy = 1;
         add(txtrPleaseEnterThe, gbc_txtrPleaseEnterThe);
 
         profileNameJLabel = new JLabel("Profile Name");
@@ -144,7 +155,7 @@ public class NewStoredPasswordPanel extends JPanel {
         gbc_profileNameJLabel.insets = new Insets(0, 0, 5, 5);
         gbc_profileNameJLabel.anchor = GridBagConstraints.EAST;
         gbc_profileNameJLabel.gridx = 0;
-        gbc_profileNameJLabel.gridy = 1;
+        gbc_profileNameJLabel.gridy = 2;
         add(profileNameJLabel, gbc_profileNameJLabel);
 
         profileNameJTextField = new JTextField();
@@ -156,7 +167,7 @@ public class NewStoredPasswordPanel extends JPanel {
         gbc_profileNameJTextField.insets = new Insets(0, 0, 5, 0);
         gbc_profileNameJTextField.fill = GridBagConstraints.BOTH;
         gbc_profileNameJTextField.gridx = 1;
-        gbc_profileNameJTextField.gridy = 1;
+        gbc_profileNameJTextField.gridy = 2;
         add(profileNameJTextField, gbc_profileNameJTextField);
 
         reTypedPasswordJPasswordField = new JPasswordField();
@@ -167,7 +178,7 @@ public class NewStoredPasswordPanel extends JPanel {
         gbc_reTypedPasswordJPasswordField.insets = new Insets(0, 0, 5, 0);
         gbc_reTypedPasswordJPasswordField.fill = GridBagConstraints.HORIZONTAL;
         gbc_reTypedPasswordJPasswordField.gridx = 1;
-        gbc_reTypedPasswordJPasswordField.gridy = 4;
+        gbc_reTypedPasswordJPasswordField.gridy = 5;
         reTypedPasswordJPasswordField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(final KeyEvent e) {
@@ -193,7 +204,7 @@ public class NewStoredPasswordPanel extends JPanel {
         gbc_passwordJPasswordField.insets = new Insets(0, 0, 5, 0);
         gbc_passwordJPasswordField.fill = GridBagConstraints.HORIZONTAL;
         gbc_passwordJPasswordField.gridx = 1;
-        gbc_passwordJPasswordField.gridy = 3;
+        gbc_passwordJPasswordField.gridy = 4;
         passwordJPasswordField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(final KeyEvent e) {
@@ -217,7 +228,7 @@ public class NewStoredPasswordPanel extends JPanel {
         gbc_passwordNameJLabel.fill = GridBagConstraints.VERTICAL;
         gbc_passwordNameJLabel.insets = new Insets(0, 0, 5, 5);
         gbc_passwordNameJLabel.gridx = 0;
-        gbc_passwordNameJLabel.gridy = 2;
+        gbc_passwordNameJLabel.gridy = 3;
         add(passwordNameJLabel, gbc_passwordNameJLabel);
 
         passwordNameJTextField = new JTextField();
@@ -227,7 +238,7 @@ public class NewStoredPasswordPanel extends JPanel {
         gbc_passwordNameJTextField.insets = new Insets(0, 0, 5, 0);
         gbc_passwordNameJTextField.fill = GridBagConstraints.HORIZONTAL;
         gbc_passwordNameJTextField.gridx = 1;
-        gbc_passwordNameJTextField.gridy = 2;
+        gbc_passwordNameJTextField.gridy = 3;
         add(passwordNameJTextField, gbc_passwordNameJTextField);
         passwordNameJTextField.addKeyListener(new KeyAdapter() {
             @Override
@@ -251,7 +262,7 @@ public class NewStoredPasswordPanel extends JPanel {
         gbc_passwordJLabel.anchor = GridBagConstraints.EAST;
         gbc_passwordJLabel.insets = new Insets(0, 0, 5, 5);
         gbc_passwordJLabel.gridx = 0;
-        gbc_passwordJLabel.gridy = 3;
+        gbc_passwordJLabel.gridy = 4;
         add(passwordJLabel, gbc_passwordJLabel);
         add(passwordJPasswordField, gbc_passwordJPasswordField);
 
@@ -260,7 +271,7 @@ public class NewStoredPasswordPanel extends JPanel {
         gbc_reTypedPasswordJLabel.insets = new Insets(0, 0, 5, 5);
         gbc_reTypedPasswordJLabel.anchor = GridBagConstraints.EAST;
         gbc_reTypedPasswordJLabel.gridx = 0;
-        gbc_reTypedPasswordJLabel.gridy = 4;
+        gbc_reTypedPasswordJLabel.gridy = 5;
         add(reTypedPasswordJLabel, gbc_reTypedPasswordJLabel);
         add(reTypedPasswordJPasswordField, gbc_reTypedPasswordJPasswordField);
 
@@ -269,7 +280,7 @@ public class NewStoredPasswordPanel extends JPanel {
         gbc_passwordNotesJLabel.anchor = GridBagConstraints.NORTHEAST;
         gbc_passwordNotesJLabel.insets = new Insets(0, 0, 0, 5);
         gbc_passwordNotesJLabel.gridx = 0;
-        gbc_passwordNotesJLabel.gridy = 5;
+        gbc_passwordNotesJLabel.gridy = 6;
         add(passwordNotesJLabel, gbc_passwordNotesJLabel);
 
         passwordNotesJTextArea = new JTextArea();
@@ -280,7 +291,7 @@ public class NewStoredPasswordPanel extends JPanel {
         final GridBagConstraints gbc_passwordNotesJTextArea = new GridBagConstraints();
         gbc_passwordNotesJTextArea.fill = GridBagConstraints.BOTH;
         gbc_passwordNotesJTextArea.gridx = 1;
-        gbc_passwordNotesJTextArea.gridy = 5;
+        gbc_passwordNotesJTextArea.gridy = 6;
         add(passwordNotesJTextArea, gbc_passwordNotesJTextArea);
 
         updatePasswordFieldValidation();
@@ -313,22 +324,10 @@ public class NewStoredPasswordPanel extends JPanel {
     }
 
     private boolean enteredPasswordNameIsValid() {
-        if (StringUtils.isEmpty(passwordNameJTextField.getText())) {
+        if (StringUtil.isEmpty(passwordNameJTextField.getText())) {
             return false;
         }
         return true;
-    }
-
-    private String getEncrypted(final byte[] toEncrypt) throws DecoderException, AbstractEncrypterException, UnsupportedEncodingException {
-        final EncrypterPBE decrypter = (EncrypterPBE) profile.getMasterPasswordEncryptionType().getEncrypter();
-        final byte[] salt = EncrypterUtils.base64StringToBytes(profile.getSalt());
-        final byte[] cipherText = EncrypterUtils.base64StringToBytes(profile.getEncryptedSecretKey());
-        final char[] passPhrase = EncrypterUtils.stringToChar(currentPassword);
-        final byte[] aesKey = decrypter.doCiper(EncryptionMode.DECRYPT_MODE, salt, cipherText, passPhrase);
-        final EncrypterAES encrypter = (EncrypterAES) profile.getStoredPasswordEncryptionType().getEncrypter();
-        final byte[] encryptedValue = encrypter.doCiper(EncryptionMode.ENCRYPT_MODE, toEncrypt, aesKey);
-
-        return EncrypterUtils.bytesToBase64String(encryptedValue);
     }
 
     private String getEncryptedPassword() throws DecoderException, AbstractEncrypterException, UnsupportedEncodingException {
@@ -341,6 +340,10 @@ public class NewStoredPasswordPanel extends JPanel {
 
     private String getEncryptedPasswordNotes() throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
         return getEncrypted(EncrypterUtils.stringToByte(getPasswordNotes()));
+    }
+
+    private String getEncrypted(final byte[] bytes) throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+        return PasswordEncryptionUtil.getEncrypted(bytes, profile, currentPassword);
     }
 
     private char[] getPassword() {

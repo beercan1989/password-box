@@ -36,9 +36,9 @@ import com.jbacon.passwordstorage.encryption.EncryptionType;
 import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 import com.jbacon.passwordstorage.password.MasterPassword;
-import com.jbacon.passwordstorage.swing.MainWindow;
-import com.jbacon.passwordstorage.tools.GenericUtils;
-import com.jbacon.passwordstorage.tools.StringUtils;
+import com.jbacon.passwordstorage.utils.GenericValidationUtil;
+import com.jbacon.passwordstorage.utils.JOptionUtil;
+import com.jbacon.passwordstorage.utils.StringUtil;
 
 public class NewMasterPasswordPanel extends JPanel {
 
@@ -57,8 +57,8 @@ public class NewMasterPasswordPanel extends JPanel {
             LOG.debug("ProfileName: " + newProfile.getProfileName());
 
             final boolean encryptionTypesValid = EncryptionType.areValid(newProfile.getProfileEncryptionType(), newProfile.getPasswordEncryptionType());
-            final boolean saltIsNotNull = GenericUtils.isNotNull(newProfile.getSalt());
-            final boolean areNotEmpty = StringUtils.areNotEmpty(newProfile.getEncryptedSecretKey(), newProfile.getProfileName());
+            final boolean saltIsNotNull = GenericValidationUtil.isNotNull(newProfile.getSalt());
+            final boolean areNotEmpty = StringUtil.areNotEmpty(newProfile.getEncryptedSecretKey(), newProfile.getProfileName());
 
             LOG.debug("Encryption Type is valid: " + encryptionTypesValid);
             LOG.debug("Salt is not null: " + saltIsNotNull);
@@ -242,7 +242,7 @@ public class NewMasterPasswordPanel extends JPanel {
                 try {
                     generateSalt();
                 } catch (final AbstractEncrypterException ex) {
-                    MainWindow.errorMessage("Failed to generate salt value.", "Salt Generation Failure", ex);
+                    JOptionUtil.errorMessage("Failed to generate salt value.", "Salt Generation Failure", ex);
                 }
             }
         });

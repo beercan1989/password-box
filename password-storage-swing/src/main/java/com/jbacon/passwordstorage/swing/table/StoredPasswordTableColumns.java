@@ -2,7 +2,7 @@ package com.jbacon.passwordstorage.swing.table;
 
 import org.apache.commons.lang.WordUtils;
 
-import com.jbacon.passwordstorage.tools.StringUtils;
+import com.jbacon.passwordstorage.utils.StringUtil;
 
 public enum StoredPasswordTableColumns {
 	ID(Integer.class), //
@@ -14,7 +14,7 @@ public enum StoredPasswordTableColumns {
 	UPDATED_AT(String.class);
 
 	public static StoredPasswordTableColumns stringToEnum(final String name) {
-		return valueOf(name.replaceAll(StringUtils.SPACE, StringUtils.UNDER_SCORE).toUpperCase());
+		return valueOf(name.replaceAll(StringUtil.SPACE, StringUtil.UNDER_SCORE).toUpperCase());
 	}
 
 	private final Class<?> type;
@@ -24,7 +24,7 @@ public enum StoredPasswordTableColumns {
 	}
 
 	public String getName() {
-		return WordUtils.capitalizeFully(this.name().replaceAll(StringUtils.UNDER_SCORE, StringUtils.SPACE));
+		return WordUtils.capitalizeFully(this.name().replaceAll(StringUtil.UNDER_SCORE, StringUtil.SPACE));
 	}
 
 	public Class<?> getType() {

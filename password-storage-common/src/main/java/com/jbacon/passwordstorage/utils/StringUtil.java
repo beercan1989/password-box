@@ -1,8 +1,8 @@
-package com.jbacon.passwordstorage.tools;
+package com.jbacon.passwordstorage.utils;
 
-import static com.jbacon.passwordstorage.tools.GenericUtils.isNotNull;
+import static com.jbacon.passwordstorage.utils.GenericValidationUtil.isNotNull;
 
-public class StringUtils {
+public class StringUtil {
     public static final String BLANK = "";
     public static final String SPACE = " ";
     public static final String UNDER_SCORE = "_";

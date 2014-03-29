@@ -1,11 +1,11 @@
-package com.jbacon.passwordstorage.tools;
+package com.jbacon.passwordstorage.utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public final class ReflectionUtils {
-    private ReflectionUtils() {
+public final class ReflectionUtil {
+    private ReflectionUtil() {
     }
 
     public static <T> Method getAccessibleMethod(final T object, final String methodName) {
