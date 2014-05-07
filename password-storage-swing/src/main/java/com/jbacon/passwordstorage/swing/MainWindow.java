@@ -79,7 +79,7 @@ public class MainWindow {
                     final MainWindow window = new MainWindow();
                     window.mainWindowJFrame.setVisible(true);
                 } catch (final Exception e) {
-                    LOG.error(e);
+                    LOG.error("", e);
                 }
             }
         });
@@ -170,7 +170,7 @@ public class MainWindow {
         currentPassword = FluidEntity.createWithDefault("### --- Default Current Password --- ###");
         activeProfile = FluidEntity.<MasterPassword> createWithDefault(new MasterPassword() {
             {
-                this.setProfileName("N/A");
+                setProfileName("N/A");
             }
         });
 
@@ -180,16 +180,22 @@ public class MainWindow {
         availableProfilesModel.addAll(savedProfiles);
 
         // Functions
-        updateAllActionStatesFunction = new UpdateAllActionStatesFunction(chckbxmntmToggleSidebar, chckbxmntmToggleActionButtons, chckbxmntmToggleAvailableProfiles, westJPanel,
-                availableProfilesJList, availableProfilesNorthButtonJPanel, loadProfileJButton, deleteProfileJButton, mntmLoadProfile, mntmDeleteProfile, activeProfile,
-                closeProfileJButton, mntmCloseProfile, newPasswordJBbutton, storedPasswordsJTable, viewPasswordJButton, editPasswordJButton, deletePasswordJButton,
-                mntmViewPassword, mntmEditPassword, mntmDeletePassword, chckbxmntmEnableDeleteDatabase, deleteDatabaseJButton, activeProfileJLabel);
-        updateStoredPasswordsFunction = new UpdateStoredPasswordsFunction(storedPasswordDao, storedPasswordsModel, availableProfilesModel, availableProfilesJList);
+        updateAllActionStatesFunction = new UpdateAllActionStatesFunction(chckbxmntmToggleSidebar,
+                chckbxmntmToggleActionButtons, chckbxmntmToggleAvailableProfiles, westJPanel, availableProfilesJList,
+                availableProfilesNorthButtonJPanel, loadProfileJButton, deleteProfileJButton, mntmLoadProfile,
+                mntmDeleteProfile, activeProfile, closeProfileJButton, mntmCloseProfile, newPasswordJBbutton,
+                storedPasswordsJTable, viewPasswordJButton, editPasswordJButton, deletePasswordJButton,
+                mntmViewPassword, mntmEditPassword, mntmDeletePassword, chckbxmntmEnableDeleteDatabase,
+                deleteDatabaseJButton, activeProfileJLabel);
+        updateStoredPasswordsFunction = new UpdateStoredPasswordsFunction(storedPasswordDao, storedPasswordsModel,
+                availableProfilesModel, availableProfilesJList);
         updateAvailableProfilesFunction = new UpdateAvailableProfilesFunction(availableProfilesModel, masterPasswordDao);
-        newPasswordFunction = new NewPasswordFunction(masterPasswordDao, storedPasswordDao, updateStoredPasswordsFunction, updateAllActionStatesFunction, activeProfile, currentPassword);
-        newProfileFunction = new NewProfileFunction(masterPasswordDao, updateAvailableProfilesFunction, updateAllActionStatesFunction);
-        loadProfileFunction = new LoadProfileFunction(availableProfilesJList, availableProfilesModel, updateStoredPasswordsFunction, updateAllActionStatesFunction, activeProfile,
-                currentPassword);
+        newPasswordFunction = new NewPasswordFunction(masterPasswordDao, storedPasswordDao,
+                updateStoredPasswordsFunction, updateAllActionStatesFunction, activeProfile, currentPassword);
+        newProfileFunction = new NewProfileFunction(masterPasswordDao, updateAvailableProfilesFunction,
+                updateAllActionStatesFunction);
+        loadProfileFunction = new LoadProfileFunction(availableProfilesJList, availableProfilesModel,
+                updateStoredPasswordsFunction, updateAllActionStatesFunction, activeProfile, currentPassword);
     }
 
     private void closeProfile() {
@@ -229,7 +235,8 @@ public class MainWindow {
 
         final int selection = availableProfilesJList.getSelectedIndex();
         if (selection < 0) {
-            JOptionUtil.showMessageWindow("Please select a profile from the \"Available Profiles\" to remove.", "Please Select A Profile");
+            JOptionUtil.showMessageWindow("Please select a profile from the \"Available Profiles\" to remove.",
+                    "Please Select A Profile");
             return;
         }
         final MasterPassword masterPassword = availableProfilesModel.get(selection);
@@ -244,7 +251,8 @@ public class MainWindow {
         updateAvailableProfilesFunction.apply();
         updateStoredPasswordsFunction.apply(false);
 
-        JOptionUtil.showMessageWindow("Profile " + masterPassword.getProfileName() + " has successfully been deleted.", "Profile Successfully Deleted");
+        JOptionUtil.showMessageWindow("Profile " + masterPassword.getProfileName() + " has successfully been deleted.",
+                "Profile Successfully Deleted");
     }
 
     private void displayStoredPassword(final MouseEvent mouseEvent) {
@@ -263,14 +271,18 @@ public class MainWindow {
                 try {
                     editPassword(password, true);
                 } catch (final UnsupportedEncodingException e) {
-                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
+                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.",
+                            "Password Decrypt Error", e);
                 } catch (final DecoderException e) {
-                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
+                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.",
+                            "Password Decrypt Error", e);
                 } catch (final AbstractEncrypterException e) {
-                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
+                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.",
+                            "Password Decrypt Error", e);
                 }
             } else {
-                JOptionUtil.errorMessage("The Storedpassword was null, while trying to view a password", "Storedpassword was null", null);
+                JOptionUtil.errorMessage("The Storedpassword was null, while trying to view a password",
+                        "Storedpassword was null", null);
             }
         } else {
             JOptionUtil.showMessageWindow("Please select a password and try again.", "No Password Selected");
@@ -446,7 +458,8 @@ public class MainWindow {
         gbl_availableProfilesNorthButtonJPanel.columnWidths = new int[] { 0, 0 };
         gbl_availableProfilesNorthButtonJPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         gbl_availableProfilesNorthButtonJPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-        gbl_availableProfilesNorthButtonJPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+        gbl_availableProfilesNorthButtonJPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, Double.MIN_VALUE };
         availableProfilesNorthButtonJPanel.setLayout(gbl_availableProfilesNorthButtonJPanel);
 
         newProfileJButton = new JButton("New Profile");
@@ -585,19 +598,21 @@ public class MainWindow {
         availableProfilesNorthButtonJPanel.add(deleteDatabaseJButton, gbc_deleteDatabaseJButton);
 
         availableProfilesJList = new JList();
-        availableProfilesJList.addKeyListener(loadProfileFunction.asEnterKeyListener());
-        availableProfilesJList.addMouseListener(loadProfileFunction.asDoubleClickListener());
+        // TODO - availableProfilesJList.addKeyListener(loadProfileFunction.asEnterKeyListener());
+        // TODO - availableProfilesJList.addMouseListener(loadProfileFunction.asDoubleClickListener());
         availableProfilesJList.setModel(availableProfilesModel);
         availableProfilesJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        availableProfilesJList.setBorder(new CompoundBorder(new EmptyBorder(10, 5, 5, 5), new CompoundBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)),
-                "Available Profiles", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(51, 51, 51)), new EmptyBorder(0, 3, 3, 3))));
+        availableProfilesJList.setBorder(new CompoundBorder(new EmptyBorder(10, 5, 5, 5), new CompoundBorder(
+                new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Available Profiles", TitledBorder.CENTER,
+                        TitledBorder.TOP, null, new Color(51, 51, 51)), new EmptyBorder(0, 3, 3, 3))));
         availableProfilesJList.setPreferredSize(new java.awt.Dimension(165, 0));
         westJPanel.add(availableProfilesJList, BorderLayout.CENTER);
 
         activeProfileJPanel = new JPanel();
         activeProfileJPanel.setBackground(Color.WHITE);
-        activeProfileJPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 5, 4, 5), new CompoundBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)),
-                "Active Profile", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(51, 51, 51)), new EmptyBorder(0, 3, 3, 3))));
+        activeProfileJPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 5, 4, 5), new CompoundBorder(
+                new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Active Profile", TitledBorder.CENTER,
+                        TitledBorder.TOP, null, new Color(51, 51, 51)), new EmptyBorder(0, 3, 3, 3))));
         westJPanel.add(activeProfileJPanel, BorderLayout.SOUTH);
 
         activeProfileJLabel = new JLabel(activeProfile.get().getProfileName());
@@ -659,7 +674,7 @@ public class MainWindow {
 
         storedPasswordsJScrollPane.setViewportView(storedPasswordsJTable);
 
-        updateAllActionStatesFunction.apply();
+        // TODO - updateAllActionStatesFunction.apply();
     }
 
     private void viewPassword() {
@@ -671,17 +686,21 @@ public class MainWindow {
                 try {
                     viewPassword(password, true);
                 } catch (final UnsupportedEncodingException e) {
-                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
+                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.",
+                            "Password Decrypt Error", e);
                     viewPasswordEncrypted(password);
                 } catch (final DecoderException e) {
-                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
+                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.",
+                            "Password Decrypt Error", e);
                     viewPasswordEncrypted(password);
                 } catch (final AbstractEncrypterException e) {
-                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
+                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.",
+                            "Password Decrypt Error", e);
                     viewPasswordEncrypted(password);
                 }
             } else {
-                JOptionUtil.errorMessage("The Storedpassword was null, while trying to view a password", "Storedpassword was null", null);
+                JOptionUtil.errorMessage("The Storedpassword was null, while trying to view a password",
+                        "Storedpassword was null", null);
             }
         } else {
             JOptionUtil.showMessageWindow("Please select a password and try again.", "No Password Selected");
@@ -700,14 +719,17 @@ public class MainWindow {
         }
     }
 
-    private void viewPassword(final StoredPassword password, final boolean doDecrypt) throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
-        final ViewStoredPasswordPanel viewStoredPassword = new ViewStoredPasswordPanel(password, activeProfile, currentPassword, doDecrypt);
+    private void viewPassword(final StoredPassword password, final boolean doDecrypt)
+            throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+        final ViewStoredPasswordPanel viewStoredPassword = new ViewStoredPasswordPanel(password, activeProfile,
+                currentPassword, doDecrypt);
 
         if (!doDecrypt) {
             JOptionUtil.showMessageWindow(viewStoredPassword, "View Stored Password");
         } else {
 
-            final int result = JOptionUtil.showCustomInputWindow(viewStoredPassword, "View Stored Password", new String[] { "Edit", "Close" });
+            final int result = JOptionUtil.showCustomInputWindow(viewStoredPassword, "View Stored Password",
+                    new String[] { "Edit", "Close" });
 
             LOG.debug("View password closed with result [" + result + "]");
 
@@ -718,10 +740,13 @@ public class MainWindow {
         }
     }
 
-    private void editPassword(final StoredPassword password, final boolean doDecrypt) throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
-        final EditStoredPasswordPanel editStoredPassword = new EditStoredPasswordPanel(password, activeProfile, currentPassword, doDecrypt);
+    private void editPassword(final StoredPassword password, final boolean doDecrypt)
+            throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+        final EditStoredPasswordPanel editStoredPassword = new EditStoredPasswordPanel(password, activeProfile,
+                currentPassword, doDecrypt);
 
-        final int result = JOptionUtil.showCustomInputWindow(editStoredPassword, "Edit Stored Password", new String[] { "Save", "Cancel" });
+        final int result = JOptionUtil.showCustomInputWindow(editStoredPassword, "Edit Stored Password", new String[] {
+                "Save", "Cancel" });
 
         if (result == OK_OPTION || editStoredPassword.isClosedByKey()) {
             LOG.debug("Going to save changes.");
