@@ -65,7 +65,8 @@ public class LoadProfileFunction implements ActionListener, AnnonymousFunction {
         doubleClickListener = new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent mouseEvent) {
-                MouseEventUtil.ifDoubleClick(mouseEvent, getThis(), updateAllActionStates);
+                MouseEventUtil.ifDoubleClick(mouseEvent, getThis());
+                updateAllActionStates.apply();
             }
         };
     }

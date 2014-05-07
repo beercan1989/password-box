@@ -10,11 +10,15 @@ public class MouseEventUtil {
         return mouseEvent.getClickCount() >= 2;
     }
 
-    public static void ifDoubleClick(final MouseEvent mouseEvent, final AnnonymousFunction... functions) {
+    public static boolean ifDoubleClick(final MouseEvent mouseEvent, final AnnonymousFunction... functions) {
         if (isDoubleClick(mouseEvent)) {
             for (final AnnonymousFunction function : functions) {
                 function.apply();
             }
+            
+            return true;
+        } else {
+            return false;
         }
     }
 }

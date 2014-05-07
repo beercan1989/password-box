@@ -10,12 +10,14 @@ import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import com.jbacon.passwordstorage.models.FluidEntity;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.utils.SwingUtil;
 
-public class UpdateAllActionStatesFunction implements ActionListener, AnnonymousFunction {
+public class UpdateAllActionStatesFunction implements ActionListener, AnnonymousFunction, ChangeListener {
 
     private final JCheckBoxMenuItem chckbxmntmToggleSidebar;
     private final JCheckBoxMenuItem chckbxmntmToggleActionButtons;
@@ -77,6 +79,11 @@ public class UpdateAllActionStatesFunction implements ActionListener, Annonymous
 
     @Override
     public void actionPerformed(final ActionEvent e) {
+        apply();
+    }
+    
+    @Override
+    public void stateChanged(ChangeEvent e) {
         apply();
     }
 

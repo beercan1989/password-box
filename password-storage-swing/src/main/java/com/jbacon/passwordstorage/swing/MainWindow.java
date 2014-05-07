@@ -68,9 +68,9 @@ import com.jbacon.passwordstorage.utils.JOptionUtil;
 import com.jbacon.passwordstorage.utils.MouseEventUtil;
 
 public class MainWindow {
-
+    
     private static final Log LOG = LogFactory.getLog(MainWindow.class);
-
+    
     public static void main(final String[] args) {
         EventQueue.invokeLater(new Runnable() {
             @Override
@@ -84,7 +84,7 @@ public class MainWindow {
             }
         });
     }
-
+    
     private final MaintenanceDao maintenanceDao;
     private final MasterPasswordsDao masterPasswordDao;
     private final StoredPasswordsDao storedPasswordDao;
@@ -92,7 +92,7 @@ public class MainWindow {
     private final MasterPasswordListModel availableProfilesModel;
     private final FluidEntity<MasterPassword> activeProfile;
     private final FluidEntity<String> currentPassword;
-
+    
     // Functions
     private final UpdateAvailableProfilesFunction updateAvailableProfilesFunction;
     private final ProcessFunction<Boolean> updateStoredPasswordsFunction;
@@ -100,7 +100,7 @@ public class MainWindow {
     private final NewPasswordFunction newPasswordFunction;
     private final LoadProfileFunction loadProfileFunction;
     private final UpdateAllActionStatesFunction updateAllActionStatesFunction;
-
+    
     private JFrame mainWindowJFrame;
     private JTable storedPasswordsJTable;
     private JList availableProfilesJList;
@@ -108,7 +108,7 @@ public class MainWindow {
     private JPanel westJPanel;
     private JPanel centreJPanel;
     private JPanel availableProfilesNorthButtonJPanel;
-
+    
     private JMenuBar menuBar;
     private JMenu mnFile;
     private JMenu mnEdit;
@@ -139,7 +139,7 @@ public class MainWindow {
     private JCheckBoxMenuItem chckbxmntmToggleSidebar;
     private JCheckBoxMenuItem chckbxmntmToggleActionButtons;
     private JCheckBoxMenuItem chckbxmntmToggleAvailableProfiles;
-
+    
     private JButton newProfileJButton;
     private JButton loadProfileJButton;
     private JButton deleteProfileJButton;
@@ -148,122 +148,124 @@ public class MainWindow {
     private JButton deletePasswordJButton;
     private JButton editPasswordJButton;
     private JButton deleteDatabaseJButton;
-
+    
     private JSeparator deleteDatabaseJSeparator;
     private JPanel activeProfileJPanel;
     private JLabel activeProfileJLabel;
     private JButton closeProfileJButton;
     private JCheckBoxMenuItem chckbxmntmEnableDeleteDatabase;
     private JMenu mnSettings;
-
+    
     public MainWindow() {
         maintenanceDao = DBUtil.createMybatisDao(MaintenanceMybatisDao.class);
         masterPasswordDao = DBUtil.createMybatisDao(MasterPasswordMybatisDao.class);
         storedPasswordDao = DBUtil.createMybatisDao(StoredPasswordMybatisDao.class);
-
+        
         maintenanceDao.createMasterPasswordTable();
         maintenanceDao.createStoredPasswordTable();
-
+        
         storedPasswordsModel = new StoredPasswordTableModel();
         availableProfilesModel = new MasterPasswordListModel();
-
+        
         currentPassword = FluidEntity.createWithDefault("### --- Default Current Password --- ###");
         activeProfile = FluidEntity.<MasterPassword> createWithDefault(new MasterPassword() {
             {
                 setProfileName("N/A");
             }
         });
-
+        
         initialize();
-
+        
         final List<MasterPassword> savedProfiles = masterPasswordDao.getMasterPasswords();
         availableProfilesModel.addAll(savedProfiles);
-
+        
         // Functions
-        updateAllActionStatesFunction = new UpdateAllActionStatesFunction(chckbxmntmToggleSidebar,
-                chckbxmntmToggleActionButtons, chckbxmntmToggleAvailableProfiles, westJPanel, availableProfilesJList,
-                availableProfilesNorthButtonJPanel, loadProfileJButton, deleteProfileJButton, mntmLoadProfile,
-                mntmDeleteProfile, activeProfile, closeProfileJButton, mntmCloseProfile, newPasswordJBbutton,
-                storedPasswordsJTable, viewPasswordJButton, editPasswordJButton, deletePasswordJButton,
-                mntmViewPassword, mntmEditPassword, mntmDeletePassword, chckbxmntmEnableDeleteDatabase,
-                deleteDatabaseJButton, activeProfileJLabel);
-        updateStoredPasswordsFunction = new UpdateStoredPasswordsFunction(storedPasswordDao, storedPasswordsModel,
-                availableProfilesModel, availableProfilesJList);
+        updateAllActionStatesFunction = new UpdateAllActionStatesFunction(chckbxmntmToggleSidebar, chckbxmntmToggleActionButtons, chckbxmntmToggleAvailableProfiles, westJPanel,
+                availableProfilesJList, availableProfilesNorthButtonJPanel, loadProfileJButton, deleteProfileJButton, mntmLoadProfile, mntmDeleteProfile, activeProfile,
+                closeProfileJButton, mntmCloseProfile, newPasswordJBbutton, storedPasswordsJTable, viewPasswordJButton, editPasswordJButton, deletePasswordJButton,
+                mntmViewPassword, mntmEditPassword, mntmDeletePassword, chckbxmntmEnableDeleteDatabase, deleteDatabaseJButton, activeProfileJLabel);
+        
+        updateStoredPasswordsFunction = new UpdateStoredPasswordsFunction(storedPasswordDao, storedPasswordsModel, availableProfilesModel, availableProfilesJList);
         updateAvailableProfilesFunction = new UpdateAvailableProfilesFunction(availableProfilesModel, masterPasswordDao);
-        newPasswordFunction = new NewPasswordFunction(masterPasswordDao, storedPasswordDao,
-                updateStoredPasswordsFunction, updateAllActionStatesFunction, activeProfile, currentPassword);
-        newProfileFunction = new NewProfileFunction(masterPasswordDao, updateAvailableProfilesFunction,
-                updateAllActionStatesFunction);
-        loadProfileFunction = new LoadProfileFunction(availableProfilesJList, availableProfilesModel,
-                updateStoredPasswordsFunction, updateAllActionStatesFunction, activeProfile, currentPassword);
+        newPasswordFunction = new NewPasswordFunction(masterPasswordDao, storedPasswordDao, updateStoredPasswordsFunction, updateAllActionStatesFunction, activeProfile,
+                currentPassword);
+        newProfileFunction = new NewProfileFunction(masterPasswordDao, updateAvailableProfilesFunction, updateAllActionStatesFunction);
+        loadProfileFunction = new LoadProfileFunction(availableProfilesJList, availableProfilesModel, updateStoredPasswordsFunction, updateAllActionStatesFunction, activeProfile,
+                currentPassword);
+        
+        //
+        // Post Function Creation Setup - TODO - Remove for the need for these to be here and inline with their declaration.
+        //
+        availableProfilesJList.addKeyListener(loadProfileFunction.asEnterKeyListener());
+        availableProfilesJList.addMouseListener(loadProfileFunction.asDoubleClickListener());
+        chckbxmntmEnableDeleteDatabase.addActionListener(updateAllActionStatesFunction);
+        updateAllActionStatesFunction.apply();
     }
-
+    
     private void closeProfile() {
         LOG.debug("closeProfile");
-
+        
         availableProfilesJList.clearSelection();
-
+        
         activeProfile.set(activeProfile.getDefault());
         currentPassword.set(currentPassword.getDefault());
-
+        
         updateAvailableProfilesFunction.apply();
         updateStoredPasswordsFunction.apply(false);
     }
-
+    
     protected void deleteDatabase() {
         maintenanceDao.dropMasterPasswordTable();
         maintenanceDao.dropStoredPasswordTable();
-
+        
         maintenanceDao.createMasterPasswordTable();
         maintenanceDao.createStoredPasswordTable();
-
+        
         availableProfilesModel.clear();
         storedPasswordsModel.clear();
-
+        
         updateAvailableProfilesFunction.apply();
         updateStoredPasswordsFunction.apply(false);
-
+        
         JOptionUtil.showMessageWindow("You have successfully deleted the database.", "Database Delete Successfull");
     }
-
+    
     private void deletePassword() {
         LOG.debug("deletePassword");
     }
-
+    
     private void deleteProfile() {
         LOG.debug("deleteProfile");
-
+        
         final int selection = availableProfilesJList.getSelectedIndex();
         if (selection < 0) {
-            JOptionUtil.showMessageWindow("Please select a profile from the \"Available Profiles\" to remove.",
-                    "Please Select A Profile");
+            JOptionUtil.showMessageWindow("Please select a profile from the \"Available Profiles\" to remove.", "Please Select A Profile");
             return;
         }
         final MasterPassword masterPassword = availableProfilesModel.get(selection);
-
+        
         masterPasswordDao.deleteMasterPassword(masterPassword);
-
+        
         final List<StoredPassword> storedPasswords = storedPasswordDao.getStoredPasswords(masterPassword);
         for (final StoredPassword storedPassword : storedPasswords) {
             storedPasswordDao.deleteStoredPassword(storedPassword);
         }
-
+        
         updateAvailableProfilesFunction.apply();
         updateStoredPasswordsFunction.apply(false);
-
-        JOptionUtil.showMessageWindow("Profile " + masterPassword.getProfileName() + " has successfully been deleted.",
-                "Profile Successfully Deleted");
+        
+        JOptionUtil.showMessageWindow("Profile " + masterPassword.getProfileName() + " has successfully been deleted.", "Profile Successfully Deleted");
     }
-
+    
     private void displayStoredPassword(final MouseEvent mouseEvent) {
         if (MouseEventUtil.isDoubleClick(mouseEvent)) {
             viewPassword();
         }
     }
-
+    
     private void editPassword() {
         LOG.debug("editProfile");
-
+        
         final int selectedRow = storedPasswordsJTable.getSelectedRow();
         if (selectedRow >= 0) {
             final StoredPassword password = storedPasswordsModel.getRow(selectedRow);
@@ -271,48 +273,44 @@ public class MainWindow {
                 try {
                     editPassword(password, true);
                 } catch (final UnsupportedEncodingException e) {
-                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.",
-                            "Password Decrypt Error", e);
+                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
                 } catch (final DecoderException e) {
-                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.",
-                            "Password Decrypt Error", e);
+                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
                 } catch (final AbstractEncrypterException e) {
-                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.",
-                            "Password Decrypt Error", e);
+                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
                 }
             } else {
-                JOptionUtil.errorMessage("The Storedpassword was null, while trying to view a password",
-                        "Storedpassword was null", null);
+                JOptionUtil.errorMessage("The Storedpassword was null, while trying to view a password", "Storedpassword was null", null);
             }
         } else {
             JOptionUtil.showMessageWindow("Please select a password and try again.", "No Password Selected");
         }
     }
-
+    
     private void exitProgram() {
         System.exit(0);
     }
-
+    
     private void initialize() {
         mainWindowJFrame = new JFrame();
         mainWindowJFrame.setTitle("Password Box");
         mainWindowJFrame.setBounds(100, 100, 800, 600);
         mainWindowJFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        
         menuBar = new JMenuBar();
         mainWindowJFrame.setJMenuBar(menuBar);
-
+        
         mnFile = new JMenu("File");
         menuBar.add(mnFile);
-
+        
         mntmNewProfile = new JMenuItem("New Profile");
         mntmNewProfile.addActionListener(newProfileFunction);
         mnFile.add(mntmNewProfile);
-
+        
         mntmLoadProfile = new JMenuItem("Load Profile");
         mntmLoadProfile.addActionListener(loadProfileFunction);
         mnFile.add(mntmLoadProfile);
-
+        
         mntmCloseProfile = new JMenuItem("Close Profile");
         mntmCloseProfile.addActionListener(new ActionListener() {
             @Override
@@ -322,7 +320,7 @@ public class MainWindow {
             }
         });
         mnFile.add(mntmCloseProfile);
-
+        
         mntmDeleteProfile = new JMenuItem("Delete Profile");
         mntmDeleteProfile.addActionListener(new ActionListener() {
             @Override
@@ -332,14 +330,14 @@ public class MainWindow {
             }
         });
         mnFile.add(mntmDeleteProfile);
-
+        
         firstFileMenuJSeparator = new JSeparator();
         mnFile.add(firstFileMenuJSeparator);
-
+        
         mntmNewPassword = new JMenuItem("New Password");
         mntmNewPassword.addActionListener(newPasswordFunction);
         mnFile.add(mntmNewPassword);
-
+        
         mntmViewPassword = new JMenuItem("View Password");
         mntmViewPassword.addActionListener(new ActionListener() {
             @Override
@@ -349,7 +347,7 @@ public class MainWindow {
             }
         });
         mnFile.add(mntmViewPassword);
-
+        
         mntmDeletePassword = new JMenuItem("Delete Password");
         mntmDeletePassword.addActionListener(new ActionListener() {
             @Override
@@ -358,7 +356,7 @@ public class MainWindow {
                 updateAllActionStatesFunction.apply();
             }
         });
-
+        
         mntmEditPassword = new JMenuItem("Edit Password");
         mntmEditPassword.addActionListener(new ActionListener() {
             @Override
@@ -369,10 +367,10 @@ public class MainWindow {
         });
         mnFile.add(mntmEditPassword);
         mnFile.add(mntmDeletePassword);
-
+        
         secondFileMenuJSeparator = new JSeparator();
         mnFile.add(secondFileMenuJSeparator);
-
+        
         mntmExit = new JMenuItem("Exit");
         mntmExit.addActionListener(new ActionListener() {
             @Override
@@ -381,75 +379,75 @@ public class MainWindow {
             }
         });
         mnFile.add(mntmExit);
-
+        
         mnEdit = new JMenu("Edit");
         menuBar.add(mnEdit);
-
+        
         mnSettings = new JMenu("Settings");
         mnEdit.add(mnSettings);
-
+        
         chckbxmntmEnableDeleteDatabase = new JCheckBoxMenuItem("Enable Delete Database");
-        chckbxmntmEnableDeleteDatabase.addActionListener(updateAllActionStatesFunction);
+        chckbxmntmEnableDeleteDatabase.addActionListener(updateAllActionStatesFunction); // TODO - Get Working here instead of after declaring the function.
         mnSettings.add(chckbxmntmEnableDeleteDatabase);
-
+        
         mnView = new JMenu("View");
         menuBar.add(mnView);
-
-        chckbxmntmToggleSidebar = new JCheckBoxMenuItem("Sidebar");
+        
+        chckbxmntmToggleSidebar = new JCheckBoxMenuItem("Sidebar"); // TODO - Get Working
         chckbxmntmToggleSidebar.setSelected(true);
         chckbxmntmToggleSidebar.addActionListener(updateAllActionStatesFunction);
         mnView.add(chckbxmntmToggleSidebar);
-
+        
         viewMenuSeparator = new JSeparator();
         mnView.add(viewMenuSeparator);
-
+        
         chckbxmntmToggleActionButtons = new JCheckBoxMenuItem("Action Buttons");
         chckbxmntmToggleActionButtons.setSelected(true);
         chckbxmntmToggleActionButtons.addActionListener(updateAllActionStatesFunction);
         mnView.add(chckbxmntmToggleActionButtons);
-
+        
         chckbxmntmToggleAvailableProfiles = new JCheckBoxMenuItem("Available Profiles");
         chckbxmntmToggleAvailableProfiles.setSelected(true);
         chckbxmntmToggleAvailableProfiles.addActionListener(updateAllActionStatesFunction);
         mnView.add(chckbxmntmToggleAvailableProfiles);
-
+        
         mnHelp = new JMenu("Help");
         menuBar.add(mnHelp);
-
+        
         mntmCheckForUpdates = new JMenuItem("Check For Updates");
         mnHelp.add(mntmCheckForUpdates);
-
+        
         firstHelpMenuJSeparator = new JSeparator();
         mnHelp.add(firstHelpMenuJSeparator);
-
+        
         mntmOpenWikiPage = new JMenuItem("Open Wiki Page");
         mnHelp.add(mntmOpenWikiPage);
-
+        
         mntmOpenDownloadPage = new JMenuItem("Open Download Page");
         mnHelp.add(mntmOpenDownloadPage);
-
+        
         secondHelpMenuJSeparator = new JSeparator();
         mnHelp.add(secondHelpMenuJSeparator);
-
+        
         mntmFaq = new JMenuItem("F.A.Q.");
         mnHelp.add(mntmFaq);
-
+        
         mntmHelpContents = new JMenuItem("Help Contents");
         mnHelp.add(mntmHelpContents);
-
+        
         thirdHelpMenuJSeparator = new JSeparator();
         mnHelp.add(thirdHelpMenuJSeparator);
-
+        
         mntmAbout = new JMenuItem("About Password Box");
         mnHelp.add(mntmAbout);
         mainWindowJFrame.getContentPane().setLayout(new BorderLayout(0, 0));
-
+        
         westJPanel = new JPanel();
         westJPanel.setBorder(new EmptyBorder(5, 5, 5, 0));
         westJPanel.setBackground(Color.WHITE);
         mainWindowJFrame.getContentPane().add(westJPanel, BorderLayout.WEST);
         westJPanel.setLayout(new BorderLayout(0, 0));
-
+        
         availableProfilesNorthButtonJPanel = new JPanel();
         availableProfilesNorthButtonJPanel.setBackground(Color.WHITE);
         availableProfilesNorthButtonJPanel.setBorder(new EmptyBorder(5, 5, 0, 5));
@@ -458,10 +456,9 @@ public class MainWindow {
         gbl_availableProfilesNorthButtonJPanel.columnWidths = new int[] { 0, 0 };
         gbl_availableProfilesNorthButtonJPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         gbl_availableProfilesNorthButtonJPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-        gbl_availableProfilesNorthButtonJPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                0.0, 0.0, 0.0, Double.MIN_VALUE };
+        gbl_availableProfilesNorthButtonJPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
         availableProfilesNorthButtonJPanel.setLayout(gbl_availableProfilesNorthButtonJPanel);
-
+        
         newProfileJButton = new JButton("New Profile");
         newProfileJButton.addActionListener(newProfileFunction);
         final GridBagConstraints gbc_newProfileJButton = new GridBagConstraints();
@@ -470,7 +467,7 @@ public class MainWindow {
         gbc_newProfileJButton.gridx = 0;
         gbc_newProfileJButton.gridy = 0;
         availableProfilesNorthButtonJPanel.add(newProfileJButton, gbc_newProfileJButton);
-
+        
         loadProfileJButton = new JButton("Load Profile");
         loadProfileJButton.addActionListener(loadProfileFunction);
         final GridBagConstraints gbc_loadProfileJButton = new GridBagConstraints();
@@ -479,7 +476,7 @@ public class MainWindow {
         gbc_loadProfileJButton.gridx = 0;
         gbc_loadProfileJButton.gridy = 1;
         availableProfilesNorthButtonJPanel.add(loadProfileJButton, gbc_loadProfileJButton);
-
+        
         deleteProfileJButton = new JButton("Delete Profile");
         deleteProfileJButton.addActionListener(new ActionListener() {
             @Override
@@ -488,7 +485,7 @@ public class MainWindow {
                 updateAllActionStatesFunction.apply();
             }
         });
-
+        
         closeProfileJButton = new JButton("Close Profile");
         closeProfileJButton.addActionListener(new ActionListener() {
             @Override
@@ -509,7 +506,7 @@ public class MainWindow {
         gbc_deleteProfileJButton.gridx = 0;
         gbc_deleteProfileJButton.gridy = 3;
         availableProfilesNorthButtonJPanel.add(deleteProfileJButton, gbc_deleteProfileJButton);
-
+        
         availableProfilesButtonSeparator = new JSeparator();
         availableProfilesButtonSeparator.setForeground(Color.BLACK);
         final GridBagConstraints gbc_availableProfilesButtonSeparator = new GridBagConstraints();
@@ -518,7 +515,7 @@ public class MainWindow {
         gbc_availableProfilesButtonSeparator.gridx = 0;
         gbc_availableProfilesButtonSeparator.gridy = 4;
         availableProfilesNorthButtonJPanel.add(availableProfilesButtonSeparator, gbc_availableProfilesButtonSeparator);
-
+        
         newPasswordJBbutton = new JButton("New Password");
         newPasswordJBbutton.addActionListener(newPasswordFunction);
         final GridBagConstraints gbc_newPasswordJBbutton = new GridBagConstraints();
@@ -527,7 +524,7 @@ public class MainWindow {
         gbc_newPasswordJBbutton.gridx = 0;
         gbc_newPasswordJBbutton.gridy = 5;
         availableProfilesNorthButtonJPanel.add(newPasswordJBbutton, gbc_newPasswordJBbutton);
-
+        
         viewPasswordJButton = new JButton("View Password");
         viewPasswordJButton.addActionListener(new ActionListener() {
             @Override
@@ -542,7 +539,7 @@ public class MainWindow {
         gbc_openPasswordJButton.gridx = 0;
         gbc_openPasswordJButton.gridy = 6;
         availableProfilesNorthButtonJPanel.add(viewPasswordJButton, gbc_openPasswordJButton);
-
+        
         editPasswordJButton = new JButton("Edit Password");
         editPasswordJButton.addActionListener(new ActionListener() {
             @Override
@@ -557,7 +554,7 @@ public class MainWindow {
         gbc_editPasswordJButton.gridx = 0;
         gbc_editPasswordJButton.gridy = 7;
         availableProfilesNorthButtonJPanel.add(editPasswordJButton, gbc_editPasswordJButton);
-
+        
         deletePasswordJButton = new JButton("Delete Password");
         deletePasswordJButton.addActionListener(new ActionListener() {
             @Override
@@ -572,7 +569,7 @@ public class MainWindow {
         gbc_deletePasswordJButton.gridx = 0;
         gbc_deletePasswordJButton.gridy = 8;
         availableProfilesNorthButtonJPanel.add(deletePasswordJButton, gbc_deletePasswordJButton);
-
+        
         deleteDatabaseJSeparator = new JSeparator();
         deleteDatabaseJSeparator.setForeground(Color.BLACK);
         final GridBagConstraints gbc_deleteDatabaseJSeparator = new GridBagConstraints();
@@ -581,7 +578,7 @@ public class MainWindow {
         gbc_deleteDatabaseJSeparator.gridx = 0;
         gbc_deleteDatabaseJSeparator.gridy = 9;
         availableProfilesNorthButtonJPanel.add(deleteDatabaseJSeparator, gbc_deleteDatabaseJSeparator);
-
+        
         deleteDatabaseJButton = new JButton("Delete Database");
         deleteDatabaseJButton.addActionListener(new ActionListener() {
             @Override
@@ -596,39 +593,35 @@ public class MainWindow {
         gbc_deleteDatabaseJButton.gridx = 0;
         gbc_deleteDatabaseJButton.gridy = 10;
         availableProfilesNorthButtonJPanel.add(deleteDatabaseJButton, gbc_deleteDatabaseJButton);
-
+        
         availableProfilesJList = new JList();
-        // TODO - availableProfilesJList.addKeyListener(loadProfileFunction.asEnterKeyListener());
-        // TODO - availableProfilesJList.addMouseListener(loadProfileFunction.asDoubleClickListener());
         availableProfilesJList.setModel(availableProfilesModel);
         availableProfilesJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        availableProfilesJList.setBorder(new CompoundBorder(new EmptyBorder(10, 5, 5, 5), new CompoundBorder(
-                new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Available Profiles", TitledBorder.CENTER,
-                        TitledBorder.TOP, null, new Color(51, 51, 51)), new EmptyBorder(0, 3, 3, 3))));
+        availableProfilesJList.setBorder(new CompoundBorder(new EmptyBorder(10, 5, 5, 5), new CompoundBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)),
+                "Available Profiles", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(51, 51, 51)), new EmptyBorder(0, 3, 3, 3))));
         availableProfilesJList.setPreferredSize(new java.awt.Dimension(165, 0));
         westJPanel.add(availableProfilesJList, BorderLayout.CENTER);
-
+        
         activeProfileJPanel = new JPanel();
         activeProfileJPanel.setBackground(Color.WHITE);
-        activeProfileJPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 5, 4, 5), new CompoundBorder(
-                new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Active Profile", TitledBorder.CENTER,
-                        TitledBorder.TOP, null, new Color(51, 51, 51)), new EmptyBorder(0, 3, 3, 3))));
+        activeProfileJPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 5, 4, 5), new CompoundBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)),
+                "Active Profile", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(51, 51, 51)), new EmptyBorder(0, 3, 3, 3))));
         westJPanel.add(activeProfileJPanel, BorderLayout.SOUTH);
-
+        
         activeProfileJLabel = new JLabel(activeProfile.get().getProfileName());
         activeProfileJLabel.setFont(new Font("Dialog", Font.BOLD, 12));
         activeProfileJPanel.add(activeProfileJLabel);
-
+        
         centreJPanel = new JPanel();
         centreJPanel.setBackground(Color.WHITE);
         centreJPanel.setBorder(new EmptyBorder(10, 5, 10, 10));
         mainWindowJFrame.getContentPane().add(centreJPanel, BorderLayout.CENTER);
-
+        
         centreJPanel.setLayout(new BorderLayout(0, 0));
-
+        
         storedPasswordsJScrollPane = new JScrollPane();
         centreJPanel.add(storedPasswordsJScrollPane, BorderLayout.CENTER);
-
+        
         storedPasswordsJTable = new JTable();
         storedPasswordsJTable.addKeyListener(new KeyAdapter() {
             @Override
@@ -657,26 +650,24 @@ public class MainWindow {
         final TableColumn idColumn = storedPasswordsJTable.getColumnModel().getColumn(idColumnIndex);
         idColumn.setMaxWidth(20);
         idColumn.setResizable(false);
-
+        
         final int createdAtColumnIndex = storedPasswordsModel.getColumnIndex(StoredPasswordTableColumns.CREATED_AT);
         final TableColumn createdAtColumn = storedPasswordsJTable.getColumnModel().getColumn(createdAtColumnIndex);
         createdAtColumn.setMaxWidth(140);
         createdAtColumn.setMinWidth(140);
         createdAtColumn.setPreferredWidth(140);
         createdAtColumn.setResizable(false);
-
+        
         final int updatedAtColumnIndex = storedPasswordsModel.getColumnIndex(StoredPasswordTableColumns.UPDATED_AT);
         final TableColumn updatedAtColumn = storedPasswordsJTable.getColumnModel().getColumn(updatedAtColumnIndex);
         updatedAtColumn.setMaxWidth(140);
         updatedAtColumn.setMinWidth(140);
         updatedAtColumn.setPreferredWidth(140);
         updatedAtColumn.setResizable(false);
-
+        
         storedPasswordsJScrollPane.setViewportView(storedPasswordsJTable);
-
-        // TODO - updateAllActionStatesFunction.apply();
     }
-
+    
     private void viewPassword() {
         LOG.debug("Viewing a Password");
         final int selectedRow = storedPasswordsJTable.getSelectedRow();
@@ -686,27 +677,23 @@ public class MainWindow {
                 try {
                     viewPassword(password, true);
                 } catch (final UnsupportedEncodingException e) {
-                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.",
-                            "Password Decrypt Error", e);
+                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
                     viewPasswordEncrypted(password);
                 } catch (final DecoderException e) {
-                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.",
-                            "Password Decrypt Error", e);
+                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
                     viewPasswordEncrypted(password);
                 } catch (final AbstractEncrypterException e) {
-                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.",
-                            "Password Decrypt Error", e);
+                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
                     viewPasswordEncrypted(password);
                 }
             } else {
-                JOptionUtil.errorMessage("The Storedpassword was null, while trying to view a password",
-                        "Storedpassword was null", null);
+                JOptionUtil.errorMessage("The Storedpassword was null, while trying to view a password", "Storedpassword was null", null);
             }
         } else {
             JOptionUtil.showMessageWindow("Please select a password and try again.", "No Password Selected");
         }
     }
-
+    
     private void viewPasswordEncrypted(final StoredPassword password) {
         try {
             viewPassword(password, false);
@@ -718,36 +705,30 @@ public class MainWindow {
             JOptionUtil.errorMessage("An error occured when trying to view your password.", "Password Error", e);
         }
     }
-
-    private void viewPassword(final StoredPassword password, final boolean doDecrypt)
-            throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
-        final ViewStoredPasswordPanel viewStoredPassword = new ViewStoredPasswordPanel(password, activeProfile,
-                currentPassword, doDecrypt);
-
+    
+    private void viewPassword(final StoredPassword password, final boolean doDecrypt) throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+        final ViewStoredPasswordPanel viewStoredPassword = new ViewStoredPasswordPanel(password, activeProfile, currentPassword, doDecrypt);
+        
         if (!doDecrypt) {
             JOptionUtil.showMessageWindow(viewStoredPassword, "View Stored Password");
         } else {
-
-            final int result = JOptionUtil.showCustomInputWindow(viewStoredPassword, "View Stored Password",
-                    new String[] { "Edit", "Close" });
-
+            
+            final int result = JOptionUtil.showCustomInputWindow(viewStoredPassword, "View Stored Password", new String[] { "Edit", "Close" });
+            
             LOG.debug("View password closed with result [" + result + "]");
-
+            
             // Edit chosen.
             if (result == 0) {
                 editPassword(password, doDecrypt);
             }
         }
     }
-
-    private void editPassword(final StoredPassword password, final boolean doDecrypt)
-            throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
-        final EditStoredPasswordPanel editStoredPassword = new EditStoredPasswordPanel(password, activeProfile,
-                currentPassword, doDecrypt);
-
-        final int result = JOptionUtil.showCustomInputWindow(editStoredPassword, "Edit Stored Password", new String[] {
-                "Save", "Cancel" });
-
+    
+    private void editPassword(final StoredPassword password, final boolean doDecrypt) throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+        final EditStoredPasswordPanel editStoredPassword = new EditStoredPasswordPanel(password, activeProfile, currentPassword, doDecrypt);
+        
+        final int result = JOptionUtil.showCustomInputWindow(editStoredPassword, "Edit Stored Password", new String[] { "Save", "Cancel" });
+        
         if (result == OK_OPTION || editStoredPassword.isClosedByKey()) {
             LOG.debug("Going to save changes.");
             storedPasswordDao.updateStoredPassword(editStoredPassword.getUpdatedPassword());

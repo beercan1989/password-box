@@ -1,7 +1,7 @@
 package com.jbacon.passwordstorage.functions;
 
-public interface AnnonymousFunctionWithException<T extends Throwable> {
+public interface AnnonymousFunctionWithException<E extends Exception> {
 
-    void apply() throws T;
+    void apply() throws E;
 
 }
