@@ -25,31 +25,32 @@ import com.jbacon.passwordstorage.utils.JOptionUtil;
 
 public class NewPasswordFunction implements ActionListener, AnnonymousFunction {
     private static final Log LOG = LogFactory.getLog(NewPasswordFunction.class);
-
+    
     private final StoredPasswordsDao storedPasswordDao;
     private final MasterPasswordsDao masterPasswordDao;
-
+    
     private final FluidEntity<MasterPassword> activeProfile;
     private final FluidEntity<String> currentPassword;
-
-    private final ProcessFunction<Boolean> updateStoredPasswordsFN;
-    private final AnnonymousFunction andFinallyFunction;
-
-    public NewPasswordFunction(final MasterPasswordsDao masterPasswordDao, final StoredPasswordsDao storedPasswordDao, final ProcessFunction<Boolean> updateStoredPasswordsFN,
-            final AnnonymousFunction andFinallyFunction, final FluidEntity<MasterPassword> activeProfile, final FluidEntity<String> currentPassword) {
+    
+    private final FluidEntity<ProcessFunction<Boolean>> updateStoredPasswordsFN;
+    private final FluidEntity<UpdateAllActionStatesFunction> andFinallyFunction;
+    
+    public NewPasswordFunction(final MasterPasswordsDao masterPasswordDao, final StoredPasswordsDao storedPasswordDao,
+            final FluidEntity<ProcessFunction<Boolean>> updateStoredPasswordsFunction, final FluidEntity<UpdateAllActionStatesFunction> updateAllActionStatesFunction,
+            final FluidEntity<MasterPassword> activeProfile, final FluidEntity<String> currentPassword) {
         this.storedPasswordDao = storedPasswordDao;
-        this.updateStoredPasswordsFN = updateStoredPasswordsFN;
+        updateStoredPasswordsFN = updateStoredPasswordsFunction;
         this.masterPasswordDao = masterPasswordDao;
-        this.andFinallyFunction = andFinallyFunction;
+        andFinallyFunction = updateAllActionStatesFunction;
         this.activeProfile = activeProfile;
         this.currentPassword = currentPassword;
     }
-
+    
     @Override
     public void actionPerformed(final ActionEvent e) {
         apply();
     }
-
+    
     @Override
     public void apply() {
         try {
@@ -57,13 +58,15 @@ public class NewPasswordFunction implements ActionListener, AnnonymousFunction {
         } catch (final Exception e) {
             JOptionUtil.errorMessage("An error occured when the creation of your new password.", "Password Creation Error", e);
         } finally {
-            andFinallyFunction.apply();
+            if (andFinallyFunction.isSet()) {
+                andFinallyFunction.get().apply();
+            }
         }
     }
-
+    
     private void newPasswordUnsafe() throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
         LOG.debug("Creating a new Password");
-
+        
         if (activeProfile.isDefault()) {
             JOptionUtil.errorMessage("You need to create or load a profile first.", "No Profile Loaded", null);
             return;
@@ -74,32 +77,34 @@ public class NewPasswordFunction implements ActionListener, AnnonymousFunction {
                 JOptionUtil.errorMessage("Failed to create a new password, as you did not fill in all the fields.", "Failed To Create New Password", null);
                 return;
             }
-
+            
             final StoredPassword storedPassword = newPassword.buildPassword();
-
+            
             if (!validateNewPassword(storedPassword)) {
                 JOptionUtil.errorMessage("Failed to create a new password, as the new password is not valid, either fields were empty or none existant.",
                         "Failed To Create New Password", null);
                 return;
             }
-
+            
             if (DBUtil.unsuccessfulImport(storedPasswordDao.instertStoredPassword(storedPassword))) {
                 JOptionUtil.errorMessage("Failed to create a new password, inserting into the database failed.", "Failed To Create New Password", null);
                 return;
             }
-
-            updateStoredPasswordsFN.apply(false);
-
+            
+            if (updateStoredPasswordsFN.isSet()) {
+                updateStoredPasswordsFN.get().apply(false);
+            }
+            
             LOG.debug("Created storedPassword for profile " + storedPassword.getProfileName());
         }
     }
-
+    
     private boolean validateNewPassword(final StoredPassword password) {
         final String profileName = password.getProfileName();
         final String encryptedPassword = password.getEncryptedPassword();
         final String encryptedPasswordName = password.getEncryptedPasswordName();
         final String encryptedPasswordNotes = password.getEncryptedPasswordNotes();
-
+        
         if (areNull(profileName, encryptedPassword, encryptedPasswordName, encryptedPasswordNotes)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Failed to validate password, as a value was null. profileName: [" + profileName + "], encryptedPassword: [" + encryptedPassword
@@ -107,7 +112,7 @@ public class NewPasswordFunction implements ActionListener, AnnonymousFunction {
             }
             return false;
         }
-
+        
         // Profile Name matches one that already exists.
         final List<String> currentProfileNames = masterPasswordDao.getMasterPasswordNames();
         if (!currentProfileNames.contains(profileName)) {
@@ -116,7 +121,7 @@ public class NewPasswordFunction implements ActionListener, AnnonymousFunction {
             }
             return false;
         }
-
+        
         return true;
     }
 }
