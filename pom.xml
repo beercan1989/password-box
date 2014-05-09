@@ -29,9 +29,9 @@
 		<module>password-storage-common</module>
 		<module>password-storage-database-mybatis</module>
 		<module>password-storage-swing</module>
-		<module>password-storage-android</module>
-		<module>password-storage-blackberry</module>
-		<module>password-storage-appengine-api</module>
+		<!--module>password-storage-android</module-->
+		<!--module>password-storage-blackberry</module-->
+		<!--module>password-storage-appengine-api</module-->
 	</modules>
 
 	<dependencyManagement>
