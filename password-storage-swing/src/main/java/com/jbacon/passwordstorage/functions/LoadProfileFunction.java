@@ -14,11 +14,9 @@ import javax.swing.JList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.jbacon.passwordstorage.encryption.EncrypterPBE;
-import com.jbacon.passwordstorage.encryption.EncryptionMode;
+import co.uk.baconi.cryptography.ciphers.pbe.PBECiphers;
+
 import com.jbacon.passwordstorage.encryption.EncryptionType;
-import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
-import com.jbacon.passwordstorage.encryption.errors.NoSuchEncryptionException;
 import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 import com.jbacon.passwordstorage.models.FluidEntity;
 import com.jbacon.passwordstorage.password.MasterPassword;
@@ -111,14 +109,20 @@ public class LoadProfileFunction implements ActionListener, AnnonymousFunction, 
         final EncryptionType encryptionType = masterPassword.getMasterPasswordEncryptionType();
         
         try {
-            if (encryptionType.getEncrypter() instanceof EncrypterPBE) {
-                final EncrypterPBE encrypter = (EncrypterPBE) encryptionType.getEncrypter();
+            
+            if (EncryptionType.isValid(encryptionType)) {
+                final PBECiphers decrypter = PBECiphers.fromString(encryptionType.algorithmName);
                 
                 final byte[] salt = EncrypterUtils.base64StringToBytes(masterPassword.getSalt());
                 final byte[] cipherText = EncrypterUtils.base64StringToBytes(masterPassword.getEncryptedSecretKey());
                 final char[] passPhrase = EncrypterUtils.stringToChar(enteredPassword);
                 
-                final byte[] result = encrypter.doCiper(EncryptionMode.DECRYPT_MODE, salt, cipherText, passPhrase);
+                // TODO - Introduce an IV - its similar to salt.
+                final byte[] iv = new byte[salt.length * 2];
+                System.arraycopy(salt, 0, iv, 0, salt.length);
+                System.arraycopy(salt, 0, iv, salt.length, salt.length);
+                
+                final byte[] result = decrypter.decrypt(passPhrase, salt, iv, cipherText);
                 
                 if (result == null) {
                     return false;
@@ -126,13 +130,8 @@ public class LoadProfileFunction implements ActionListener, AnnonymousFunction, 
                 
                 return true;
             }
-        } catch (final NoSuchEncryptionException e) {
-            LOG.error("NoSuchEncryptionException", e);
-        } catch (final AbstractEncrypterException e) {
-            if (e.getCause() instanceof javax.crypto.BadPaddingException) {
-                return false;
-            }
-            LOG.error("AbstractEncrypterException", e);
+        } catch (final Exception e) {
+            LOG.error("Exception thrown while checking if isPasswordCorrect.", e);
         }
         return false;
     }

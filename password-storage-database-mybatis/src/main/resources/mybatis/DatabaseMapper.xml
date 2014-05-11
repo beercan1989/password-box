@@ -29,11 +29,11 @@
 	</select>
 	
 	<insert id="instertMasterPassword" parameterType="com.jbacon.passwordstorage.password.MasterPassword">
-		INSERT OR FAIL INTO MasterPasswords (profileName, secretKey, salt, createdAt, updatedAt, masterET, storedET) VALUES (#{profileName}, #{encryptedSecretKey}, #{salt}, datetime('now', 'utc'), datetime('now', 'utc'), #{masterPasswordEncryptionType}, #{storedPasswordEncryptionType});
+		INSERT OR FAIL INTO MasterPasswords (profileName, secretKey, salt, createdAt, updatedAt, masterET, storedET) VALUES (#{profileName}, #{encryptedSecretKey}, #{salt}, datetime('now', 'localtime'), datetime('now', 'localtime'), #{masterPasswordEncryptionType}, #{storedPasswordsEncryptionType});
 	</insert>
 	
 	<update id="updateMasterPassword" parameterType="com.jbacon.passwordstorage.password.MasterPassword">
-		UPDATE OR FAIL MasterPasswords SET profileName = #{profileName}, secretKey = #{encryptedSecretKey}, salt = #{salt}, updatedAt = datetime('now', 'utc') WHERE id = #{id};
+		UPDATE OR FAIL MasterPasswords SET profileName = #{profileName}, secretKey = #{encryptedSecretKey}, salt = #{salt}, updatedAt = datetime('now', 'localtime') WHERE id = #{id};
 	</update>
 	
 	
@@ -59,11 +59,11 @@
 	</select>
 	
 	<insert id="instertStoredPassword" parameterType="com.jbacon.passwordstorage.password.StoredPassword">
-		INSERT OR FAIL INTO StoredPasswords (profileName, passwordName, password, passwordNotes, createdAt, updatedAt) VALUES (#{profileName}, #{encryptedPasswordName}, #{encryptedPassword}, #{encryptedPasswordNotes}, datetime('now', 'utc'), datetime('now', 'utc'));
+		INSERT OR FAIL INTO StoredPasswords (profileName, passwordName, password, passwordNotes, createdAt, updatedAt) VALUES (#{profileName}, #{encryptedPasswordName}, #{encryptedPassword}, #{encryptedPasswordNotes}, datetime('now', 'localtime'), datetime('now', 'localtime'));
 	</insert>
 	
 	<update id="updateStoredPassword" parameterType="com.jbacon.passwordstorage.password.StoredPassword">
-		UPDATE OR FAIL StoredPasswords SET profileName = #{profileName}, passwordName = #{encryptedPasswordName}, password = #{encryptedPassword}, passwordNotes = #{encryptedPasswordNotes}, updatedAt = datetime('now', 'utc') WHERE id = #{id};
+		UPDATE OR FAIL StoredPasswords SET profileName = #{profileName}, passwordName = #{encryptedPasswordName}, password = #{encryptedPassword}, passwordNotes = #{encryptedPasswordNotes}, updatedAt = datetime('now', 'localtime') WHERE id = #{id};
 	</update>
 	
 	

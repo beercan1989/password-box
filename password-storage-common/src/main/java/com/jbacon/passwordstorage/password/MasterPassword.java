@@ -5,59 +5,58 @@ import java.util.Date;
 import com.jbacon.passwordstorage.encryption.EncryptionType;
 
 public class MasterPassword extends GenericPassword {
-
+    
     private String encryptedSecretKey;
     private String salt;
-
+    
     private EncryptionType masterPasswordEncryptionType;
-    private EncryptionType storedPasswordEncryptionType;
-
+    private EncryptionType storedPasswordsEncryptionType;
+    
     public MasterPassword() {
         super();
     }
-
-    public MasterPassword(final String profileName, final String encryptedSecretKey, final String salt,
-            final Date createdAt, final Date updatedAt, final Integer id,
+    
+    public MasterPassword(final String profileName, final String encryptedSecretKey, final String salt, final Date createdAt, final Date updatedAt, final Integer id,
             final EncryptionType masterPasswordEncryptionType, final EncryptionType storedPasswordEncryptionType) {
         super(createdAt, updatedAt, id, profileName);
         this.encryptedSecretKey = encryptedSecretKey;
         this.salt = salt;
         this.masterPasswordEncryptionType = masterPasswordEncryptionType;
-        this.storedPasswordEncryptionType = storedPasswordEncryptionType;
+        this.storedPasswordsEncryptionType = storedPasswordEncryptionType;
     }
-
+    
     public String getEncryptedSecretKey() {
         return encryptedSecretKey;
     }
-
+    
     public EncryptionType getMasterPasswordEncryptionType() {
         return masterPasswordEncryptionType;
     }
-
+    
     public String getSalt() {
         return salt;
     }
-
-    public EncryptionType getStoredPasswordEncryptionType() {
-        return storedPasswordEncryptionType;
+    
+    public EncryptionType getStoredPasswordsEncryptionType() {
+        return storedPasswordsEncryptionType;
     }
-
+    
     public void setEncryptedSecretKey(final String encryptedSecretKey) {
         this.encryptedSecretKey = encryptedSecretKey;
     }
-
+    
     public void setMasterPasswordEncryptionType(final EncryptionType masterPasswordEncryptionType) {
         this.masterPasswordEncryptionType = masterPasswordEncryptionType;
     }
-
+    
     public void setSalt(final String salt) {
         this.salt = salt;
     }
-
-    public void setStoredPasswordsEncryptionType(final EncryptionType storedPasswordEncryptionType) {
-        this.storedPasswordEncryptionType = storedPasswordEncryptionType;
+    
+    public void setStoredPasswordsEncryptionType(final EncryptionType storedPasswordsEncryptionType) {
+        this.storedPasswordsEncryptionType = storedPasswordsEncryptionType;
     }
-
+    
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
@@ -76,5 +75,5 @@ public class MasterPassword extends GenericPassword {
         // builder.append("]");
         return builder.toString();
     }
-
+    
 }

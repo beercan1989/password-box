@@ -12,10 +12,11 @@ import javax.swing.JOptionPane;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.crypto.DataLengthException;
+import org.bouncycastle.crypto.InvalidCipherTextException;
 
 import com.jbacon.passwordstorage.database.dao.MasterPasswordsDao;
 import com.jbacon.passwordstorage.database.dao.StoredPasswordsDao;
-import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.models.FluidEntity;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
@@ -64,7 +65,7 @@ public class NewPasswordFunction implements ActionListener, AnnonymousFunction {
         }
     }
     
-    private void newPasswordUnsafe() throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+    private void newPasswordUnsafe() throws UnsupportedEncodingException, DecoderException, DataLengthException, IllegalStateException, InvalidCipherTextException {
         LOG.debug("Creating a new Password");
         
         if (activeProfile.isDefault()) {

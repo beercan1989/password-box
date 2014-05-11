@@ -27,8 +27,9 @@ import javax.swing.border.LineBorder;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.crypto.DataLengthException;
+import org.bouncycastle.crypto.InvalidCipherTextException;
 
-import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
@@ -36,19 +37,19 @@ import com.jbacon.passwordstorage.utils.PasswordEncryptionUtil;
 import com.jbacon.passwordstorage.utils.StringUtil;
 
 public class NewStoredPasswordPanel extends JPanel {
-
+    
     private static final long serialVersionUID = -501345374303874233L;
     private static final char PASSWORD_MASK = '*';
-
+    
     private static final Log LOG = LogFactory.getLog(NewStoredPasswordPanel.class);
-
+    
     public static boolean isValid(final NewStoredPasswordPanel newPassword) {
         try {
             final String profileName = newPassword.getProfileName();
             final String encryptedPassword = newPassword.getEncryptedPassword();
             final String encryptedPasswordName = newPassword.getEncryptedPasswordName();
             final String encryptedPasswordNotes = newPassword.getEncryptedPasswordNotes();
-
+            
             if (LOG.isDebugEnabled()) {
                 final StringBuilder logEntry = new StringBuilder();
                 logEntry.append("Validating NewStoredPasswordPanel [aka StoredPassword].");
@@ -69,44 +70,38 @@ public class NewStoredPasswordPanel extends JPanel {
                 logEntry.append("Encrypted Password Notes: " + encryptedPasswordNotes);
                 LOG.debug(logEntry.toString());
             }
-
+            
             return newPassword.enteredPasswordIsValid() && newPassword.enteredPasswordNameIsValid();
-
-        } catch (final UnsupportedEncodingException e) {
-            LOG.debug(e);
-            return false;
-        } catch (final DecoderException e) {
-            LOG.debug(e);
-            return false;
-        } catch (final AbstractEncrypterException e) {
+            
+        } catch (final Exception e) {
             LOG.debug(e);
             return false;
         }
     }
-
+    
     private final MasterPassword profile;
     private final String currentPassword;
-
+    
     private final JLabel profileNameJLabel;
     private final JTextField profileNameJTextField;
-
+    
     private final JLabel passwordJLabel;
     private final JPasswordField passwordJPasswordField;
     private final JTextArea txtrPleaseEnterThe;
     private final JPasswordField reTypedPasswordJPasswordField;
     private final JLabel reTypedPasswordJLabel;
-
+    
     private static final Border INVALID_JPASSWORDFIELD = new LineBorder(Color.RED, 2);
     private static final Border VALID_JPASSWORDFIELD = new JPasswordField().getBorder();
     private static final Border INVALID_JTEXTFIELD = INVALID_JPASSWORDFIELD;
     private static final Border VALID_JTEXTFIELD = new JTextField().getBorder();
-
+    
     private final JLabel passwordNameJLabel;
     private final JTextField passwordNameJTextField;
     private final JLabel passwordNotesJLabel;
     private final JTextArea passwordNotesJTextArea;
     private final JLabel titleJLabel;
-
+    
     /**
      * Create the panel.
      * 
@@ -118,7 +113,7 @@ public class NewStoredPasswordPanel extends JPanel {
     public NewStoredPasswordPanel(final MasterPassword profile, final String currentPassword) {
         this.profile = profile;
         this.currentPassword = currentPassword;
-
+        
         setBorder(new EmptyBorder(10, 10, 10, 10));
         final GridBagLayout gridBagLayout = new GridBagLayout();
         gridBagLayout.columnWidths = new int[] { 0, 0, 0 };
@@ -126,7 +121,7 @@ public class NewStoredPasswordPanel extends JPanel {
         gridBagLayout.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
         gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
         setLayout(gridBagLayout);
-
+        
         titleJLabel = new JLabel("New Password");
         titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
         final GridBagConstraints gbc_titleJLabel = new GridBagConstraints();
@@ -135,7 +130,7 @@ public class NewStoredPasswordPanel extends JPanel {
         gbc_titleJLabel.gridx = 0;
         gbc_titleJLabel.gridy = 0;
         add(titleJLabel, gbc_titleJLabel);
-
+        
         txtrPleaseEnterThe = new JTextArea();
         txtrPleaseEnterThe.setBackground(UIManager.getColor("Label.background"));
         txtrPleaseEnterThe.setEditable(false);
@@ -148,7 +143,7 @@ public class NewStoredPasswordPanel extends JPanel {
         gbc_txtrPleaseEnterThe.gridx = 0;
         gbc_txtrPleaseEnterThe.gridy = 1;
         add(txtrPleaseEnterThe, gbc_txtrPleaseEnterThe);
-
+        
         profileNameJLabel = new JLabel("Profile Name");
         final GridBagConstraints gbc_profileNameJLabel = new GridBagConstraints();
         gbc_profileNameJLabel.fill = GridBagConstraints.VERTICAL;
@@ -157,7 +152,7 @@ public class NewStoredPasswordPanel extends JPanel {
         gbc_profileNameJLabel.gridx = 0;
         gbc_profileNameJLabel.gridy = 2;
         add(profileNameJLabel, gbc_profileNameJLabel);
-
+        
         profileNameJTextField = new JTextField();
         profileNameJTextField.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         profileNameJTextField.setPreferredSize(new Dimension(101, 25));
@@ -169,7 +164,7 @@ public class NewStoredPasswordPanel extends JPanel {
         gbc_profileNameJTextField.gridx = 1;
         gbc_profileNameJTextField.gridy = 2;
         add(profileNameJTextField, gbc_profileNameJTextField);
-
+        
         reTypedPasswordJPasswordField = new JPasswordField();
         reTypedPasswordJPasswordField.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         reTypedPasswordJPasswordField.setPreferredSize(new Dimension(101, 25));
@@ -184,18 +179,18 @@ public class NewStoredPasswordPanel extends JPanel {
             public void keyPressed(final KeyEvent e) {
                 updatePasswordFieldValidation();
             }
-
+            
             @Override
             public void keyReleased(final KeyEvent e) {
                 updatePasswordFieldValidation();
             }
-
+            
             @Override
             public void keyTyped(final KeyEvent e) {
                 updatePasswordFieldValidation();
             }
         });
-
+        
         passwordJPasswordField = new JPasswordField();
         passwordJPasswordField.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         passwordJPasswordField.setPreferredSize(new Dimension(101, 25));
@@ -210,18 +205,18 @@ public class NewStoredPasswordPanel extends JPanel {
             public void keyPressed(final KeyEvent e) {
                 updatePasswordFieldValidation();
             }
-
+            
             @Override
             public void keyReleased(final KeyEvent e) {
                 updatePasswordFieldValidation();
             }
-
+            
             @Override
             public void keyTyped(final KeyEvent e) {
                 updatePasswordFieldValidation();
             }
         });
-
+        
         passwordNameJLabel = new JLabel("Password Name");
         final GridBagConstraints gbc_passwordNameJLabel = new GridBagConstraints();
         gbc_passwordNameJLabel.anchor = GridBagConstraints.EAST;
@@ -230,7 +225,7 @@ public class NewStoredPasswordPanel extends JPanel {
         gbc_passwordNameJLabel.gridx = 0;
         gbc_passwordNameJLabel.gridy = 3;
         add(passwordNameJLabel, gbc_passwordNameJLabel);
-
+        
         passwordNameJTextField = new JTextField();
         passwordNameJTextField.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         passwordNameJTextField.setPreferredSize(new Dimension(101, 25));
@@ -245,18 +240,18 @@ public class NewStoredPasswordPanel extends JPanel {
             public void keyPressed(final KeyEvent e) {
                 updatePasswordFieldValidation();
             }
-
+            
             @Override
             public void keyReleased(final KeyEvent e) {
                 updatePasswordFieldValidation();
             }
-
+            
             @Override
             public void keyTyped(final KeyEvent e) {
                 updatePasswordFieldValidation();
             }
         });
-
+        
         passwordJLabel = new JLabel("Password");
         final GridBagConstraints gbc_passwordJLabel = new GridBagConstraints();
         gbc_passwordJLabel.anchor = GridBagConstraints.EAST;
@@ -265,7 +260,7 @@ public class NewStoredPasswordPanel extends JPanel {
         gbc_passwordJLabel.gridy = 4;
         add(passwordJLabel, gbc_passwordJLabel);
         add(passwordJPasswordField, gbc_passwordJPasswordField);
-
+        
         reTypedPasswordJLabel = new JLabel("Re-Type Password");
         final GridBagConstraints gbc_reTypedPasswordJLabel = new GridBagConstraints();
         gbc_reTypedPasswordJLabel.insets = new Insets(0, 0, 5, 5);
@@ -274,7 +269,7 @@ public class NewStoredPasswordPanel extends JPanel {
         gbc_reTypedPasswordJLabel.gridy = 5;
         add(reTypedPasswordJLabel, gbc_reTypedPasswordJLabel);
         add(reTypedPasswordJPasswordField, gbc_reTypedPasswordJPasswordField);
-
+        
         passwordNotesJLabel = new JLabel("Password Notes");
         final GridBagConstraints gbc_passwordNotesJLabel = new GridBagConstraints();
         gbc_passwordNotesJLabel.anchor = GridBagConstraints.NORTHEAST;
@@ -282,7 +277,7 @@ public class NewStoredPasswordPanel extends JPanel {
         gbc_passwordNotesJLabel.gridx = 0;
         gbc_passwordNotesJLabel.gridy = 6;
         add(passwordNotesJLabel, gbc_passwordNotesJLabel);
-
+        
         passwordNotesJTextArea = new JTextArea();
         passwordNotesJTextArea.setPreferredSize(new Dimension(101, 150));
         passwordNotesJTextArea.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
@@ -293,75 +288,75 @@ public class NewStoredPasswordPanel extends JPanel {
         gbc_passwordNotesJTextArea.gridx = 1;
         gbc_passwordNotesJTextArea.gridy = 6;
         add(passwordNotesJTextArea, gbc_passwordNotesJTextArea);
-
+        
         updatePasswordFieldValidation();
     }
-
-    public StoredPassword buildPassword() throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+    
+    public StoredPassword buildPassword() throws UnsupportedEncodingException, DecoderException, DataLengthException, IllegalStateException, InvalidCipherTextException {
         final StoredPassword password = new StoredPassword();
         password.setProfileName(getProfileName());
         password.setEncryptedPassword(getEncryptedPassword());
         password.setEncryptedPasswordName(getEncryptedPasswordName());
         password.setEncryptedPasswordNotes(getEncryptedPasswordNotes());
-
+        
         // Dont know ID, UpdateAT or CreatedAt at this point.
         return password;
     }
-
+    
     private boolean enteredPasswordIsValid() {
         final char[] password = passwordJPasswordField.getPassword();
         final char[] retypedPassword = reTypedPasswordJPasswordField.getPassword();
-
+        
         if (isNull(password) || isNull(retypedPassword)) {
             return false;
         }
-
+        
         if (password.length == 0 || retypedPassword.length == 0) {
             return false;
         }
-
+        
         return Arrays.equals(password, retypedPassword);
     }
-
+    
     private boolean enteredPasswordNameIsValid() {
         if (StringUtil.isEmpty(passwordNameJTextField.getText())) {
             return false;
         }
         return true;
     }
-
-    private String getEncryptedPassword() throws DecoderException, AbstractEncrypterException, UnsupportedEncodingException {
+    
+    private String getEncryptedPassword() throws DecoderException, UnsupportedEncodingException, DataLengthException, IllegalStateException, InvalidCipherTextException {
         return getEncrypted(EncrypterUtils.charToByte(getPassword()));
     }
-
-    private String getEncryptedPasswordName() throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+    
+    private String getEncryptedPasswordName() throws UnsupportedEncodingException, DecoderException, DataLengthException, IllegalStateException, InvalidCipherTextException {
         return getEncrypted(EncrypterUtils.stringToByte(getPasswordName()));
     }
-
-    private String getEncryptedPasswordNotes() throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+    
+    private String getEncryptedPasswordNotes() throws UnsupportedEncodingException, DecoderException, DataLengthException, IllegalStateException, InvalidCipherTextException {
         return getEncrypted(EncrypterUtils.stringToByte(getPasswordNotes()));
     }
-
-    private String getEncrypted(final byte[] bytes) throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+    
+    private String getEncrypted(final byte[] bytes) throws UnsupportedEncodingException, DecoderException, DataLengthException, IllegalStateException, InvalidCipherTextException {
         return PasswordEncryptionUtil.getEncrypted(bytes, profile, currentPassword);
     }
-
+    
     private char[] getPassword() {
         return passwordJPasswordField.getPassword();
     }
-
+    
     private String getPasswordName() {
         return passwordNameJTextField.getText();
     }
-
+    
     private String getPasswordNotes() {
         return passwordNotesJTextArea.getText();
     }
-
+    
     private String getProfileName() {
         return profile.getProfileName();
     }
-
+    
     protected void updatePasswordFieldValidation() {
         if (enteredPasswordIsValid()) {
             passwordJPasswordField.setBorder(VALID_JPASSWORDFIELD);
@@ -370,7 +365,7 @@ public class NewStoredPasswordPanel extends JPanel {
             passwordJPasswordField.setBorder(INVALID_JPASSWORDFIELD);
             reTypedPasswordJPasswordField.setBorder(INVALID_JPASSWORDFIELD);
         }
-
+        
         if (enteredPasswordNameIsValid()) {
             passwordNameJTextField.setBorder(VALID_JTEXTFIELD);
         } else {

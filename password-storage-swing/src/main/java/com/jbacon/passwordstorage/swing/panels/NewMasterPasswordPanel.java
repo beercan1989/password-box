@@ -29,11 +29,14 @@ import javax.swing.border.LineBorder;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.crypto.DataLengthException;
+import org.bouncycastle.crypto.InvalidCipherTextException;
 
-import com.jbacon.passwordstorage.encryption.EncrypterPBE;
-import com.jbacon.passwordstorage.encryption.EncryptionMode;
+import co.uk.baconi.cryptography.ciphers.pbe.PBECiphers;
+import co.uk.baconi.cryptography.ciphers.symmetric.SymmetricCiphers;
+
 import com.jbacon.passwordstorage.encryption.EncryptionType;
-import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
+import com.jbacon.passwordstorage.encryption.errors.InvalidEncryptionTypeForSaltGeneration;
 import com.jbacon.passwordstorage.encryption.tools.EncrypterUtils;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.utils.GenericValidationUtil;
@@ -41,12 +44,12 @@ import com.jbacon.passwordstorage.utils.JOptionUtil;
 import com.jbacon.passwordstorage.utils.StringUtil;
 
 public class NewMasterPasswordPanel extends JPanel {
-
+    
     private static final char PASSWORD_MASK = '*';
     private static final long serialVersionUID = 8536565892859901568L;
-
+    
     private static final Log LOG = LogFactory.getLog(NewMasterPasswordPanel.class);
-
+    
     public static boolean isValid(final NewMasterPasswordPanel newProfile) {
         try {
             LOG.debug("Validating NewMasterPasswordPanel [aka MasterPassword].");
@@ -55,22 +58,22 @@ public class NewMasterPasswordPanel extends JPanel {
             LOG.debug("Salt: " + EncrypterUtils.bytesToBase64String(newProfile.getSalt()));
             LOG.debug("EncryptedSecretKey: " + newProfile.getEncryptedSecretKey());
             LOG.debug("ProfileName: " + newProfile.getProfileName());
-
+            
             final boolean encryptionTypesValid = EncryptionType.areValid(newProfile.getProfileEncryptionType(), newProfile.getPasswordEncryptionType());
             final boolean saltIsNotNull = GenericValidationUtil.isNotNull(newProfile.getSalt());
             final boolean areNotEmpty = StringUtil.areNotEmpty(newProfile.getEncryptedSecretKey(), newProfile.getProfileName());
-
+            
             LOG.debug("Encryption Type is valid: " + encryptionTypesValid);
             LOG.debug("Salt is not null: " + saltIsNotNull);
             LOG.debug("Secret Key & Profile Name are not empty: " + areNotEmpty);
-
+            
             return encryptionTypesValid && saltIsNotNull && areNotEmpty;
-        } catch (final AbstractEncrypterException e) {
-            LOG.error(e);
+        } catch (final Exception e) {
+            LOG.error("", e);
             return false;
         }
     }
-
+    
     private final JLabel profileNameJLabel;
     private final JTextField profileNameJTextField;
     private final JLabel passwordJLabel;
@@ -88,13 +91,13 @@ public class NewMasterPasswordPanel extends JPanel {
     private final JLabel profileEncryptionTypeJLabel;
     private final JLabel passwordEncryptionTypeJLabel;
     private final JLabel reTypedPasswordJLabel;
-
+    
     private byte[] salt;
     private byte[] encryptedSecretKey;
-
+    
     private static final Border INVALID_JPASSWORDFIELD = new LineBorder(Color.RED, 2);
     private static final Border VALID_JPASSWORDFIELD = new JPasswordField().getBorder();
-
+    
     /**
      * Create the panel.
      */
@@ -106,7 +109,7 @@ public class NewMasterPasswordPanel extends JPanel {
         gridBagLayout.columnWeights = new double[] { 0.0, 1.0, 1.0, Double.MIN_VALUE };
         gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
         setLayout(gridBagLayout);
-
+        
         txtrPleaseEnterThe = new JTextArea();
         txtrPleaseEnterThe.setBackground(UIManager.getColor("Label.background"));
         txtrPleaseEnterThe.setEditable(false);
@@ -119,7 +122,7 @@ public class NewMasterPasswordPanel extends JPanel {
         gbc_txtrPleaseEnterThe.gridx = 0;
         gbc_txtrPleaseEnterThe.gridy = 0;
         add(txtrPleaseEnterThe, gbc_txtrPleaseEnterThe);
-
+        
         profileNameJLabel = new JLabel("Profile Name");
         final GridBagConstraints gbc_profileNameJLabel = new GridBagConstraints();
         gbc_profileNameJLabel.fill = GridBagConstraints.VERTICAL;
@@ -128,7 +131,7 @@ public class NewMasterPasswordPanel extends JPanel {
         gbc_profileNameJLabel.gridx = 0;
         gbc_profileNameJLabel.gridy = 1;
         add(profileNameJLabel, gbc_profileNameJLabel);
-
+        
         profileNameJTextField = new JTextField();
         profileNameJTextField.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         final GridBagConstraints gbc_profileNameJTextField = new GridBagConstraints();
@@ -138,7 +141,7 @@ public class NewMasterPasswordPanel extends JPanel {
         gbc_profileNameJTextField.gridy = 1;
         add(profileNameJTextField, gbc_profileNameJTextField);
         profileNameJTextField.setColumns(15);
-
+        
         passwordJLabel = new JLabel("Password");
         final GridBagConstraints gbc_passwordJLabel = new GridBagConstraints();
         gbc_passwordJLabel.anchor = GridBagConstraints.EAST;
@@ -146,7 +149,7 @@ public class NewMasterPasswordPanel extends JPanel {
         gbc_passwordJLabel.gridx = 0;
         gbc_passwordJLabel.gridy = 2;
         add(passwordJLabel, gbc_passwordJLabel);
-
+        
         passwordJPasswordField = new JPasswordField();
         passwordJPasswordField.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         passwordJPasswordField.setEchoChar(PASSWORD_MASK);
@@ -160,19 +163,19 @@ public class NewMasterPasswordPanel extends JPanel {
             public void keyPressed(final KeyEvent e) {
                 updatePasswordFieldValidation();
             }
-
+            
             @Override
             public void keyReleased(final KeyEvent e) {
                 updatePasswordFieldValidation();
             }
-
+            
             @Override
             public void keyTyped(final KeyEvent e) {
                 updatePasswordFieldValidation();
             }
         });
         add(passwordJPasswordField, gbc_passwordJPasswordField);
-
+        
         generatePasswordJButton = new JButton("Generate");
         generatePasswordJButton.setVisible(false);
         final GridBagConstraints gbc_generatePasswordJButton = new GridBagConstraints();
@@ -180,7 +183,7 @@ public class NewMasterPasswordPanel extends JPanel {
         gbc_generatePasswordJButton.gridx = 2;
         gbc_generatePasswordJButton.gridy = 2;
         add(generatePasswordJButton, gbc_generatePasswordJButton);
-
+        
         reTypedPasswordJLabel = new JLabel("Re-Type Password");
         final GridBagConstraints gbc_reTypedPasswordJLabel = new GridBagConstraints();
         gbc_reTypedPasswordJLabel.insets = new Insets(0, 0, 5, 5);
@@ -188,7 +191,7 @@ public class NewMasterPasswordPanel extends JPanel {
         gbc_reTypedPasswordJLabel.gridx = 0;
         gbc_reTypedPasswordJLabel.gridy = 3;
         add(reTypedPasswordJLabel, gbc_reTypedPasswordJLabel);
-
+        
         reTypedPasswordJPasswordField = new JPasswordField();
         reTypedPasswordJPasswordField.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         reTypedPasswordJPasswordField.setPreferredSize(new Dimension(101, 25));
@@ -203,19 +206,19 @@ public class NewMasterPasswordPanel extends JPanel {
             public void keyPressed(final KeyEvent e) {
                 updatePasswordFieldValidation();
             }
-
+            
             @Override
             public void keyReleased(final KeyEvent e) {
                 updatePasswordFieldValidation();
             }
-
+            
             @Override
             public void keyTyped(final KeyEvent e) {
                 updatePasswordFieldValidation();
             }
         });
         add(reTypedPasswordJPasswordField, gbc_reTypedPasswordJPasswordField);
-
+        
         saltJLabel = new JLabel("Salt");
         final GridBagConstraints gbc_saltJLabel = new GridBagConstraints();
         gbc_saltJLabel.anchor = GridBagConstraints.EAST;
@@ -223,7 +226,7 @@ public class NewMasterPasswordPanel extends JPanel {
         gbc_saltJLabel.gridx = 0;
         gbc_saltJLabel.gridy = 4;
         add(saltJLabel, gbc_saltJLabel);
-
+        
         saltJPasswordField = new JPasswordField();
         saltJPasswordField.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         saltJPasswordField.setEditable(false);
@@ -234,14 +237,14 @@ public class NewMasterPasswordPanel extends JPanel {
         gbc_saltJPasswordField.gridx = 1;
         gbc_saltJPasswordField.gridy = 4;
         add(saltJPasswordField, gbc_saltJPasswordField);
-
+        
         generateSaltJButton = new JButton("Generate");
         generateSaltJButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 try {
                     generateSalt();
-                } catch (final AbstractEncrypterException ex) {
+                } catch (final InvalidEncryptionTypeForSaltGeneration ex) {
                     JOptionUtil.errorMessage("Failed to generate salt value.", "Salt Generation Failure", ex);
                 }
             }
@@ -251,11 +254,11 @@ public class NewMasterPasswordPanel extends JPanel {
         gbc_generateSaltJButton.gridx = 2;
         gbc_generateSaltJButton.gridy = 4;
         add(generateSaltJButton, gbc_generateSaltJButton);
-
+        
         saltJPasswordField.setPreferredSize(generateSaltJButton.getPreferredSize());
         passwordJPasswordField.setPreferredSize(generateSaltJButton.getPreferredSize());
         profileNameJTextField.setPreferredSize(generateSaltJButton.getPreferredSize());
-
+        
         saltLengthJLabel = new JLabel("Salt Length");
         final GridBagConstraints gbc_saltLengthJLabel = new GridBagConstraints();
         gbc_saltLengthJLabel.anchor = GridBagConstraints.EAST;
@@ -263,7 +266,7 @@ public class NewMasterPasswordPanel extends JPanel {
         gbc_saltLengthJLabel.gridx = 0;
         gbc_saltLengthJLabel.gridy = 5;
         add(saltLengthJLabel, gbc_saltLengthJLabel);
-
+        
         saltLengthJSpinner = new JSpinner();
         saltLengthJSpinner.setModel(new SpinnerNumberModel(new Integer(EncryptionType.DEFAULT_SALT_SIZE), new Integer(1), null, new Integer(1)));
         final GridBagConstraints gbc_saltLengthJSpinner = new GridBagConstraints();
@@ -272,11 +275,20 @@ public class NewMasterPasswordPanel extends JPanel {
         gbc_saltLengthJSpinner.gridx = 1;
         gbc_saltLengthJSpinner.gridy = 5;
         add(saltLengthJSpinner, gbc_saltLengthJSpinner);
-
+        
         profileEncryptionTypeJComboBox = new JComboBox();
-        final EncryptionType[] masterPasswordJComboBoxOptions = new EncryptionType[] { EncryptionType.PBE_WITH_MD5_AND_DES, EncryptionType.PBE_WITH_SHA1_AND_256_AES_CBC_BC,
-                EncryptionType.PBE_WITH_SHA_AND_3_KEY_TRIPPLE_DES_CBC, EncryptionType.PBE_WITH_SHA_AND_TWOFISH_CBC };
-
+        @SuppressWarnings("deprecation")
+        final EncryptionType[] masterPasswordJComboBoxOptions = new EncryptionType[] { EncryptionType.PBE_WITH_MD5_AND_DES,//
+                EncryptionType.PBE_WITH_SHA1_AND_256_AES_CBC_BC,//
+                EncryptionType.PBE_WITH_SHA256_AND_128_AES_CBC,//
+                EncryptionType.PBE_WITH_SHA256_AND_256_AES_CBC,//
+                EncryptionType.PBE_WITH_SHA512_AND_256_AES_CBC,//
+                EncryptionType.PBE_WITH_WHIRLPOOL_AND_256_AES_CBC,//
+                EncryptionType.PBE_WITH_SHA256_AND_TWOFISH_CBC,//
+                EncryptionType.PBE_WITH_SHA512_AND_TWOFISH_CBC,//
+                EncryptionType.PBE_WITH_WHIRLPOOL_AND_TWOFISH_CBC //
+        };
+        
         profileEncryptionTypeJLabel = new JLabel("Profile Encryption Type");
         final GridBagConstraints gbc_profileEncryptionTypeJLabel = new GridBagConstraints();
         gbc_profileEncryptionTypeJLabel.insets = new Insets(0, 0, 5, 5);
@@ -285,17 +297,17 @@ public class NewMasterPasswordPanel extends JPanel {
         gbc_profileEncryptionTypeJLabel.gridy = 6;
         add(profileEncryptionTypeJLabel, gbc_profileEncryptionTypeJLabel);
         profileEncryptionTypeJComboBox.setModel(new DefaultComboBoxModel(masterPasswordJComboBoxOptions));
-        profileEncryptionTypeJComboBox.setSelectedItem(EncryptionType.PBE_WITH_SHA1_AND_256_AES_CBC_BC);
+        profileEncryptionTypeJComboBox.setSelectedItem(EncryptionType.PBE_WITH_SHA256_AND_128_AES_CBC);
         final GridBagConstraints gbc_profileEncryptionTypeJComboBox = new GridBagConstraints();
         gbc_profileEncryptionTypeJComboBox.fill = GridBagConstraints.HORIZONTAL;
         gbc_profileEncryptionTypeJComboBox.insets = new Insets(0, 0, 5, 5);
         gbc_profileEncryptionTypeJComboBox.gridx = 1;
         gbc_profileEncryptionTypeJComboBox.gridy = 6;
         add(profileEncryptionTypeJComboBox, gbc_profileEncryptionTypeJComboBox);
-
+        
         passwordEncryptionTypeJComboBox = new JComboBox();
-        final EncryptionType[] storedPAsswordJComboBoxOptions = new EncryptionType[] { EncryptionType.AES_128, EncryptionType.AES_256 };
-
+        final EncryptionType[] storedPAsswordJComboBoxOptions = new EncryptionType[] { EncryptionType.AES_128, EncryptionType.AES_256, EncryptionType.TWOFISH_256 };
+        
         passwordEncryptionTypeJLabel = new JLabel("Password Encryption Type");
         final GridBagConstraints gbc_passwordEncryptionTypeJLabel = new GridBagConstraints();
         gbc_passwordEncryptionTypeJLabel.insets = new Insets(0, 0, 0, 5);
@@ -304,7 +316,7 @@ public class NewMasterPasswordPanel extends JPanel {
         gbc_passwordEncryptionTypeJLabel.gridy = 7;
         add(passwordEncryptionTypeJLabel, gbc_passwordEncryptionTypeJLabel);
         passwordEncryptionTypeJComboBox.setModel(new DefaultComboBoxModel(storedPAsswordJComboBoxOptions));
-        passwordEncryptionTypeJComboBox.setSelectedItem(EncryptionType.AES_256);
+        passwordEncryptionTypeJComboBox.setSelectedItem(EncryptionType.AES_128);
         final GridBagConstraints gbc_passwordEncryptionTypeJComboBox = new GridBagConstraints();
         gbc_passwordEncryptionTypeJComboBox.insets = new Insets(0, 0, 0, 5);
         gbc_passwordEncryptionTypeJComboBox.fill = GridBagConstraints.HORIZONTAL;
@@ -312,8 +324,8 @@ public class NewMasterPasswordPanel extends JPanel {
         gbc_passwordEncryptionTypeJComboBox.gridy = 7;
         add(passwordEncryptionTypeJComboBox, gbc_passwordEncryptionTypeJComboBox);
     }
-
-    public MasterPassword buildProfile() throws AbstractEncrypterException {
+    
+    public MasterPassword buildProfile() throws DataLengthException, IllegalStateException, InvalidCipherTextException {
         final MasterPassword profile = new MasterPassword();
         profile.setProfileName(getProfileName());
         profile.setSalt(EncrypterUtils.bytesToBase64String(getSalt()));
@@ -323,52 +335,61 @@ public class NewMasterPasswordPanel extends JPanel {
         // Dont know ID, UpdateAT or CreatedAt at this point.
         return profile;
     }
-
-    private void generateSalt() throws AbstractEncrypterException {
+    
+    private void generateSalt() throws InvalidEncryptionTypeForSaltGeneration {
         salt = EncrypterUtils.generateSalt(getProfileEncryptionType(), getSaltLength());
         saltJPasswordField.setText(EncrypterUtils.bytesToBase64String(salt));
     }
-
-    public String getEncryptedSecretKey() throws AbstractEncrypterException {
+    
+    public String getEncryptedSecretKey() throws DataLengthException, IllegalStateException, InvalidCipherTextException {
         if (encryptedSecretKey == null) {
-            final EncrypterPBE encrypter = (EncrypterPBE) getProfileEncryptionType().getEncrypter();
-            final byte[] secretKey = EncrypterUtils.generateAesEncryptionKey(getPasswordEncryptionType());
-            encryptedSecretKey = encrypter.doCiper(EncryptionMode.ENCRYPT_MODE, salt, secretKey, getPassword());
+            
+            final PBECiphers encrypter = PBECiphers.fromString(getProfileEncryptionType().algorithmName);
+            
+            final SymmetricCiphers symmetricCipher = SymmetricCiphers.fromString(getPasswordEncryptionType().algorithmName);
+            
+            final byte[] newSecretKey = symmetricCipher.generateKey(256);
+            
+            // TODO - Introduce an IV - its similar to salt.
+            final byte[] iv = new byte[salt.length * 2];
+            System.arraycopy(salt, 0, iv, 0, salt.length);
+            System.arraycopy(salt, 0, iv, salt.length, salt.length);
+            encryptedSecretKey = encrypter.encrypt(getPassword(), salt, iv, newSecretKey);
         }
         return EncrypterUtils.bytesToBase64String(encryptedSecretKey);
     }
-
+    
     private char[] getPassword() {
         return passwordJPasswordField.getPassword();
     }
-
+    
     public EncryptionType getPasswordEncryptionType() {
         return (EncryptionType) passwordEncryptionTypeJComboBox.getSelectedItem();
     }
-
+    
     public EncryptionType getProfileEncryptionType() {
         return (EncryptionType) profileEncryptionTypeJComboBox.getSelectedItem();
     }
-
+    
     public String getProfileName() {
         return profileNameJTextField.getText();
     }
-
+    
     public byte[] getSalt() {
         return salt;
     }
-
+    
     private int getSaltLength() {
         return (Integer) saltLengthJSpinner.getValue();
     }
-
+    
     private boolean passwordsEqual() {
         final char[] password = passwordJPasswordField.getPassword();
         final char[] retypedPassword = reTypedPasswordJPasswordField.getPassword();
-
+        
         return (password == null || retypedPassword == null) ? false : Arrays.equals(password, retypedPassword);
     }
-
+    
     protected void updatePasswordFieldValidation() {
         if (passwordsEqual()) {
             passwordJPasswordField.setBorder(VALID_JPASSWORDFIELD);
@@ -377,6 +398,6 @@ public class NewMasterPasswordPanel extends JPanel {
             passwordJPasswordField.setBorder(INVALID_JPASSWORDFIELD);
             reTypedPasswordJPasswordField.setBorder(INVALID_JPASSWORDFIELD);
         }
-
+        
     }
 }

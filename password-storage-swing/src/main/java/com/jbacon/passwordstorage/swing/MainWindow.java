@@ -40,6 +40,8 @@ import javax.swing.table.TableColumn;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.crypto.DataLengthException;
+import org.bouncycastle.crypto.InvalidCipherTextException;
 
 import com.jbacon.passwordstorage.database.dao.MaintenanceDao;
 import com.jbacon.passwordstorage.database.dao.MasterPasswordsDao;
@@ -47,7 +49,6 @@ import com.jbacon.passwordstorage.database.dao.StoredPasswordsDao;
 import com.jbacon.passwordstorage.database.mybatis.MaintenanceMybatisDao;
 import com.jbacon.passwordstorage.database.mybatis.MasterPasswordMybatisDao;
 import com.jbacon.passwordstorage.database.mybatis.StoredPasswordMybatisDao;
-import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.functions.AnnonymousFunction;
 import com.jbacon.passwordstorage.functions.LoadProfileFunction;
 import com.jbacon.passwordstorage.functions.NewPasswordFunction;
@@ -270,11 +271,7 @@ public class MainWindow {
             if (password != null) {
                 try {
                     editPassword(password, true);
-                } catch (final UnsupportedEncodingException e) {
-                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
-                } catch (final DecoderException e) {
-                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
-                } catch (final AbstractEncrypterException e) {
+                } catch (final Exception e) {
                     JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
                 }
             } else {
@@ -681,13 +678,7 @@ public class MainWindow {
             if (password != null) {
                 try {
                     viewPassword(password, true);
-                } catch (final UnsupportedEncodingException e) {
-                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
-                    viewPasswordEncrypted(password);
-                } catch (final DecoderException e) {
-                    JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
-                    viewPasswordEncrypted(password);
-                } catch (final AbstractEncrypterException e) {
+                } catch (final Exception e) {
                     JOptionUtil.errorMessage("An error occured when trying to decrypt your password.", "Password Decrypt Error", e);
                     viewPasswordEncrypted(password);
                 }
@@ -702,16 +693,13 @@ public class MainWindow {
     private void viewPasswordEncrypted(final StoredPassword password) {
         try {
             viewPassword(password, false);
-        } catch (final UnsupportedEncodingException e) {
-            JOptionUtil.errorMessage("An error occured when trying to view your password.", "Password Error", e);
-        } catch (final DecoderException e) {
-            JOptionUtil.errorMessage("An error occured when trying to view your password.", "Password Error", e);
-        } catch (final AbstractEncrypterException e) {
+        } catch (final Exception e) {
             JOptionUtil.errorMessage("An error occured when trying to view your password.", "Password Error", e);
         }
     }
     
-    private void viewPassword(final StoredPassword password, final boolean doDecrypt) throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+    private void viewPassword(final StoredPassword password, final boolean doDecrypt) throws UnsupportedEncodingException, DecoderException, DataLengthException,
+            IllegalStateException, InvalidCipherTextException {
         final ViewStoredPasswordPanel viewStoredPassword = new ViewStoredPasswordPanel(password, activeProfile, currentPassword, doDecrypt);
         
         if (!doDecrypt) {
@@ -729,7 +717,8 @@ public class MainWindow {
         }
     }
     
-    private void editPassword(final StoredPassword password, final boolean doDecrypt) throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
+    private void editPassword(final StoredPassword password, final boolean doDecrypt) throws UnsupportedEncodingException, DecoderException, DataLengthException,
+            IllegalStateException, InvalidCipherTextException {
         final EditStoredPasswordPanel editStoredPassword = new EditStoredPasswordPanel(password, activeProfile, currentPassword, doDecrypt);
         
         final int result = JOptionUtil.showCustomInputWindow(editStoredPassword, "Edit Stored Password", new String[] { "Save", "Cancel" });

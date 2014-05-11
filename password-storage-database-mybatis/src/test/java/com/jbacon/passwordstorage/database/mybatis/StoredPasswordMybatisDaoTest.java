@@ -22,44 +22,47 @@ import com.jbacon.passwordstorage.password.StoredPassword;
 import com.jbacon.test.tools.RemoveTestFiles;
 
 public class StoredPasswordMybatisDaoTest {
-
+    
     private static final String TV_SP_ENCRYPTED_PASSWORD_NOTES = "encryptedPasswordNotes";
     private static final String TV_SP_ENCRYPTED_PASSWORD = "encryptedPassword";
     private static final String TV_SP_ENCRYPTED_PASSWORD_NAME = "encryptedPasswordName";
     private static final String TEST_SQLITE_DATABASE_FILENAME = "dbTest.sqlite";
     private static final String TEST_MYBATIS_CONFIGURATION_FILENAME = "mybatisTest/Configuration.xml";
-
+    
     private static final String TV_MP_SALT = "salt";
     private static final String TV_MP_ENCRYPTED_SECRET_KEY = "encryptedSecretKey";
     private static final String TV_MP_PROFILE_NAME = "profileName";
-
+    
+    @SuppressWarnings("deprecation")
+    private static final EncryptionType MD5_DES_PBE = EncryptionType.PBE_WITH_MD5_AND_DES;
+    private static final EncryptionType AES_SYMMETRIC = EncryptionType.AES_128;
+    
     private static MaintenanceMybatisDao MAINTENANCE_DAO;
     private static StoredPasswordMybatisDao STORED_PASSWORD_DAO;
-
+    
     @AfterClass
     public static void cleanUp() throws IOException {
         RemoveTestFiles.remove(TEST_SQLITE_DATABASE_FILENAME);
     }
-
+    
     private static MasterPassword generateMasterPassword(final int id) {
-        return new MasterPassword(TV_MP_PROFILE_NAME + id, TV_MP_ENCRYPTED_SECRET_KEY + id, TV_MP_SALT + id,
-                new Date(), new Date(), null, EncryptionType.AES_256, EncryptionType.PBE_WITH_MD5_AND_DES);
+        return new MasterPassword(TV_MP_PROFILE_NAME + id, TV_MP_ENCRYPTED_SECRET_KEY + id, TV_MP_SALT + id, null, null, null, MD5_DES_PBE, AES_SYMMETRIC);
     }
-
+    
     private static StoredPassword generateStoredPassword(final int spId, final int mpId) {
-        return new StoredPassword(TV_SP_ENCRYPTED_PASSWORD_NAME + spId, TV_MP_PROFILE_NAME + mpId,
-                TV_SP_ENCRYPTED_PASSWORD + spId, TV_SP_ENCRYPTED_PASSWORD_NOTES + spId, new Date(), new Date(), null);
+        return new StoredPassword(TV_SP_ENCRYPTED_PASSWORD_NAME + spId, TV_MP_PROFILE_NAME + mpId, TV_SP_ENCRYPTED_PASSWORD + spId, TV_SP_ENCRYPTED_PASSWORD_NOTES + spId, null,
+                null, null);
     }
-
+    
     @BeforeClass
     public static void setupBeforeClass() throws IOException {
         MAINTENANCE_DAO = new MaintenanceMybatisDao(TEST_MYBATIS_CONFIGURATION_FILENAME);
         STORED_PASSWORD_DAO = new StoredPasswordMybatisDao(TEST_MYBATIS_CONFIGURATION_FILENAME);
-
+        
         MAINTENANCE_DAO.dropStoredPasswordTable();
         MAINTENANCE_DAO.createStoredPasswordTable();
     }
-
+    
     @Test
     public void should_01_InstertStoredPassword() {
         final StoredPassword toInsert = generateStoredPassword(1, 1);
@@ -67,7 +70,7 @@ public class StoredPasswordMybatisDaoTest {
         assertThat(result, is(not(nullValue())));
         assertThat(result, is(equalTo(1)));
     }
-
+    
     @Test
     public void should_02_GetAllStoredPasswords() {
         final List<StoredPassword> result = STORED_PASSWORD_DAO.getStoredPasswords();
@@ -75,7 +78,7 @@ public class StoredPasswordMybatisDaoTest {
         assertThat(result.size(), is(equalTo(1)));
         assertThat(result.get(0).getId(), is(equalTo(1)));
     }
-
+    
     @Test
     public void should_03_GetStoredPasswordId() {
         final StoredPassword toGetIdFor = generateStoredPassword(1, 1);
@@ -83,7 +86,7 @@ public class StoredPasswordMybatisDaoTest {
         assertThat(result, is(not(nullValue())));
         assertThat(result, is(equalTo(1)));
     }
-
+    
     @Test
     public void should_04_GetStoredPasswordById() {
         final StoredPassword result = STORED_PASSWORD_DAO.getStoredPassword(1);
@@ -94,7 +97,7 @@ public class StoredPasswordMybatisDaoTest {
         assertThat(result.getProfileName(), is(equalTo(TV_MP_PROFILE_NAME + 1)));
         assertThat(result.getCreatedAt(), is(greaterThan(DateUtils.addSeconds(new Date(), -10))));
     }
-
+    
     @Test
     public void should_05_GetStoredPasswordsByMasterPassword() {
         final MasterPassword toUse = generateMasterPassword(1);
@@ -103,7 +106,7 @@ public class StoredPasswordMybatisDaoTest {
         assertThat(result.size(), is(equalTo(1)));
         assertThat(result.get(0).getId(), is(equalTo(1)));
     }
-
+    
     @Test
     public void should_06_UpdateStoredPassword() {
         final StoredPassword toUpdate = generateStoredPassword(1, 1);
@@ -113,7 +116,7 @@ public class StoredPasswordMybatisDaoTest {
         assertThat(result, is(not(nullValue())));
         assertThat(result, is(equalTo(1)));
     }
-
+    
     @Test
     public void should_07_DeleteStoredPassword() {
         final StoredPassword toUpdate = generateStoredPassword(1, 1);

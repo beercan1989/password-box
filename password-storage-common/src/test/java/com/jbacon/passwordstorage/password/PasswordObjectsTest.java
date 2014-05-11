@@ -14,26 +14,29 @@ import org.junit.Test;
 import com.jbacon.passwordstorage.encryption.EncryptionType;
 
 public class PasswordObjectsTest {
-
+    
     private static final String PASSWORD_NAME = "password Name";
     private static final String PASSWORD_NOTES = "Password Notes";
     private static final String PASSWORD = "password";
     private static final String SALT = "salt";
     private static final String ENCRYPTED_SECRET_KEY = "encryptedSecretKey";
     private static final String PROFILE_NAME = "profileName";
-
+    
+    @SuppressWarnings("deprecation")
+    private static final EncryptionType MD5_DES_PBE = EncryptionType.PBE_WITH_MD5_AND_DES;
+    private static final EncryptionType AES_SYMMETRIC = EncryptionType.AES_128;
+    
     private static Date getCreatedAt() {
         return new Date(0);
     }
-
+    
     private static Date getUpdatedAt() {
         return new Date(0);
     }
-
+    
     @Test
     public void shouldCreateAFilledInMasterPassword() {
-        final MasterPassword masterPassword = new MasterPassword(PROFILE_NAME, ENCRYPTED_SECRET_KEY, SALT,
-                getCreatedAt(), getUpdatedAt(), 1, EncryptionType.AES_256, EncryptionType.PBE_WITH_MD5_AND_DES);
+        final MasterPassword masterPassword = new MasterPassword(PROFILE_NAME, ENCRYPTED_SECRET_KEY, SALT, getCreatedAt(), getUpdatedAt(), 1, MD5_DES_PBE, AES_SYMMETRIC);
         assertThat(masterPassword, is(not(nullValue())));
         assertThat(masterPassword.getCreatedAt(), is(equalTo(getCreatedAt())));
         assertThat(masterPassword.getUpdatedAt(), is(equalTo(getUpdatedAt())));
@@ -42,11 +45,10 @@ public class PasswordObjectsTest {
         assertThat(masterPassword.getEncryptedSecretKey(), is(equalTo(ENCRYPTED_SECRET_KEY)));
         assertThat(masterPassword.getSalt(), is(equalTo(SALT)));
     }
-
+    
     @Test
     public void shouldCreateAFilledInStoredPassword() {
-        final StoredPassword storedPassword = new StoredPassword(PASSWORD_NAME, PROFILE_NAME, PASSWORD, PASSWORD_NOTES,
-                getCreatedAt(), getUpdatedAt(), 1);
+        final StoredPassword storedPassword = new StoredPassword(PASSWORD_NAME, PROFILE_NAME, PASSWORD, PASSWORD_NOTES, getCreatedAt(), getUpdatedAt(), 1);
         assertThat(storedPassword, is(not(nullValue())));
         assertThat(storedPassword.getCreatedAt(), is(equalTo(getCreatedAt())));
         assertThat(storedPassword.getUpdatedAt(), is(equalTo(getUpdatedAt())));
@@ -56,7 +58,7 @@ public class PasswordObjectsTest {
         assertThat(storedPassword.getEncryptedPasswordNotes(), is(equalTo(PASSWORD_NOTES)));
         assertThat(storedPassword.getEncryptedPassword(), is(equalTo(PASSWORD)));
     }
-
+    
     @Test
     public void shouldCreateBlankMasterPassword() {
         final MasterPassword masterPassword = new MasterPassword();
@@ -67,14 +69,14 @@ public class PasswordObjectsTest {
         assertThat(masterPassword.getProfileName(), is(nullValue()));
         assertThat(masterPassword.getEncryptedSecretKey(), is(nullValue()));
         assertThat(masterPassword.getSalt(), is(nullValue()));
-
+        
         masterPassword.setCreatedAt(getCreatedAt());
         masterPassword.setUpdatedAt(getUpdatedAt());
         masterPassword.setEncryptedSecretKey(ENCRYPTED_SECRET_KEY);
         masterPassword.setId(1);
         masterPassword.setProfileName(PROFILE_NAME);
         masterPassword.setSalt(SALT);
-
+        
         assertThat(masterPassword.getCreatedAt(), is(equalTo(getCreatedAt())));
         assertThat(masterPassword.getUpdatedAt(), is(equalTo(getUpdatedAt())));
         assertThat(masterPassword.getId(), is(equalTo(1)));
@@ -82,7 +84,7 @@ public class PasswordObjectsTest {
         assertThat(masterPassword.getEncryptedSecretKey(), is(equalTo(ENCRYPTED_SECRET_KEY)));
         assertThat(masterPassword.getSalt(), is(equalTo(SALT)));
     }
-
+    
     @Test
     public void shouldCreateBlankMasterStoredPassword() {
         final StoredPassword storedPassword = new StoredPassword();
@@ -94,7 +96,7 @@ public class PasswordObjectsTest {
         assertThat(storedPassword.getEncryptedPasswordName(), is(nullValue()));
         assertThat(storedPassword.getEncryptedPasswordNotes(), is(nullValue()));
         assertThat(storedPassword.getEncryptedPassword(), is(nullValue()));
-
+        
         storedPassword.setCreatedAt(getCreatedAt());
         storedPassword.setUpdatedAt(getUpdatedAt());
         storedPassword.setId(1);
@@ -102,7 +104,7 @@ public class PasswordObjectsTest {
         storedPassword.setEncryptedPassword(PASSWORD);
         storedPassword.setEncryptedPasswordName(PASSWORD_NAME);
         storedPassword.setEncryptedPasswordNotes(PASSWORD_NOTES);
-
+        
         assertThat(storedPassword.getCreatedAt(), is(equalTo(getCreatedAt())));
         assertThat(storedPassword.getUpdatedAt(), is(equalTo(getUpdatedAt())));
         assertThat(storedPassword.getId(), is(equalTo(1)));
@@ -111,12 +113,12 @@ public class PasswordObjectsTest {
         assertThat(storedPassword.getEncryptedPasswordNotes(), is(equalTo(PASSWORD_NOTES)));
         assertThat(storedPassword.getEncryptedPassword(), is(equalTo(PASSWORD)));
     }
-
+    
     @Test
     public void shouldHaveCustomToString() {
         final StoredPassword storedPassword = new StoredPassword();
         final MasterPassword masterPassword = new MasterPassword();
-
+        
         assertThat(storedPassword.toString(), is(not(nullValue())));
         assertThat(storedPassword.toString(), containsString("encryptedPasswordName"));
         assertThat(masterPassword.toString(), is(not(nullValue())));

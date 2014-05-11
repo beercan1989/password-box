@@ -9,10 +9,11 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.crypto.DataLengthException;
+import org.bouncycastle.crypto.InvalidCipherTextException;
 
 import com.jbacon.passwordstorage.database.dao.MasterPasswordsDao;
 import com.jbacon.passwordstorage.encryption.EncryptionType;
-import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.models.FluidEntity;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.swing.panels.NewMasterPasswordPanel;
@@ -43,7 +44,7 @@ public class NewProfileFunction implements ActionListener, AnnonymousFunction {
     public void apply() {
         try {
             applyWithException();
-        } catch (final AbstractEncrypterException e) {
+        } catch (final Exception e) {
             JOptionUtil.errorMessage("An error occured when the creation of your new profile.", "Profile Creation Error", e);
         } finally {
             if (updateAvailableProfiles.isSet()) {
@@ -55,7 +56,7 @@ public class NewProfileFunction implements ActionListener, AnnonymousFunction {
         }
     }
     
-    private void applyWithException() throws AbstractEncrypterException {
+    private void applyWithException() throws DataLengthException, IllegalStateException, InvalidCipherTextException {
         LOG.debug("Creating a new Profile");
         final NewMasterPasswordPanel newProfile = new NewMasterPasswordPanel();
         if (JOptionUtil.showDefaultInputWindow(newProfile, "New Profile") == OK_OPTION) {
@@ -83,7 +84,7 @@ public class NewProfileFunction implements ActionListener, AnnonymousFunction {
     }
     
     private boolean validateNewProfile(final MasterPassword profile) {
-        final boolean encryptionTypesValid = EncryptionType.areValid(profile.getMasterPasswordEncryptionType(), profile.getStoredPasswordEncryptionType());
+        final boolean encryptionTypesValid = EncryptionType.areValid(profile.getMasterPasswordEncryptionType(), profile.getStoredPasswordsEncryptionType());
         final boolean areNotEmpty = StringUtil.areNotEmpty(profile.getEncryptedSecretKey(), profile.getProfileName(), profile.getSalt());
         
         if (encryptionTypesValid && areNotEmpty) {

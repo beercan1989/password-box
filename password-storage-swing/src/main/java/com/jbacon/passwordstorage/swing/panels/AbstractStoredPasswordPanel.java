@@ -15,25 +15,26 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 
 import org.apache.commons.codec.DecoderException;
+import org.bouncycastle.crypto.DataLengthException;
+import org.bouncycastle.crypto.InvalidCipherTextException;
 
-import com.jbacon.passwordstorage.encryption.errors.AbstractEncrypterException;
 import com.jbacon.passwordstorage.models.FluidEntity;
 import com.jbacon.passwordstorage.password.MasterPassword;
 import com.jbacon.passwordstorage.password.StoredPassword;
 import com.jbacon.passwordstorage.utils.PasswordEncryptionUtil;
 
 public class AbstractStoredPasswordPanel extends JPanel {
-
+    
     private static final long serialVersionUID = 7935700589519594046L;
-
+    
     private static final AbstractBorder TEXT_AREA_BORDER = new EtchedBorder(EtchedBorder.LOWERED, null, null);
     private static final Insets TEXT_AREA_MARGIN = new Insets(1, 5, 1, 5);
-
+    
     private final FluidEntity<MasterPassword> activeProfile;
     private final FluidEntity<String> currentPassword;
-
+    
     protected final StoredPassword password;
-
+    
     protected final JLabel passwordNameJLabel;
     protected final JLabel passwordIdJLabel;
     protected final JLabel profileNameJLabel;
@@ -49,13 +50,13 @@ public class AbstractStoredPasswordPanel extends JPanel {
     protected final JTextArea createdAtJTextArea;
     protected final JTextArea passwordNotesJTextArea;
     protected final JLabel titleJLabel;
-
+    
     public AbstractStoredPasswordPanel(final StoredPassword password, final String titleLabel, final FluidEntity<MasterPassword> activeProfile,
             final FluidEntity<String> currentPassword) {
         this.password = password;
         this.activeProfile = activeProfile;
         this.currentPassword = currentPassword;
-
+        
         setBorder(new EmptyBorder(10, 10, 10, 10));
         final GridBagLayout gridBagLayout = new GridBagLayout();
         gridBagLayout.columnWidths = new int[] { 0, 0, 0 };
@@ -63,7 +64,7 @@ public class AbstractStoredPasswordPanel extends JPanel {
         gridBagLayout.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
         gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
         setLayout(gridBagLayout);
-
+        
         titleJLabel = new JLabel(titleLabel);
         titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
         final GridBagConstraints gbc_titleJLabel = new GridBagConstraints();
@@ -72,7 +73,7 @@ public class AbstractStoredPasswordPanel extends JPanel {
         gbc_titleJLabel.gridx = 0;
         gbc_titleJLabel.gridy = 0;
         add(titleJLabel, gbc_titleJLabel);
-
+        
         passwordIdJLabel = new JLabel("Password ID");
         final GridBagConstraints gbc_passwordIdJLabel = new GridBagConstraints();
         gbc_passwordIdJLabel.anchor = GridBagConstraints.EAST;
@@ -81,7 +82,7 @@ public class AbstractStoredPasswordPanel extends JPanel {
         gbc_passwordIdJLabel.gridx = 0;
         gbc_passwordIdJLabel.gridy = 1;
         add(passwordIdJLabel, gbc_passwordIdJLabel);
-
+        
         passwordIdJTextArea = new JTextArea();
         passwordIdJTextArea.setWrapStyleWord(true);
         passwordIdJTextArea.setLineWrap(true);
@@ -95,7 +96,7 @@ public class AbstractStoredPasswordPanel extends JPanel {
         gbc_passwordIdJTextArea.gridy = 1;
         add(passwordIdJTextArea, gbc_passwordIdJTextArea);
         passwordIdJTextArea.setColumns(10);
-
+        
         profileNameJLabel = new JLabel("Profile Name");
         final GridBagConstraints gbc_profileNameJLabel = new GridBagConstraints();
         gbc_profileNameJLabel.anchor = GridBagConstraints.EAST;
@@ -104,7 +105,7 @@ public class AbstractStoredPasswordPanel extends JPanel {
         gbc_profileNameJLabel.gridx = 0;
         gbc_profileNameJLabel.gridy = 2;
         add(profileNameJLabel, gbc_profileNameJLabel);
-
+        
         profileNameJTextArea = new JTextArea();
         profileNameJTextArea.setWrapStyleWord(true);
         profileNameJTextArea.setLineWrap(true);
@@ -117,7 +118,7 @@ public class AbstractStoredPasswordPanel extends JPanel {
         gbc_profileNameJTextArea.gridx = 1;
         gbc_profileNameJTextArea.gridy = 2;
         add(profileNameJTextArea, gbc_profileNameJTextArea);
-
+        
         updatedAtJLabel = new JLabel("Updated At");
         final GridBagConstraints gbc_updatedAtJLabel = new GridBagConstraints();
         gbc_updatedAtJLabel.anchor = GridBagConstraints.EAST;
@@ -126,7 +127,7 @@ public class AbstractStoredPasswordPanel extends JPanel {
         gbc_updatedAtJLabel.gridx = 0;
         gbc_updatedAtJLabel.gridy = 3;
         add(updatedAtJLabel, gbc_updatedAtJLabel);
-
+        
         updatedAtJTextArea = new JTextArea();
         updatedAtJTextArea.setWrapStyleWord(true);
         updatedAtJTextArea.setLineWrap(true);
@@ -140,7 +141,7 @@ public class AbstractStoredPasswordPanel extends JPanel {
         gbc_updatedAtJTextArea.gridy = 3;
         add(updatedAtJTextArea, gbc_updatedAtJTextArea);
         updatedAtJTextArea.setText(password.getUpdatedAtAsString());
-
+        
         createdAtJLabel = new JLabel("Created At");
         final GridBagConstraints gbc_createdAtJLabel = new GridBagConstraints();
         gbc_createdAtJLabel.anchor = GridBagConstraints.EAST;
@@ -149,7 +150,7 @@ public class AbstractStoredPasswordPanel extends JPanel {
         gbc_createdAtJLabel.gridx = 0;
         gbc_createdAtJLabel.gridy = 4;
         add(createdAtJLabel, gbc_createdAtJLabel);
-
+        
         createdAtJTextArea = new JTextArea();
         createdAtJTextArea.setWrapStyleWord(true);
         createdAtJTextArea.setLineWrap(true);
@@ -163,7 +164,7 @@ public class AbstractStoredPasswordPanel extends JPanel {
         gbc_createdAtJTextArea.gridy = 4;
         add(createdAtJTextArea, gbc_createdAtJTextArea);
         createdAtJTextArea.setText(password.getCreatedAtAsString());
-
+        
         passwordNameJLabel = new JLabel("Password Name");
         final GridBagConstraints gbc_passwordNameJLabel = new GridBagConstraints();
         gbc_passwordNameJLabel.anchor = GridBagConstraints.EAST;
@@ -172,7 +173,7 @@ public class AbstractStoredPasswordPanel extends JPanel {
         gbc_passwordNameJLabel.gridx = 0;
         gbc_passwordNameJLabel.gridy = 5;
         add(passwordNameJLabel, gbc_passwordNameJLabel);
-
+        
         passwordNameJTextArea = new JTextArea();
         passwordNameJTextArea.setWrapStyleWord(true);
         passwordNameJTextArea.setLineWrap(true);
@@ -185,7 +186,7 @@ public class AbstractStoredPasswordPanel extends JPanel {
         gbc_passwordNameJTextArea.gridx = 1;
         gbc_passwordNameJTextArea.gridy = 5;
         add(passwordNameJTextArea, gbc_passwordNameJTextArea);
-
+        
         passwordJLabel = new JLabel("Password");
         final GridBagConstraints gbc_passwordJLabel = new GridBagConstraints();
         gbc_passwordJLabel.anchor = GridBagConstraints.EAST;
@@ -194,7 +195,7 @@ public class AbstractStoredPasswordPanel extends JPanel {
         gbc_passwordJLabel.gridx = 0;
         gbc_passwordJLabel.gridy = 6;
         add(passwordJLabel, gbc_passwordJLabel);
-
+        
         passwordJTextArea = new JTextArea();
         passwordJTextArea.setWrapStyleWord(true);
         passwordJTextArea.setLineWrap(true);
@@ -207,7 +208,7 @@ public class AbstractStoredPasswordPanel extends JPanel {
         gbc_passwordJTextArea.gridx = 1;
         gbc_passwordJTextArea.gridy = 6;
         add(passwordJTextArea, gbc_passwordJTextArea);
-
+        
         passwordNotesJLabel = new JLabel("Password Notes");
         final GridBagConstraints gbc_passwordNotesJLabel = new GridBagConstraints();
         gbc_passwordNotesJLabel.anchor = GridBagConstraints.NORTHEAST;
@@ -215,7 +216,7 @@ public class AbstractStoredPasswordPanel extends JPanel {
         gbc_passwordNotesJLabel.gridx = 0;
         gbc_passwordNotesJLabel.gridy = 7;
         add(passwordNotesJLabel, gbc_passwordNotesJLabel);
-
+        
         passwordNotesJTextArea = new JTextArea();
         passwordNotesJTextArea.setWrapStyleWord(true);
         passwordNotesJTextArea.setLineWrap(true);
@@ -227,20 +228,21 @@ public class AbstractStoredPasswordPanel extends JPanel {
         gbc_textArea.gridx = 1;
         gbc_textArea.gridy = 7;
         add(passwordNotesJTextArea, gbc_textArea);
-
+        
         final Dimension preferedSize = new Dimension(600, 400);
         this.setPreferredSize(preferedSize);
         this.setMinimumSize(preferedSize);
     }
-
-    protected void setupPasswordDetails(final boolean doDecryption) throws UnsupportedEncodingException, DecoderException, AbstractEncrypterException {
-
+    
+    protected void setupPasswordDetails(final boolean doDecryption) throws UnsupportedEncodingException, DecoderException, DataLengthException, IllegalStateException,
+            InvalidCipherTextException {
+        
         passwordIdJTextArea.setText(password.getId().toString());
         profileNameJTextArea.setText(password.getProfileName());
-
+        
         final MasterPassword profile = getProfile();
         final String currentPassword = getCurrentPassword();
-
+        
         if (doDecryption) {
             passwordNameJTextArea.setText(PasswordEncryptionUtil.getDecrypted(password.getEncryptedPasswordName(), profile, currentPassword));
             passwordJTextArea.setText(PasswordEncryptionUtil.getDecrypted(password.getEncryptedPassword(), profile, currentPassword));
@@ -254,11 +256,11 @@ public class AbstractStoredPasswordPanel extends JPanel {
             passwordNotesJTextArea.setEnabled(false);
         }
     }
-
+    
     protected MasterPassword getProfile() {
         return activeProfile.get();
     }
-
+    
     protected String getCurrentPassword() {
         return currentPassword.get();
     }
