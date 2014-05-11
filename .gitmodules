@@ -1,0 +1,3 @@
+[submodule "cipher-utils"]
+	path = cipher-utils
+	url = https://code.google.com/p/cipher-utils/
