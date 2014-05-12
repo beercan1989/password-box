@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.jbacon.passwordstorage.database.dao.MaintenanceDao;
 import com.jbacon.passwordstorage.database.dao.MasterPasswordsDao;
 import com.jbacon.passwordstorage.database.dao.StoredPasswordsDao;
+import com.jbacon.passwordstorage.database.errors.UnsupportedDatabaseException;
 
 public enum DatabaseType implements Database {
     Android,
@@ -12,17 +13,17 @@ public enum DatabaseType implements Database {
     Blackberry;
 
     @Override
-    public MaintenanceDao createMaintenanceDao() throws IOException {
-        throw new RuntimeException("Database type has not been implemented yet.");
+    public MaintenanceDao createMaintenanceDao() throws IOException, UnsupportedDatabaseException {
+        throw new UnsupportedDatabaseException("Database type has not been implemented yet.");
     }
 
     @Override
-    public MasterPasswordsDao createMasterPasswordDao() throws IOException {
-        throw new RuntimeException("Database type has not been implemented yet.");
+    public MasterPasswordsDao createMasterPasswordDao() throws IOException, UnsupportedDatabaseException {
+        throw new UnsupportedDatabaseException("Database type has not been implemented yet.");
     }
 
     @Override
-    public StoredPasswordsDao createStoredPasswordDao() throws IOException {
-        throw new RuntimeException("Database type has not been implemented yet.");
+    public StoredPasswordsDao createStoredPasswordDao() throws IOException, UnsupportedDatabaseException {
+        throw new UnsupportedDatabaseException("Database type has not been implemented yet.");
     }
 }
