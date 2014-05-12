@@ -27,6 +27,7 @@
 	</properties>
 
 	<modules>
+		<module>cipher-utils</module>
 		<module>password-storage-common</module>
 		<module>password-storage-database-mybatis</module>
 		<module>password-storage-swing</module>
